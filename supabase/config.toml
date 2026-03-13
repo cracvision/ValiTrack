@@ -2,3 +2,4 @@ project_id = "ulhtyjrohwephsvejtxk"
 
 [functions.admin-manage-users]
 verify_jwt = false
+
