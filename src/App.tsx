@@ -3,8 +3,15 @@ import { BrowserRouter, Route, Routes } from "react-router-dom";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { Toaster } from "@/components/ui/toaster";
 import { TooltipProvider } from "@/components/ui/tooltip";
-import Index from "./pages/Index.tsx";
-import NotFound from "./pages/NotFound.tsx";
+import { Layout } from "@/components/Layout";
+import Dashboard from "./pages/Dashboard";
+import SystemProfiles from "./pages/SystemProfiles";
+import ReviewCases from "./pages/ReviewCases";
+import EvidenceVault from "./pages/EvidenceVault";
+import FindingsActions from "./pages/FindingsActions";
+import Reports from "./pages/Reports";
+import AuditLog from "./pages/AuditLog";
+import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
 
@@ -14,11 +21,18 @@ const App = () => (
       <Toaster />
       <Sonner />
       <BrowserRouter>
-        <Routes>
-          <Route path="/" element={<Index />} />
-          {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
-          <Route path="*" element={<NotFound />} />
-        </Routes>
+        <Layout>
+          <Routes>
+            <Route path="/" element={<Dashboard />} />
+            <Route path="/systems" element={<SystemProfiles />} />
+            <Route path="/reviews" element={<ReviewCases />} />
+            <Route path="/evidence" element={<EvidenceVault />} />
+            <Route path="/findings" element={<FindingsActions />} />
+            <Route path="/reports" element={<Reports />} />
+            <Route path="/audit-log" element={<AuditLog />} />
+            <Route path="*" element={<NotFound />} />
+          </Routes>
+        </Layout>
       </BrowserRouter>
     </TooltipProvider>
   </QueryClientProvider>
