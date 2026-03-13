@@ -11,7 +11,7 @@ export type FindingStatus = 'Open' | 'In Progress' | 'Closed';
 export type ActionItemStatus = 'Open' | 'In Progress' | 'Completed' | 'Verified';
 export type EvidenceCategory = 'SOP' | 'Change Control' | 'Validation Report' | 'Audit Report' | 'Training Record' | 'Other';
 
-export type AppRole = 'AppAdmin' | 'QA' | 'SystemOwner' | 'Viewer';
+export type AppRole = 'super_user' | 'system_owner' | 'system_administrator' | 'business_owner' | 'quality_assurance';
 
 export interface SystemProfile {
   id: string;
