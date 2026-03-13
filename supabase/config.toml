@@ -3,5 +3,3 @@ project_id = "ulhtyjrohwephsvejtxk"
 [functions.admin-manage-users]
 verify_jwt = false
 
-[functions.bootstrap-admin]
-verify_jwt = false
