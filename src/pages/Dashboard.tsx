@@ -1,55 +1,100 @@
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
-import { Server, ClipboardCheck, AlertTriangle, CheckCircle } from 'lucide-react';
-import { mockSystems, mockReviewCases, mockFindings } from '@/data/mockData';
+import { Button } from '@/components/ui/button';
+import { Server, ClipboardCheck, AlertTriangle, CalendarClock, Plus } from 'lucide-react';
+import { useLocalStorage } from '@/hooks/useLocalStorage';
+import { useNavigate } from 'react-router-dom';
+import type { SystemProfile } from '@/types';
 
-const stats = [
-  {
-    title: 'Active Systems',
-    value: mockSystems.filter((s) => s.status === 'Active').length,
-    icon: Server,
-    description: 'Under validated state',
-  },
-  {
-    title: 'Open Reviews',
-    value: mockReviewCases.filter((r) => r.status !== 'Completed').length,
-    icon: ClipboardCheck,
-    description: 'Draft, Under Review, or Pending QA',
-  },
-  {
-    title: 'Open Findings',
-    value: mockFindings.filter((f) => f.status !== 'Closed').length,
-    icon: AlertTriangle,
-    description: 'Requiring attention',
-  },
-  {
-    title: 'Completed Reviews',
-    value: mockReviewCases.filter((r) => r.status === 'Completed').length,
-    icon: CheckCircle,
-    description: 'Successfully closed',
-  },
-];
-
-const statusColor: Record<string, string> = {
-  Draft: 'bg-muted text-muted-foreground',
-  'Under Review': 'bg-primary/10 text-primary',
-  'Pending QA': 'bg-orange-100 text-orange-700',
-  Completed: 'bg-green-100 text-green-700',
+const classificationColor: Record<string, string> = {
+  'GxP Critical': 'bg-destructive/10 text-destructive',
+  'GxP Non-Critical': 'bg-orange-100 text-orange-700',
+  'Non-GxP': 'bg-muted text-muted-foreground',
 };
 
-const severityColor: Record<string, string> = {
-  Critical: 'bg-destructive/10 text-destructive',
-  Major: 'bg-orange-100 text-orange-700',
-  Minor: 'bg-yellow-100 text-yellow-700',
-  Observation: 'bg-muted text-muted-foreground',
+const statusColor: Record<string, string> = {
+  Active: 'bg-green-100 text-green-700',
+  Retired: 'bg-muted text-muted-foreground',
+  'Under Validation': 'bg-primary/10 text-primary',
 };
 
 export default function Dashboard() {
-  const upcomingReviews = mockReviewCases
-    .filter((r) => r.status !== 'Completed')
-    .sort((a, b) => new Date(a.due_date).getTime() - new Date(b.due_date).getTime());
+  const [systems] = useLocalStorage<SystemProfile[]>('gxp_systems', []);
+  const navigate = useNavigate();
 
-  const openFindings = mockFindings.filter((f) => f.status !== 'Closed');
+  const activeSystems = systems.filter((s) => s.status === 'Active');
+  const gxpCritical = systems.filter((s) => s.gxp_classification === 'GxP Critical');
+  const highRisk = systems.filter((s) => s.risk_level === 'High');
+
+  // Systems with reviews due in the next 90 days
+  const now = new Date();
+  const in90Days = new Date();
+  in90Days.setDate(in90Days.getDate() + 90);
+  const upcomingReviews = systems
+    .filter((s) => {
+      const reviewDate = new Date(s.next_review_date);
+      return s.status === 'Active' && reviewDate >= now && reviewDate <= in90Days;
+    })
+    .sort((a, b) => new Date(a.next_review_date).getTime() - new Date(b.next_review_date).getTime());
+
+  // Systems with overdue reviews
+  const overdueReviews = systems.filter((s) => {
+    return s.status === 'Active' && new Date(s.next_review_date) < now;
+  });
+
+  const stats = [
+    {
+      title: 'Total Systems',
+      value: systems.length,
+      icon: Server,
+      description: `${activeSystems.length} active`,
+    },
+    {
+      title: 'GxP Critical',
+      value: gxpCritical.length,
+      icon: AlertTriangle,
+      description: 'Requiring periodic review',
+    },
+    {
+      title: 'High Risk',
+      value: highRisk.length,
+      icon: ClipboardCheck,
+      description: 'Enhanced oversight required',
+    },
+    {
+      title: 'Reviews Due (90d)',
+      value: upcomingReviews.length + overdueReviews.length,
+      icon: CalendarClock,
+      description: overdueReviews.length > 0 ? `${overdueReviews.length} overdue` : 'On schedule',
+    },
+  ];
+
+  if (systems.length === 0) {
+    return (
+      <div className="space-y-6">
+        <div>
+          <h1 className="text-2xl font-bold text-foreground">Dashboard</h1>
+          <p className="text-sm text-muted-foreground">
+            GxP Computerized System Periodic Review Management
+          </p>
+        </div>
+        <Card>
+          <CardContent className="flex flex-col items-center justify-center py-20">
+            <Server className="h-16 w-16 text-muted-foreground/30 mb-4" />
+            <h2 className="text-xl font-semibold text-foreground mb-2">Welcome to GxP Periodic Review</h2>
+            <p className="text-sm text-muted-foreground text-center max-w-md mb-6">
+              Start by registering your first computerized system. Once registered, you can track
+              validation status, schedule periodic reviews, and manage compliance documentation.
+            </p>
+            <Button onClick={() => navigate('/systems')}>
+              <Plus className="mr-2 h-4 w-4" />
+              Register First System
+            </Button>
+          </CardContent>
+        </Card>
+      </div>
+    );
+  }
 
   return (
     <div className="space-y-6">
@@ -79,56 +124,88 @@ export default function Dashboard() {
       </div>
 
       <div className="grid gap-6 lg:grid-cols-2">
+        {/* Overdue Reviews */}
+        {overdueReviews.length > 0 && (
+          <Card className="border-destructive/30">
+            <CardHeader>
+              <CardTitle className="text-base text-destructive flex items-center gap-2">
+                <AlertTriangle className="h-4 w-4" />
+                Overdue Reviews
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="space-y-3">
+                {overdueReviews.map((system) => (
+                  <div key={system.id} className="flex items-center justify-between rounded-lg border border-destructive/20 bg-destructive/5 p-3">
+                    <div className="space-y-1">
+                      <p className="text-sm font-medium text-foreground">{system.name}</p>
+                      <p className="text-xs text-muted-foreground">
+                        Was due: {new Date(system.next_review_date).toLocaleDateString()} · {system.owner_name}
+                      </p>
+                    </div>
+                    <Badge variant="secondary" className={classificationColor[system.gxp_classification]}>
+                      {system.gxp_classification}
+                    </Badge>
+                  </div>
+                ))}
+              </div>
+            </CardContent>
+          </Card>
+        )}
+
         {/* Upcoming Reviews */}
         <Card>
           <CardHeader>
-            <CardTitle className="text-base">Upcoming Reviews</CardTitle>
+            <CardTitle className="text-base">Upcoming Reviews (Next 90 Days)</CardTitle>
           </CardHeader>
           <CardContent>
-            <div className="space-y-3">
-              {upcomingReviews.map((review) => (
-                <div
-                  key={review.id}
-                  className="flex items-center justify-between rounded-lg border border-border p-3"
-                >
-                  <div className="space-y-1">
-                    <p className="text-sm font-medium text-foreground">{review.system_name}</p>
-                    <p className="text-xs text-muted-foreground">
-                      Due: {new Date(review.due_date).toLocaleDateString()} · {review.reviewer_name}
-                    </p>
+            {upcomingReviews.length === 0 ? (
+              <p className="text-sm text-muted-foreground py-4 text-center">No reviews due in the next 90 days.</p>
+            ) : (
+              <div className="space-y-3">
+                {upcomingReviews.map((system) => (
+                  <div key={system.id} className="flex items-center justify-between rounded-lg border border-border p-3">
+                    <div className="space-y-1">
+                      <p className="text-sm font-medium text-foreground">{system.name}</p>
+                      <p className="text-xs text-muted-foreground">
+                        Due: {new Date(system.next_review_date).toLocaleDateString()} · {system.owner_name}
+                      </p>
+                    </div>
+                    <Badge variant="secondary" className={statusColor[system.status]}>
+                      {system.status}
+                    </Badge>
                   </div>
-                  <Badge variant="secondary" className={statusColor[review.status]}>
-                    {review.status}
-                  </Badge>
-                </div>
-              ))}
-            </div>
+                ))}
+              </div>
+            )}
           </CardContent>
         </Card>
 
-        {/* Open Findings */}
+        {/* Registered Systems */}
         <Card>
           <CardHeader>
-            <CardTitle className="text-base">Open Findings</CardTitle>
+            <CardTitle className="text-base">Registered Systems</CardTitle>
           </CardHeader>
           <CardContent>
             <div className="space-y-3">
-              {openFindings.map((finding) => (
-                <div
-                  key={finding.id}
-                  className="flex items-center justify-between rounded-lg border border-border p-3"
-                >
-                  <div className="space-y-1 flex-1 mr-3">
-                    <p className="text-sm font-medium text-foreground">{finding.system_name}</p>
-                    <p className="text-xs text-muted-foreground line-clamp-1">
-                      {finding.description}
+              {systems.slice(0, 6).map((system) => (
+                <div key={system.id} className="flex items-center justify-between rounded-lg border border-border p-3">
+                  <div className="space-y-1">
+                    <p className="text-sm font-medium text-foreground">{system.name}</p>
+                    <p className="text-xs text-muted-foreground">
+                      {system.system_identifier} · {system.system_category} · {system.vendor_name}
                     </p>
                   </div>
-                  <Badge variant="secondary" className={severityColor[finding.severity]}>
-                    {finding.severity}
+                  <Badge variant="secondary" className={classificationColor[system.gxp_classification]}>
+                    {system.gxp_classification}
                   </Badge>
                 </div>
               ))}
+              {systems.length > 6 && (
+                <Button variant="link" className="w-full text-xs" onClick={() => navigate('/systems')}>
+                  View all {systems.length} systems →
+                </Button>
+              )}
             </div>
           </CardContent>
         </Card>

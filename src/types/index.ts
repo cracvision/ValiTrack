@@ -1,5 +1,6 @@
 // GxP Periodic Review - Domain Types
 
+export type SystemCategory = 'LIMS' | 'ERP' | 'DCS' | 'MES' | 'QMS' | 'DMS' | 'SCADA' | 'CDS' | 'ELN' | 'Other';
 export type GxPClassification = 'GxP Critical' | 'GxP Non-Critical' | 'Non-GxP';
 export type RiskLevel = 'High' | 'Medium' | 'Low';
 export type SystemStatus = 'Active' | 'Retired' | 'Under Validation';
@@ -15,15 +16,23 @@ export type AppRole = 'AppAdmin' | 'QA' | 'SystemOwner' | 'Viewer';
 export interface SystemProfile {
   id: string;
   name: string;
+  system_identifier: string;
+  system_category: SystemCategory;
   description: string;
-  vendor: string;
+  intended_use: string;
   gxp_classification: GxPClassification;
   risk_level: RiskLevel;
+  status: SystemStatus;
+  vendor_name: string;
+  vendor_contact: string;
+  vendor_contract_ref: string;
   owner_id: string;
   owner_name: string;
-  status: SystemStatus;
   validation_date: string;
+  review_period_months: number;
   next_review_date: string;
+  created_at: string;
+  updated_at: string;
 }
 
 export interface ReviewCase {
