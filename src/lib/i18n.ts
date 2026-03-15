@@ -1,10 +1,10 @@
 import i18n from 'i18next';
 import { initReactI18next } from 'react-i18next';
 
-import commonEs from '../../public/locales/es/common.json';
-import authEs from '../../public/locales/es/auth.json';
-import commonEn from '../../public/locales/en/common.json';
-import authEn from '../../public/locales/en/auth.json';
+import commonEs from '../locales/es/common.json';
+import authEs from '../locales/es/auth.json';
+import commonEn from '../locales/en/common.json';
+import authEn from '../locales/en/auth.json';
 
 i18n.use(initReactI18next).init({
   resources: {

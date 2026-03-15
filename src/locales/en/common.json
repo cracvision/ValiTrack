@@ -1,0 +1,180 @@
+{
+  "app": {
+    "name": "GxP Review",
+    "subtitle": "Periodic Review Manager",
+    "headerTitle": "GxP Periodic Review Management"
+  },
+  "nav": {
+    "main": "Main",
+    "compliance": "Compliance",
+    "administration": "Administration",
+    "dashboard": "Dashboard",
+    "systemProfiles": "System Profiles",
+    "reviewCases": "Review Cases",
+    "evidenceVault": "Evidence Vault",
+    "findingsActions": "Findings & Actions",
+    "reports": "Reports",
+    "auditLog": "Audit Log",
+    "userManagement": "User Management"
+  },
+  "sidebar": {
+    "signOut": "Sign out",
+    "loading": "Loading...",
+    "noRole": "No Role"
+  },
+  "dashboard": {
+    "title": "Dashboard",
+    "subtitle": "GxP Computerized System Periodic Review Management",
+    "welcome": "Welcome to GxP Periodic Review",
+    "welcomeDesc": "Start by registering your first computerized system. Once registered, you can track validation status, schedule periodic reviews, and manage compliance documentation.",
+    "registerFirst": "Register First System",
+    "overviewSubtitle": "Overview of computerized system periodic review status",
+    "totalSystems": "Total Systems",
+    "active": "{{count}} active",
+    "gxpCritical": "GxP Critical",
+    "requireReview": "Requiring periodic review",
+    "highRisk": "High Risk",
+    "enhancedOversight": "Enhanced oversight required",
+    "reviewsDue90": "Reviews Due (90d)",
+    "overdue": "{{count}} overdue",
+    "onSchedule": "On schedule",
+    "overdueReviews": "Overdue Reviews",
+    "upcomingReviews": "Upcoming Reviews (Next 90 Days)",
+    "noReviewsDue": "No reviews due in the next 90 days.",
+    "wasDue": "Was due: {{date}} · {{owner}}",
+    "due": "Due: {{date}} · {{owner}}",
+    "registeredSystems": "Registered Systems",
+    "viewAll": "View all {{count}} systems →"
+  },
+  "pages": {
+    "reviewCases": {
+      "title": "Review Cases",
+      "subtitle": "Periodic review workflow management",
+      "placeholder": "Review Cases workflow — coming in Iteration 3"
+    },
+    "evidenceVault": {
+      "title": "Evidence Vault",
+      "subtitle": "Secure document repository with integrity verification",
+      "placeholder": "Evidence Vault — coming in Iteration 4"
+    },
+    "findingsActions": {
+      "title": "Findings & Actions",
+      "subtitle": "Track findings, CAPAs, and corrective actions",
+      "placeholder": "Findings & Actions — coming in Iteration 5"
+    },
+    "reports": {
+      "title": "Reports",
+      "subtitle": "Compliance reports and analytics",
+      "placeholder": "Reports — coming in Iteration 7"
+    },
+    "auditLog": {
+      "title": "Audit Log",
+      "subtitle": "Immutable record of all system changes (21 CFR Part 11)",
+      "placeholder": "Audit Log — coming in Iteration 7"
+    }
+  },
+  "users": {
+    "title": "User Management",
+    "subtitle": "Create and manage user accounts and role assignments.",
+    "createUser": "Create User",
+    "searchPlaceholder": "Search by name, email or username...",
+    "allUsers": "All Users",
+    "countOf": "{{filtered}} of {{total}} user(s)",
+    "noUsers": "No users found. Create the first account.",
+    "noMatch": "No users match the search criteria.",
+    "name": "Name",
+    "email": "Email",
+    "language": "Language",
+    "status": "Status",
+    "role": "Role",
+    "actions": "Actions",
+    "you": "You",
+    "noRole": "No role",
+    "edit": "Edit",
+    "unblock": "Unblock",
+    "block": "Block",
+    "delete": "Delete",
+    "statusActive": "Active",
+    "statusBlocked": "Blocked",
+    "statusExpired": "Expired",
+    "statusPending": "Pending",
+    "deleteTitle": "Delete user?",
+    "deleteDesc": "This will permanently delete the account of <strong>{{email}}</strong>. This action cannot be undone.",
+    "cancel": "Cancel",
+    "confirmDelete": "Delete",
+    "unblockTitle": "Unblock user?",
+    "unblockDesc": "This will unblock the account of <strong>{{email}}</strong> and reset failed login attempts.",
+    "confirmUnblock": "Unblock",
+    "userDeleted": "User deleted",
+    "userDeletedDesc": "{{email}} has been deleted.",
+    "userUnblocked": "User unblocked",
+    "userUnblockedDesc": "{{email}} has been unblocked.",
+    "userBlocked": "User blocked"
+  },
+  "userForm": {
+    "createTitle": "Create User Account",
+    "createDesc": "The user will need to change their password on first login.",
+    "editTitle": "Edit User",
+    "editDesc": "Modify user details. Leave password empty to keep it unchanged.",
+    "fullName": "Full Name",
+    "username": "Username",
+    "usernamePlaceholder": "jdoe (optional)",
+    "emailLabel": "Email",
+    "tempPassword": "Temporary Password",
+    "newPassword": "New Password (optional)",
+    "newPasswordPlaceholder": "Leave empty to keep unchanged",
+    "minChars": "Min. 12 characters",
+    "language": "Language",
+    "selectLanguage": "Select language",
+    "userRole": "User Role",
+    "selectRole": "Select role",
+    "expirationDate": "Expiration Date",
+    "noExpiration": "No expiration date",
+    "createAccount": "Create Account",
+    "saveChanges": "Save Changes",
+    "cancel": "Cancel",
+    "userCreated": "User created",
+    "userCreatedDesc": "{{email}} has been created with a temporary password.",
+    "userUpdated": "User updated",
+    "userUpdatedDesc": "{{email}} has been updated.",
+    "roleDescriptions": {
+      "super_user": "Manages the platform, creates and revokes accounts",
+      "system_owner": "Owner of the system under periodic review",
+      "system_administrator": "Administrator of the system under review",
+      "business_owner": "Business process owner",
+      "quality_assurance": "Quality assurance"
+    }
+  },
+  "password": {
+    "requirementsTitle": "Password requirements",
+    "minLength": "Minimum 12 characters",
+    "uppercase": "At least one uppercase letter",
+    "lowercase": "At least one lowercase letter",
+    "number": "At least one number",
+    "special": "At least one special character",
+    "noEmail": "Must not contain your email",
+    "noUsername": "Must not contain your username"
+  },
+  "resetPassword": {
+    "title": "Change Password",
+    "subtitle": "You must change your temporary password before continuing.",
+    "newPassword": "New Password",
+    "confirmPassword": "Confirm Password",
+    "placeholder": "Min. 12 characters",
+    "confirmPlaceholder": "Repeat password",
+    "mismatch": "Passwords do not match.",
+    "submit": "Update Password",
+    "notMeetReqs": "Password does not meet requirements.",
+    "updated": "Password updated",
+    "updatedDesc": "You can now access the application."
+  },
+  "notFound": {
+    "title": "404",
+    "message": "Oops! Page not found",
+    "goHome": "Return to Home"
+  },
+  "common": {
+    "error": "Error",
+    "loading": "Loading..."
+  }
+}
