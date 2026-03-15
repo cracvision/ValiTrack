@@ -17,7 +17,7 @@ export function PasswordRequirements({ password, email, username }: PasswordRequ
         {checks.map((check: PasswordCheck) => (
           <li key={check.id} className="flex items-center gap-2 text-xs">
             {check.passed
-              ? <Check className="h-3.5 w-3.5 text-green-600 shrink-0" />
+              ? <Check className="h-3.5 w-3.5 text-primary shrink-0" />
               : <X className="h-3.5 w-3.5 text-destructive shrink-0" />}
             <span className={check.passed ? "text-muted-foreground" : "text-foreground"}>
               {check.label}
