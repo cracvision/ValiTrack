@@ -1,4 +1,5 @@
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
+import { validatePasswordPolicy, hashPasswordForHistory, savePasswordToHistory } from '../_shared/passwordPolicy.ts';
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
@@ -6,195 +7,244 @@ const corsHeaders = {
     "authorization, x-client-info, apikey, content-type, x-supabase-client-platform, x-supabase-client-platform-version, x-supabase-client-runtime, x-supabase-client-runtime-version",
 };
 
+function json(body: unknown, status = 200) {
+  return new Response(JSON.stringify(body), {
+    status,
+    headers: { ...corsHeaders, "Content-Type": "application/json" },
+  });
+}
+
 Deno.serve(async (req) => {
   if (req.method === "OPTIONS") {
     return new Response(null, { headers: corsHeaders });
   }
 
   try {
-    // Validate caller is authenticated
     const authHeader = req.headers.get("Authorization");
     if (!authHeader?.startsWith("Bearer ")) {
-      return new Response(JSON.stringify({ error: "Unauthorized" }), {
-        status: 401,
-        headers: { ...corsHeaders, "Content-Type": "application/json" },
-      });
+      return json({ error: "Unauthorized" }, 401);
     }
 
     const supabaseUrl = Deno.env.get("SUPABASE_URL")!;
-    const supabaseServiceKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
-    const supabaseAnonKey = Deno.env.get("SUPABASE_ANON_KEY")!;
+    const serviceKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
+    const anonKey = Deno.env.get("SUPABASE_ANON_KEY")!;
 
-    // Verify caller identity
-    const callerClient = createClient(supabaseUrl, supabaseAnonKey, {
+    const callerClient = createClient(supabaseUrl, anonKey, {
       global: { headers: { Authorization: authHeader } },
     });
 
     const token = authHeader.replace("Bearer ", "");
     const { data: claimsData, error: claimsError } = await callerClient.auth.getClaims(token);
     if (claimsError || !claimsData?.claims) {
-      return new Response(JSON.stringify({ error: "Invalid token" }), {
-        status: 401,
-        headers: { ...corsHeaders, "Content-Type": "application/json" },
-      });
+      return json({ error: "Invalid token" }, 401);
     }
 
-    const callerId = claimsData.claims.sub;
+    const callerId = claimsData.claims.sub as string;
+    const admin = createClient(supabaseUrl, serviceKey);
 
-    // Check caller has super_user role using service client
-    const adminClient = createClient(supabaseUrl, supabaseServiceKey);
-
-    const { data: hasRole } = await adminClient.rpc("has_role", {
+    // Verify super_user
+    const { data: hasRole } = await admin.rpc("has_role", {
       _user_id: callerId,
       _role: "super_user",
     });
-
     if (!hasRole) {
-      return new Response(JSON.stringify({ error: "Forbidden: super_user role required" }), {
-        status: 403,
-        headers: { ...corsHeaders, "Content-Type": "application/json" },
-      });
+      return json({ error: "Forbidden: super_user role required" }, 403);
     }
 
     const { action, ...payload } = await req.json();
 
     switch (action) {
-      case "create_user": {
-        const { email, full_name, password, roles } = payload;
-        if (!email || !password || !full_name || !roles?.length) {
-          return new Response(
-            JSON.stringify({ error: "email, full_name, password, and roles are required" }),
-            { status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" } }
-          );
-        }
-
-        // Create user via admin API
-        const { data: userData, error: createError } =
-          await adminClient.auth.admin.createUser({
-            email,
-            password,
-            email_confirm: true,
-            user_metadata: { full_name },
-          });
-
-        if (createError) {
-          return new Response(JSON.stringify({ error: createError.message }), {
-            status: 400,
-            headers: { ...corsHeaders, "Content-Type": "application/json" },
-          });
-        }
-
-        // Assign roles
-        for (const role of roles) {
-          await adminClient.from("user_roles").insert({
-            user_id: userData.user.id,
-            role,
-          });
-        }
-
-        return new Response(
-          JSON.stringify({ user: { id: userData.user.id, email, full_name, roles } }),
-          { status: 200, headers: { ...corsHeaders, "Content-Type": "application/json" } }
-        );
-      }
-
+      // ───────── LIST USERS ─────────
       case "list_users": {
-        // Get all app_users with their roles
-        const { data: appUsers, error: usersError } = await adminClient
-          .from("app_users")
-          .select("*")
-          .order("created_at", { ascending: false });
+        // Use the private view via raw SQL (service_role bypasses schema restrictions)
+        const { data, error } = await admin.rpc("get_admin_users_list" as any);
+        
+        if (error) {
+          // Fallback: manual join if the function doesn't exist yet
+          const { data: appUsers, error: usersErr } = await admin
+            .from("app_users")
+            .select("*")
+            .order("created_at", { ascending: false });
 
-        if (usersError) {
-          return new Response(JSON.stringify({ error: usersError.message }), {
-            status: 500,
-            headers: { ...corsHeaders, "Content-Type": "application/json" },
-          });
+          if (usersErr) return json({ error: usersErr.message }, 500);
+
+          const { data: allRoles } = await admin.from("user_roles").select("*");
+          const { data: allLangs } = await admin.from("user_language_preference").select("*");
+
+          const users = (appUsers || []).map((u: any) => ({
+            user_id: u.id,
+            full_name: u.full_name,
+            username: u.username,
+            email: u.email,
+            is_blocked: u.is_blocked,
+            blocked_reason: u.blocked_reason,
+            account_expires_at: u.account_expires_at,
+            must_change_password: u.must_change_password,
+            registered_at: u.created_at,
+            language_code: (allLangs || []).find((l: any) => l.user_id === u.id)?.language_code || null,
+            roles: (allRoles || [])
+              .filter((r: any) => r.user_id === u.id)
+              .map((r: any) => r.role)
+              .join(","),
+          }));
+
+          return json({ users });
         }
 
-        const { data: allRoles, error: rolesError } = await adminClient
-          .from("user_roles")
-          .select("*");
-
-        if (rolesError) {
-          return new Response(JSON.stringify({ error: rolesError.message }), {
-            status: 500,
-            headers: { ...corsHeaders, "Content-Type": "application/json" },
-          });
-        }
-
-        const usersWithRoles = appUsers.map((u: any) => ({
-          ...u,
-          roles: allRoles
-            .filter((r: any) => r.user_id === profile.id)
-            .map((r: any) => r.role),
-        }));
-
-        return new Response(JSON.stringify({ users: usersWithRoles }), {
-          status: 200,
-          headers: { ...corsHeaders, "Content-Type": "application/json" },
-        });
+        return json({ users: data });
       }
 
-      case "update_roles": {
-        const { user_id, roles } = payload;
-        if (!user_id || !roles) {
-          return new Response(
-            JSON.stringify({ error: "user_id and roles are required" }),
-            { status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" } }
-          );
-        }
-
-        // Delete existing roles
-        await adminClient.from("user_roles").delete().eq("user_id", user_id);
-
-        // Insert new roles
-        for (const role of roles) {
-          await adminClient.from("user_roles").insert({ user_id, role });
-        }
-
-        return new Response(JSON.stringify({ success: true }), {
-          status: 200,
-          headers: { ...corsHeaders, "Content-Type": "application/json" },
-        });
-      }
-
-      case "disable_user": {
+      // ───────── DELETE USER ─────────
+      case "delete_user": {
         const { user_id } = payload;
-        if (!user_id) {
-          return new Response(
-            JSON.stringify({ error: "user_id is required" }),
-            { status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" } }
-          );
-        }
+        if (!user_id) return json({ error: "user_id is required" }, 400);
+        if (user_id === callerId) return json({ error: "Cannot delete your own account" }, 400);
 
-        const { error: banError } = await adminClient.auth.admin.updateUserById(user_id, {
-          ban_duration: "876600h", // ~100 years
+        const { error: delError } = await admin.auth.admin.deleteUser(user_id);
+        if (delError) return json({ error: delError.message }, 400);
+
+        // Audit
+        await admin.from("audit_log").insert({
+          user_id: callerId,
+          action: "user_deleted",
+          resource_type: "user",
+          resource_id: user_id,
+          details: { deleted_by: callerId },
         });
 
-        if (banError) {
-          return new Response(JSON.stringify({ error: banError.message }), {
-            status: 400,
-            headers: { ...corsHeaders, "Content-Type": "application/json" },
+        return json({ success: true });
+      }
+
+      // ───────── UNBLOCK USER ─────────
+      case "unblock_user": {
+        const { user_id } = payload;
+        if (!user_id) return json({ error: "user_id is required" }, 400);
+
+        // Unban in auth
+        await admin.auth.admin.updateUserById(user_id, { ban_duration: "none" });
+
+        // Update app_users
+        const { error: updErr } = await admin
+          .from("app_users")
+          .update({
+            is_blocked: false,
+            blocked_at: null,
+            blocked_reason: null,
+            failed_login_attempts: 0,
+            first_failed_login_at: null,
+          })
+          .eq("id", user_id);
+
+        if (updErr) return json({ error: updErr.message }, 500);
+
+        await admin.from("audit_log").insert({
+          user_id: callerId,
+          action: "user_unblocked",
+          resource_type: "user",
+          resource_id: user_id,
+        });
+
+        return json({ success: true });
+      }
+
+      // ───────── BLOCK USER ─────────
+      case "block_user": {
+        const { user_id, reason } = payload;
+        if (!user_id) return json({ error: "user_id is required" }, 400);
+        if (user_id === callerId) return json({ error: "Cannot block your own account" }, 400);
+
+        await admin.auth.admin.updateUserById(user_id, { ban_duration: "876600h" });
+
+        await admin
+          .from("app_users")
+          .update({
+            is_blocked: true,
+            blocked_at: new Date().toISOString(),
+            blocked_reason: reason || "Blocked by administrator",
+          })
+          .eq("id", user_id);
+
+        await admin.from("audit_log").insert({
+          user_id: callerId,
+          action: "user_blocked",
+          resource_type: "user",
+          resource_id: user_id,
+          details: { reason },
+        });
+
+        return json({ success: true });
+      }
+
+      // ───────── UPDATE USER ─────────
+      case "update_user": {
+        const { user_id, full_name, username, email, role, language_code, account_expires_at, password } = payload;
+        if (!user_id) return json({ error: "user_id is required" }, 400);
+
+        // Update app_users fields
+        const updateFields: Record<string, any> = {};
+        if (full_name !== undefined) updateFields.full_name = full_name;
+        if (username !== undefined) updateFields.username = username || null;
+        if (account_expires_at !== undefined) updateFields.account_expires_at = account_expires_at || null;
+
+        if (Object.keys(updateFields).length > 0) {
+          const { error } = await admin.from("app_users").update(updateFields).eq("id", user_id);
+          if (error) return json({ error: error.message }, 500);
+        }
+
+        // Update email in auth if changed
+        if (email) {
+          await admin.auth.admin.updateUserById(user_id, { email, email_confirm: true });
+          await admin.from("app_users").update({ email }).eq("id", user_id);
+        }
+
+        // Update password if provided
+        if (password) {
+          const validation = validatePasswordPolicy(password, email, username);
+          if (!validation.valid) {
+            return json({ error: "Password does not meet requirements", validation_errors: validation.errors }, 400);
+          }
+          await admin.auth.admin.updateUserById(user_id, { password });
+          await admin.from("app_users").update({ must_change_password: true }).eq("id", user_id);
+          const hash = await hashPasswordForHistory(password);
+          await savePasswordToHistory(admin, user_id, hash);
+        }
+
+        // Update role if provided
+        if (role) {
+          const validRoles = ['super_user', 'system_owner', 'system_administrator', 'business_owner', 'quality_assurance'];
+          if (!validRoles.includes(role)) return json({ error: "Invalid role" }, 400);
+
+          await admin.from("user_roles").delete().eq("user_id", user_id);
+          await admin.from("user_roles").insert({ user_id, role, created_by: callerId });
+        }
+
+        // Update language if provided
+        if (language_code) {
+          await admin.from("user_language_preference").upsert({
+            user_id,
+            language_code,
+            locked: true,
+            locked_at: new Date().toISOString(),
+            updated_at: new Date().toISOString(),
           });
         }
 
-        return new Response(JSON.stringify({ success: true }), {
-          status: 200,
-          headers: { ...corsHeaders, "Content-Type": "application/json" },
+        await admin.from("audit_log").insert({
+          user_id: callerId,
+          action: "user_updated",
+          resource_type: "user",
+          resource_id: user_id,
+          details: { updated_fields: Object.keys({ ...updateFields, ...(email ? { email } : {}), ...(role ? { role } : {}), ...(password ? { password: "***" } : {}), ...(language_code ? { language_code } : {}) }) },
         });
+
+        return json({ success: true });
       }
 
       default:
-        return new Response(JSON.stringify({ error: `Unknown action: ${action}` }), {
-          status: 400,
-          headers: { ...corsHeaders, "Content-Type": "application/json" },
-        });
+        return json({ error: `Unknown action: ${action}` }, 400);
     }
-  } catch (err) {
-    return new Response(JSON.stringify({ error: err.message }), {
-      status: 500,
-      headers: { ...corsHeaders, "Content-Type": "application/json" },
-    });
+  } catch (err: any) {
+    console.error("admin-manage-users error:", err);
+    return json({ error: err.message || "Internal server error" }, 500);
   }
 });
