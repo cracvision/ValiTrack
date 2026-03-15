@@ -61,6 +61,11 @@ export function UserManagement({ currentUserId }: UserManagementProps) {
   const [actionLoading, setActionLoading] = useState(false);
 
   const callAdmin = useCallback(async (body: Record<string, unknown>) => {
+    // Guard: don't call edge function if there's no active session
+    const { data: sessionData } = await supabase.auth.getSession();
+    if (!sessionData.session) {
+      throw new Error('No active session');
+    }
     const { data, error } = await supabase.functions.invoke('admin-manage-users', { body });
     if (error) throw new Error(error.message);
     if (data?.error) throw new Error(data.error);
@@ -73,7 +78,10 @@ export function UserManagement({ currentUserId }: UserManagementProps) {
       const data = await callAdmin({ action: 'list_users' });
       setUsers(data.users ?? []);
     } catch (err: any) {
-      toast({ title: t('common.error'), description: err.message, variant: 'destructive' });
+      // Silently ignore "No active session" errors (happens during logout)
+      if (err.message !== 'No active session') {
+        toast({ title: t('common.error'), description: err.message, variant: 'destructive' });
+      }
     } finally {
       setLoading(false);
     }

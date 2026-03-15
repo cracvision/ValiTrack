@@ -45,10 +45,17 @@ export function useAuth() {
   }, []);
 
   useEffect(() => {
+    let initialSessionHandled = false;
+
     const { data: { subscription } } = supabase.auth.onAuthStateChange(
       async (event, session) => {
+        // Skip the INITIAL_SESSION event since we handle it via getSession below
+        if (event === 'INITIAL_SESSION') {
+          return;
+        }
         setState((prev) => ({ ...prev, user: session?.user ?? null, session }));
         if (session?.user) {
+          // Use setTimeout to avoid potential deadlocks with Supabase auth
           setTimeout(() => fetchProfileAndRoles(session.user.id), 0);
         } else {
           setState((prev) => ({ ...prev, profile: null, roles: [], loading: false }));
@@ -58,6 +65,8 @@ export function useAuth() {
     );
 
     supabase.auth.getSession().then(({ data: { session } }) => {
+      if (initialSessionHandled) return;
+      initialSessionHandled = true;
       setState((prev) => ({ ...prev, user: session?.user ?? null, session }));
       if (session?.user) {
         fetchProfileAndRoles(session.user.id);
