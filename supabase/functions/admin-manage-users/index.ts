@@ -99,14 +99,14 @@ Deno.serve(async (req) => {
       }
 
       case "list_users": {
-        // Get all profiles with their roles
-        const { data: profiles, error: profilesError } = await adminClient
-          .from("profiles")
+        // Get all app_users with their roles
+        const { data: appUsers, error: usersError } = await adminClient
+          .from("app_users")
           .select("*")
           .order("created_at", { ascending: false });
 
-        if (profilesError) {
-          return new Response(JSON.stringify({ error: profilesError.message }), {
+        if (usersError) {
+          return new Response(JSON.stringify({ error: usersError.message }), {
             status: 500,
             headers: { ...corsHeaders, "Content-Type": "application/json" },
           });
@@ -123,8 +123,8 @@ Deno.serve(async (req) => {
           });
         }
 
-        const usersWithRoles = profiles.map((profile: any) => ({
-          ...profile,
+        const usersWithRoles = appUsers.map((u: any) => ({
+          ...u,
           roles: allRoles
             .filter((r: any) => r.user_id === profile.id)
             .map((r: any) => r.role),

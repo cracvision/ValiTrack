@@ -75,7 +75,7 @@ export function useAuth() {
   const updatePassword = async (newPassword: string) => {
     const { error } = await supabase.auth.updateUser({ password: newPassword });
     if (!error && state.user) {
-      await supabase.from('profiles').update({ must_change_password: false }).eq('id', state.user.id);
+      await supabase.from('app_users').update({ must_change_password: false }).eq('id', state.user.id);
       setState((prev) => ({
         ...prev,
         profile: prev.profile ? { ...prev.profile, must_change_password: false } : null,
