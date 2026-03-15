@@ -24,7 +24,7 @@ export function useAuth() {
 
   const fetchProfileAndRoles = useCallback(async (userId: string) => {
     const [profileRes, rolesRes] = await Promise.all([
-      supabase.from('profiles').select('full_name, email, must_change_password').eq('id', userId).single(),
+      supabase.from('app_users').select('full_name, email, must_change_password').eq('id', userId).single(),
       supabase.rpc('get_user_roles', { _user_id: userId }),
     ]);
 
