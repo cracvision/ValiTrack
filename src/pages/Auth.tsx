@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { Navigate } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import { useAuth } from '@/hooks/useAuth';
 import { Shield, Loader2, Lock, Eye, EyeOff, Mail } from 'lucide-react';
 import { Button } from '@/components/ui/button';
@@ -9,6 +10,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { useToast } from '@/hooks/use-toast';
 
 export default function Auth() {
+  const { t } = useTranslation('auth');
   const { user, profile, loading, signIn } = useAuth();
   const { toast } = useToast();
   const [email, setEmail] = useState('');
@@ -39,7 +41,7 @@ export default function Auth() {
 
     if (error) {
       toast({
-        title: 'Login failed',
+        title: t('loginFailed'),
         description: error.message,
         variant: 'destructive',
       });
@@ -53,21 +55,19 @@ export default function Auth() {
           <div className="mx-auto mb-4 flex h-14 w-14 items-center justify-center rounded-full bg-primary">
             <Shield className="h-7 w-7 text-primary-foreground" />
           </div>
-          <CardTitle className="text-2xl">GxP Periodic Review</CardTitle>
-          <CardDescription>
-            Sign in to access the Periodic System Review platform
-          </CardDescription>
+          <CardTitle className="text-2xl">{t('title')}</CardTitle>
+          <CardDescription>{t('subtitle')}</CardDescription>
         </CardHeader>
         <CardContent>
           <form onSubmit={handleSubmit} className="space-y-4">
             <div className="space-y-2">
-              <Label htmlFor="email">Email</Label>
+              <Label htmlFor="email">{t('emailLabel')}</Label>
               <div className="relative">
                 <Mail className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
                 <Input
                   id="email"
                   type="email"
-                  placeholder="you@company.com"
+                  placeholder={t('emailPlaceholder')}
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
                   className="pl-10"
@@ -76,13 +76,13 @@ export default function Auth() {
               </div>
             </div>
             <div className="space-y-2">
-              <Label htmlFor="password">Password</Label>
+              <Label htmlFor="password">{t('passwordLabel')}</Label>
               <div className="relative">
                 <Lock className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
                 <Input
                   id="password"
                   type={showPassword ? "text" : "password"}
-                  placeholder="••••••••"
+                  placeholder={t('passwordPlaceholder')}
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
                   className="pl-10 pr-10"
@@ -100,14 +100,12 @@ export default function Auth() {
               </div>
             </div>
             <Button type="submit" className="w-full" disabled={submitting}>
-              {submitting ? (
-                <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-              ) : null}
-              Sign In
+              {submitting ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : null}
+              {t('signIn')}
             </Button>
           </form>
           <p className="mt-4 text-center text-xs text-muted-foreground">
-            Contact your administrator to request an account.
+            {t('contactAdmin')}
           </p>
         </CardContent>
       </Card>

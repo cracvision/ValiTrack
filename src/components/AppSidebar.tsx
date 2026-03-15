@@ -10,10 +10,10 @@ import {
   Users,
   LogOut,
 } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 import { NavLink } from '@/components/NavLink';
 import { useLocation } from 'react-router-dom';
 import { useAuth } from '@/hooks/useAuth';
-import { Badge } from '@/components/ui/badge';
 import {
   Sidebar,
   SidebarContent,
@@ -29,24 +29,25 @@ import {
   useSidebar,
 } from '@/components/ui/sidebar';
 
-const mainNav = [
-  { title: 'Dashboard', url: '/dashboard', icon: LayoutDashboard },
-  { title: 'System Profiles', url: '/systems', icon: Server },
-  { title: 'Review Cases', url: '/reviews', icon: ClipboardCheck },
-  { title: 'Evidence Vault', url: '/evidence', icon: Archive },
-  { title: 'Findings & Actions', url: '/findings', icon: AlertTriangle },
-];
-
-const reportsNav = [
-  { title: 'Reports', url: '/reports', icon: BarChart3 },
-  { title: 'Audit Log', url: '/audit-log', icon: ScrollText },
-];
-
 export function AppSidebar() {
+  const { t } = useTranslation();
   const { state } = useSidebar();
   const collapsed = state === 'collapsed';
   const location = useLocation();
   const { profile, roles, signOut, isSuperUser } = useAuth();
+
+  const mainNav = [
+    { title: t('nav.dashboard'), url: '/dashboard', icon: LayoutDashboard },
+    { title: t('nav.systemProfiles'), url: '/systems', icon: Server },
+    { title: t('nav.reviewCases'), url: '/reviews', icon: ClipboardCheck },
+    { title: t('nav.evidenceVault'), url: '/evidence', icon: Archive },
+    { title: t('nav.findingsActions'), url: '/findings', icon: AlertTriangle },
+  ];
+
+  const reportsNav = [
+    { title: t('nav.reports'), url: '/reports', icon: BarChart3 },
+    { title: t('nav.auditLog'), url: '/audit-log', icon: ScrollText },
+  ];
 
   const isActive = (path: string) =>
     path === '/dashboard' ? location.pathname === '/dashboard' : location.pathname.startsWith(path);
@@ -62,7 +63,7 @@ export function AppSidebar() {
 
   const primaryRole = roles[0]
     ? roles[0].replace(/_/g, ' ').replace(/\b\w/g, (c) => c.toUpperCase())
-    : 'No Role';
+    : t('sidebar.noRole');
 
   return (
     <Sidebar collapsible="icon">
@@ -71,8 +72,8 @@ export function AppSidebar() {
           <Shield className="h-6 w-6 shrink-0 text-sidebar-primary" />
           {!collapsed && (
             <div className="flex flex-col">
-              <span className="text-sm font-bold text-sidebar-foreground">GxP Review</span>
-              <span className="text-[10px] text-sidebar-foreground/60">Periodic Review Manager</span>
+              <span className="text-sm font-bold text-sidebar-foreground">{t('app.name')}</span>
+              <span className="text-[10px] text-sidebar-foreground/60">{t('app.subtitle')}</span>
             </div>
           )}
         </div>
@@ -80,11 +81,11 @@ export function AppSidebar() {
 
       <SidebarContent>
         <SidebarGroup>
-          <SidebarGroupLabel>Main</SidebarGroupLabel>
+          <SidebarGroupLabel>{t('nav.main')}</SidebarGroupLabel>
           <SidebarGroupContent>
             <SidebarMenu>
               {mainNav.map((item) => (
-                <SidebarMenuItem key={item.title}>
+                <SidebarMenuItem key={item.url}>
                   <SidebarMenuButton asChild isActive={isActive(item.url)} tooltip={item.title}>
                     <NavLink to={item.url}>
                       <item.icon className="h-4 w-4" />
@@ -100,11 +101,11 @@ export function AppSidebar() {
         <SidebarSeparator />
 
         <SidebarGroup>
-          <SidebarGroupLabel>Compliance</SidebarGroupLabel>
+          <SidebarGroupLabel>{t('nav.compliance')}</SidebarGroupLabel>
           <SidebarGroupContent>
             <SidebarMenu>
               {reportsNav.map((item) => (
-                <SidebarMenuItem key={item.title}>
+                <SidebarMenuItem key={item.url}>
                   <SidebarMenuButton asChild isActive={isActive(item.url)} tooltip={item.title}>
                     <NavLink to={item.url}>
                       <item.icon className="h-4 w-4" />
@@ -121,18 +122,18 @@ export function AppSidebar() {
           <>
             <SidebarSeparator />
             <SidebarGroup>
-              <SidebarGroupLabel>Administration</SidebarGroupLabel>
+              <SidebarGroupLabel>{t('nav.administration')}</SidebarGroupLabel>
               <SidebarGroupContent>
                 <SidebarMenu>
                   <SidebarMenuItem>
                     <SidebarMenuButton
                       asChild
                       isActive={isActive('/admin/users')}
-                      tooltip="User Management"
+                      tooltip={t('nav.userManagement')}
                     >
                       <NavLink to="/admin/users">
                         <Users className="h-4 w-4" />
-                        {!collapsed && <span>User Management</span>}
+                        {!collapsed && <span>{t('nav.userManagement')}</span>}
                       </NavLink>
                     </SidebarMenuButton>
                   </SidebarMenuItem>
@@ -151,7 +152,7 @@ export function AppSidebar() {
           {!collapsed && (
             <div className="flex flex-1 flex-col overflow-hidden">
               <span className="truncate text-xs font-medium text-sidebar-foreground">
-                {profile?.full_name || 'Loading...'}
+                {profile?.full_name || t('sidebar.loading')}
               </span>
               <span className="truncate text-[10px] text-sidebar-foreground/60">
                 {primaryRole}
@@ -162,7 +163,7 @@ export function AppSidebar() {
             <button
               onClick={signOut}
               className="shrink-0 rounded p-1 text-sidebar-foreground/60 hover:bg-sidebar-accent hover:text-sidebar-foreground"
-              title="Sign out"
+              title={t('sidebar.signOut')}
             >
               <LogOut className="h-4 w-4" />
             </button>
