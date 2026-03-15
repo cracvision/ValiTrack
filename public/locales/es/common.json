@@ -1,0 +1,180 @@
+{
+  "app": {
+    "name": "GxP Review",
+    "subtitle": "Periodic Review Manager",
+    "headerTitle": "Gestión de Revisiones Periódicas GxP"
+  },
+  "nav": {
+    "main": "Principal",
+    "compliance": "Cumplimiento",
+    "administration": "Administración",
+    "dashboard": "Panel",
+    "systemProfiles": "Perfiles de Sistemas",
+    "reviewCases": "Casos de Revisión",
+    "evidenceVault": "Bóveda de Evidencia",
+    "findingsActions": "Hallazgos y Acciones",
+    "reports": "Reportes",
+    "auditLog": "Registro de Auditoría",
+    "userManagement": "Gestión de Usuarios"
+  },
+  "sidebar": {
+    "signOut": "Cerrar sesión",
+    "loading": "Cargando...",
+    "noRole": "Sin Rol"
+  },
+  "dashboard": {
+    "title": "Panel",
+    "subtitle": "Gestión de revisiones periódicas de sistemas computarizados",
+    "welcome": "Bienvenido a GxP Periodic Review",
+    "welcomeDesc": "Comienza registrando tu primer sistema computarizado. Una vez registrado, podrás rastrear el estado de validación, programar revisiones periódicas y gestionar la documentación de cumplimiento.",
+    "registerFirst": "Registrar Primer Sistema",
+    "overviewSubtitle": "Resumen del estado de revisiones periódicas de sistemas computarizados",
+    "totalSystems": "Sistemas Totales",
+    "active": "{{count}} activo(s)",
+    "gxpCritical": "GxP Crítico",
+    "requireReview": "Requiere revisión periódica",
+    "highRisk": "Alto Riesgo",
+    "enhancedOversight": "Supervisión reforzada requerida",
+    "reviewsDue90": "Revisiones (90d)",
+    "overdue": "{{count}} vencida(s)",
+    "onSchedule": "Al día",
+    "overdueReviews": "Revisiones Vencidas",
+    "upcomingReviews": "Próximas Revisiones (90 Días)",
+    "noReviewsDue": "No hay revisiones pendientes en los próximos 90 días.",
+    "wasDue": "Venció: {{date}} · {{owner}}",
+    "due": "Vence: {{date}} · {{owner}}",
+    "registeredSystems": "Sistemas Registrados",
+    "viewAll": "Ver los {{count}} sistemas →"
+  },
+  "pages": {
+    "reviewCases": {
+      "title": "Casos de Revisión",
+      "subtitle": "Gestión del flujo de trabajo de revisiones periódicas",
+      "placeholder": "Flujo de Casos de Revisión — disponible en Iteración 3"
+    },
+    "evidenceVault": {
+      "title": "Bóveda de Evidencia",
+      "subtitle": "Repositorio seguro de documentos con verificación de integridad",
+      "placeholder": "Bóveda de Evidencia — disponible en Iteración 4"
+    },
+    "findingsActions": {
+      "title": "Hallazgos y Acciones",
+      "subtitle": "Seguimiento de hallazgos, CAPAs y acciones correctivas",
+      "placeholder": "Hallazgos y Acciones — disponible en Iteración 5"
+    },
+    "reports": {
+      "title": "Reportes",
+      "subtitle": "Reportes de cumplimiento y analíticas",
+      "placeholder": "Reportes — disponible en Iteración 7"
+    },
+    "auditLog": {
+      "title": "Registro de Auditoría",
+      "subtitle": "Registro inmutable de todos los cambios del sistema (21 CFR Part 11)",
+      "placeholder": "Registro de Auditoría — disponible en Iteración 7"
+    }
+  },
+  "users": {
+    "title": "Gestión de Usuarios",
+    "subtitle": "Crear y gestionar cuentas de usuario y asignación de roles.",
+    "createUser": "Crear Usuario",
+    "searchPlaceholder": "Buscar por nombre, email o username...",
+    "allUsers": "Todos los Usuarios",
+    "countOf": "{{filtered}} de {{total}} usuario(s)",
+    "noUsers": "No se encontraron usuarios. Crea la primera cuenta.",
+    "noMatch": "No se encontraron usuarios que coincidan con la búsqueda.",
+    "name": "Nombre",
+    "email": "Email",
+    "language": "Idioma",
+    "status": "Estado",
+    "role": "Rol",
+    "actions": "Acciones",
+    "you": "Tú",
+    "noRole": "Sin rol",
+    "edit": "Editar",
+    "unblock": "Desbloquear",
+    "block": "Bloquear",
+    "delete": "Eliminar",
+    "statusActive": "Activa",
+    "statusBlocked": "Bloqueada",
+    "statusExpired": "Expirada",
+    "statusPending": "Pendiente",
+    "deleteTitle": "¿Eliminar usuario?",
+    "deleteDesc": "Esta acción eliminará permanentemente la cuenta de <strong>{{email}}</strong>. Esta acción no se puede deshacer.",
+    "cancel": "Cancelar",
+    "confirmDelete": "Eliminar",
+    "unblockTitle": "¿Desbloquear usuario?",
+    "unblockDesc": "Esto desbloqueará la cuenta de <strong>{{email}}</strong> y reiniciará los intentos fallidos de inicio de sesión.",
+    "confirmUnblock": "Desbloquear",
+    "userDeleted": "Usuario eliminado",
+    "userDeletedDesc": "{{email}} ha sido eliminado.",
+    "userUnblocked": "Usuario desbloqueado",
+    "userUnblockedDesc": "{{email}} ha sido desbloqueado.",
+    "userBlocked": "Usuario bloqueado"
+  },
+  "userForm": {
+    "createTitle": "Crear Cuenta de Usuario",
+    "createDesc": "El usuario deberá cambiar su contraseña en el primer inicio de sesión.",
+    "editTitle": "Editar Usuario",
+    "editDesc": "Modificar los datos del usuario. Deja la contraseña vacía para no cambiarla.",
+    "fullName": "Nombre Completo",
+    "username": "Username",
+    "usernamePlaceholder": "jdoe (opcional)",
+    "emailLabel": "Email",
+    "tempPassword": "Contraseña Temporal",
+    "newPassword": "Nueva Contraseña (opcional)",
+    "newPasswordPlaceholder": "Dejar vacío para no cambiar",
+    "minChars": "Min. 12 caracteres",
+    "language": "Idioma",
+    "selectLanguage": "Seleccionar idioma",
+    "userRole": "Rol del Usuario",
+    "selectRole": "Seleccionar rol",
+    "expirationDate": "Fecha de Expiración",
+    "noExpiration": "Sin fecha de expiración",
+    "createAccount": "Crear Cuenta",
+    "saveChanges": "Guardar Cambios",
+    "cancel": "Cancelar",
+    "userCreated": "Usuario creado",
+    "userCreatedDesc": "{{email}} ha sido creado con contraseña temporal.",
+    "userUpdated": "Usuario actualizado",
+    "userUpdatedDesc": "{{email}} ha sido actualizado.",
+    "roleDescriptions": {
+      "super_user": "Administra la plataforma, crea y revoca cuentas",
+      "system_owner": "Dueño del sistema bajo revisión periódica",
+      "system_administrator": "Administrador del sistema bajo revisión",
+      "business_owner": "Responsable del negocio",
+      "quality_assurance": "Garantía de calidad"
+    }
+  },
+  "password": {
+    "requirementsTitle": "Requisitos de contraseña",
+    "minLength": "Mínimo 12 caracteres",
+    "uppercase": "Al menos una letra mayúscula",
+    "lowercase": "Al menos una letra minúscula",
+    "number": "Al menos un número",
+    "special": "Al menos un carácter especial",
+    "noEmail": "No debe contener tu email",
+    "noUsername": "No debe contener tu nombre de usuario"
+  },
+  "resetPassword": {
+    "title": "Cambiar Contraseña",
+    "subtitle": "Debes cambiar tu contraseña temporal antes de continuar.",
+    "newPassword": "Nueva Contraseña",
+    "confirmPassword": "Confirmar Contraseña",
+    "placeholder": "Min. 12 caracteres",
+    "confirmPlaceholder": "Repetir contraseña",
+    "mismatch": "Las contraseñas no coinciden.",
+    "submit": "Actualizar Contraseña",
+    "notMeetReqs": "La contraseña no cumple los requisitos.",
+    "updated": "Contraseña actualizada",
+    "updatedDesc": "Ya puedes acceder a la aplicación."
+  },
+  "notFound": {
+    "title": "404",
+    "message": "¡Ups! Página no encontrada",
+    "goHome": "Volver al inicio"
+  },
+  "common": {
+    "error": "Error",
+    "loading": "Cargando..."
+  }
+}
