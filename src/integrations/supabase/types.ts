@@ -14,6 +14,105 @@ export type Database = {
   }
   public: {
     Tables: {
+      app_users: {
+        Row: {
+          account_expires_at: string | null
+          blocked_at: string | null
+          blocked_reason: string | null
+          created_at: string
+          email: string
+          failed_login_attempts: number
+          first_failed_login_at: string | null
+          full_name: string
+          id: string
+          is_blocked: boolean
+          must_change_password: boolean
+          updated_at: string
+          username: string | null
+        }
+        Insert: {
+          account_expires_at?: string | null
+          blocked_at?: string | null
+          blocked_reason?: string | null
+          created_at?: string
+          email: string
+          failed_login_attempts?: number
+          first_failed_login_at?: string | null
+          full_name?: string
+          id: string
+          is_blocked?: boolean
+          must_change_password?: boolean
+          updated_at?: string
+          username?: string | null
+        }
+        Update: {
+          account_expires_at?: string | null
+          blocked_at?: string | null
+          blocked_reason?: string | null
+          created_at?: string
+          email?: string
+          failed_login_attempts?: number
+          first_failed_login_at?: string | null
+          full_name?: string
+          id?: string
+          is_blocked?: boolean
+          must_change_password?: boolean
+          updated_at?: string
+          username?: string | null
+        }
+        Relationships: []
+      }
+      audit_log: {
+        Row: {
+          action: string
+          created_at: string
+          details: Json | null
+          id: string
+          resource_id: string | null
+          resource_type: string | null
+          user_id: string | null
+        }
+        Insert: {
+          action: string
+          created_at?: string
+          details?: Json | null
+          id?: string
+          resource_id?: string | null
+          resource_type?: string | null
+          user_id?: string | null
+        }
+        Update: {
+          action?: string
+          created_at?: string
+          details?: Json | null
+          id?: string
+          resource_id?: string | null
+          resource_type?: string | null
+          user_id?: string | null
+        }
+        Relationships: []
+      }
+      password_history: {
+        Row: {
+          created_at: string
+          id: string
+          password_hash: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          password_hash: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          password_hash?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       profiles: {
         Row: {
           created_at: string
@@ -41,21 +140,51 @@ export type Database = {
         }
         Relationships: []
       }
+      user_language_preference: {
+        Row: {
+          created_at: string
+          language_code: string
+          locked: boolean
+          locked_at: string | null
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          language_code?: string
+          locked?: boolean
+          locked_at?: string | null
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          language_code?: string
+          locked?: boolean
+          locked_at?: string | null
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       user_roles: {
         Row: {
           created_at: string
+          created_by: string | null
           id: string
           role: Database["public"]["Enums"]["app_role"]
           user_id: string
         }
         Insert: {
           created_at?: string
+          created_by?: string | null
           id?: string
           role: Database["public"]["Enums"]["app_role"]
           user_id: string
         }
         Update: {
           created_at?: string
+          created_by?: string | null
           id?: string
           role?: Database["public"]["Enums"]["app_role"]
           user_id?: string

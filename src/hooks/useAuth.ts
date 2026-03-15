@@ -24,7 +24,7 @@ export function useAuth() {
 
   const fetchProfileAndRoles = useCallback(async (userId: string) => {
     const [profileRes, rolesRes] = await Promise.all([
-      supabase.from('profiles').select('full_name, email, must_change_password').eq('id', userId).single(),
+      supabase.from('app_users').select('full_name, email, must_change_password').eq('id', userId).single(),
       supabase.rpc('get_user_roles', { _user_id: userId }),
     ]);
 
@@ -75,7 +75,7 @@ export function useAuth() {
   const updatePassword = async (newPassword: string) => {
     const { error } = await supabase.auth.updateUser({ password: newPassword });
     if (!error && state.user) {
-      await supabase.from('profiles').update({ must_change_password: false }).eq('id', state.user.id);
+      await supabase.from('app_users').update({ must_change_password: false }).eq('id', state.user.id);
       setState((prev) => ({
         ...prev,
         profile: prev.profile ? { ...prev.profile, must_change_password: false } : null,
