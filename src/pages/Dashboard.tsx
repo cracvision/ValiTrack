@@ -1,3 +1,4 @@
+import { useTranslation } from 'react-i18next';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
@@ -19,6 +20,7 @@ const statusColor: Record<string, string> = {
 };
 
 export default function Dashboard() {
+  const { t } = useTranslation();
   const [systems] = useLocalStorage<SystemProfile[]>('gxp_systems', []);
   const navigate = useNavigate();
 
@@ -26,7 +28,6 @@ export default function Dashboard() {
   const gxpCritical = systems.filter((s) => s.gxp_classification === 'GxP Critical');
   const highRisk = systems.filter((s) => s.risk_level === 'High');
 
-  // Systems with reviews due in the next 90 days
   const now = new Date();
   const in90Days = new Date();
   in90Days.setDate(in90Days.getDate() + 90);
@@ -37,35 +38,36 @@ export default function Dashboard() {
     })
     .sort((a, b) => new Date(a.next_review_date).getTime() - new Date(b.next_review_date).getTime());
 
-  // Systems with overdue reviews
   const overdueReviews = systems.filter((s) => {
     return s.status === 'Active' && new Date(s.next_review_date) < now;
   });
 
   const stats = [
     {
-      title: 'Total Systems',
+      title: t('dashboard.totalSystems'),
       value: systems.length,
       icon: Server,
-      description: `${activeSystems.length} active`,
+      description: t('dashboard.active', { count: activeSystems.length }),
     },
     {
-      title: 'GxP Critical',
+      title: t('dashboard.gxpCritical'),
       value: gxpCritical.length,
       icon: AlertTriangle,
-      description: 'Requiring periodic review',
+      description: t('dashboard.requireReview'),
     },
     {
-      title: 'High Risk',
+      title: t('dashboard.highRisk'),
       value: highRisk.length,
       icon: ClipboardCheck,
-      description: 'Enhanced oversight required',
+      description: t('dashboard.enhancedOversight'),
     },
     {
-      title: 'Reviews Due (90d)',
+      title: t('dashboard.reviewsDue90'),
       value: upcomingReviews.length + overdueReviews.length,
       icon: CalendarClock,
-      description: overdueReviews.length > 0 ? `${overdueReviews.length} overdue` : 'On schedule',
+      description: overdueReviews.length > 0
+        ? t('dashboard.overdue', { count: overdueReviews.length })
+        : t('dashboard.onSchedule'),
     },
   ];
 
@@ -73,22 +75,19 @@ export default function Dashboard() {
     return (
       <div className="space-y-6">
         <div>
-          <h1 className="text-2xl font-bold text-foreground">Dashboard</h1>
-          <p className="text-sm text-muted-foreground">
-            GxP Computerized System Periodic Review Management
-          </p>
+          <h1 className="text-2xl font-bold text-foreground">{t('dashboard.title')}</h1>
+          <p className="text-sm text-muted-foreground">{t('dashboard.subtitle')}</p>
         </div>
         <Card>
           <CardContent className="flex flex-col items-center justify-center py-20">
             <Server className="h-16 w-16 text-muted-foreground/30 mb-4" />
-            <h2 className="text-xl font-semibold text-foreground mb-2">Welcome to GxP Periodic Review</h2>
+            <h2 className="text-xl font-semibold text-foreground mb-2">{t('dashboard.welcome')}</h2>
             <p className="text-sm text-muted-foreground text-center max-w-md mb-6">
-              Start by registering your first computerized system. Once registered, you can track
-              validation status, schedule periodic reviews, and manage compliance documentation.
+              {t('dashboard.welcomeDesc')}
             </p>
             <Button onClick={() => navigate('/systems')}>
               <Plus className="mr-2 h-4 w-4" />
-              Register First System
+              {t('dashboard.registerFirst')}
             </Button>
           </CardContent>
         </Card>
@@ -99,20 +98,15 @@ export default function Dashboard() {
   return (
     <div className="space-y-6">
       <div>
-        <h1 className="text-2xl font-bold text-foreground">Dashboard</h1>
-        <p className="text-sm text-muted-foreground">
-          Overview of computerized system periodic review status
-        </p>
+        <h1 className="text-2xl font-bold text-foreground">{t('dashboard.title')}</h1>
+        <p className="text-sm text-muted-foreground">{t('dashboard.overviewSubtitle')}</p>
       </div>
 
-      {/* Summary Cards */}
       <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
         {stats.map((stat) => (
           <Card key={stat.title}>
             <CardHeader className="flex flex-row items-center justify-between pb-2">
-              <CardTitle className="text-sm font-medium text-muted-foreground">
-                {stat.title}
-              </CardTitle>
+              <CardTitle className="text-sm font-medium text-muted-foreground">{stat.title}</CardTitle>
               <stat.icon className="h-4 w-4 text-muted-foreground" />
             </CardHeader>
             <CardContent>
@@ -124,13 +118,12 @@ export default function Dashboard() {
       </div>
 
       <div className="grid gap-6 lg:grid-cols-2">
-        {/* Overdue Reviews */}
         {overdueReviews.length > 0 && (
           <Card className="border-destructive/30">
             <CardHeader>
               <CardTitle className="text-base text-destructive flex items-center gap-2">
                 <AlertTriangle className="h-4 w-4" />
-                Overdue Reviews
+                {t('dashboard.overdueReviews')}
               </CardTitle>
             </CardHeader>
             <CardContent>
@@ -140,7 +133,7 @@ export default function Dashboard() {
                     <div className="space-y-1">
                       <p className="text-sm font-medium text-foreground">{system.name}</p>
                       <p className="text-xs text-muted-foreground">
-                        Was due: {new Date(system.next_review_date).toLocaleDateString()} · {system.owner_name}
+                        {t('dashboard.wasDue', { date: new Date(system.next_review_date).toLocaleDateString(), owner: system.owner_name })}
                       </p>
                     </div>
                     <Badge variant="secondary" className={classificationColor[system.gxp_classification]}>
@@ -153,14 +146,13 @@ export default function Dashboard() {
           </Card>
         )}
 
-        {/* Upcoming Reviews */}
         <Card>
           <CardHeader>
-            <CardTitle className="text-base">Upcoming Reviews (Next 90 Days)</CardTitle>
+            <CardTitle className="text-base">{t('dashboard.upcomingReviews')}</CardTitle>
           </CardHeader>
           <CardContent>
             {upcomingReviews.length === 0 ? (
-              <p className="text-sm text-muted-foreground py-4 text-center">No reviews due in the next 90 days.</p>
+              <p className="text-sm text-muted-foreground py-4 text-center">{t('dashboard.noReviewsDue')}</p>
             ) : (
               <div className="space-y-3">
                 {upcomingReviews.map((system) => (
@@ -168,7 +160,7 @@ export default function Dashboard() {
                     <div className="space-y-1">
                       <p className="text-sm font-medium text-foreground">{system.name}</p>
                       <p className="text-xs text-muted-foreground">
-                        Due: {new Date(system.next_review_date).toLocaleDateString()} · {system.owner_name}
+                        {t('dashboard.due', { date: new Date(system.next_review_date).toLocaleDateString(), owner: system.owner_name })}
                       </p>
                     </div>
                     <Badge variant="secondary" className={statusColor[system.status]}>
@@ -181,10 +173,9 @@ export default function Dashboard() {
           </CardContent>
         </Card>
 
-        {/* Registered Systems */}
         <Card>
           <CardHeader>
-            <CardTitle className="text-base">Registered Systems</CardTitle>
+            <CardTitle className="text-base">{t('dashboard.registeredSystems')}</CardTitle>
           </CardHeader>
           <CardContent>
             <div className="space-y-3">
@@ -203,7 +194,7 @@ export default function Dashboard() {
               ))}
               {systems.length > 6 && (
                 <Button variant="link" className="w-full text-xs" onClick={() => navigate('/systems')}>
-                  View all {systems.length} systems →
+                  {t('dashboard.viewAll', { count: systems.length })}
                 </Button>
               )}
             </div>
