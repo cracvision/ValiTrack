@@ -404,7 +404,7 @@ export function SystemProfileForm({ open, onOpenChange, onSubmit, editingSystem 
                 <FormField control={form.control} name="gamp_category" render={({ field }) => (
                   <FormItem>
                     <FormLabel>GAMP Category *</FormLabel>
-                    <Select onValueChange={field.onChange} defaultValue={field.value || undefined}>
+                    <Select onValueChange={field.onChange} value={field.value || undefined}>
                       <FormControl><SelectTrigger><SelectValue placeholder="Select the GAMP category" /></SelectTrigger></FormControl>
                       <SelectContent>
                         {GAMP_CATEGORY_OPTIONS.map((opt) => (
