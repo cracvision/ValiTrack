@@ -202,7 +202,7 @@ export default function SystemProfiles() {
               </TableHeader>
               <TableBody>
                 {filtered.map((system) => (
-                  <TableRow key={system.id}>
+                  <TableRow key={system.id} className="cursor-pointer hover:bg-muted/50" onClick={() => setViewingSystem(system)}>
                     <TableCell>
                       <div>
                         <p className="font-medium text-foreground">{system.name}</p>
