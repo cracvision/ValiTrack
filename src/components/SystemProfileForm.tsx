@@ -324,7 +324,7 @@ export function SystemProfileForm({ open, onOpenChange, onSubmit, editingSystem 
                   <FormItem>
                     <FormLabel>GxP Classification *</FormLabel>
                     <Select onValueChange={field.onChange} defaultValue={field.value || undefined}>
-                      <FormControl><SelectTrigger><SelectValue /></SelectTrigger></FormControl>
+                      <FormControl><SelectTrigger><SelectValue placeholder="Choose the corresponding classification" /></SelectTrigger></FormControl>
                       <SelectContent>
                         {GXP_OPTIONS.map((opt) => (
                           <SelectItem key={opt.value} value={opt.value}>
