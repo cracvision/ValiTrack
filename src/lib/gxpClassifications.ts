@@ -1,4 +1,4 @@
-import type { GxPClassification, RiskLevel } from '@/types';
+import type { GxPClassification, RiskLevel, SystemEnvironment, GampCategory } from '@/types';
 
 export interface GxPOption {
   value: GxPClassification;
