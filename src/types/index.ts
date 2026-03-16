@@ -27,7 +27,10 @@ export interface SystemProfile {
   vendor_contact: string;
   vendor_contract_ref: string;
   owner_id: string;
-  owner_name: string;
+  system_owner_id: string;
+  system_admin_id: string;
+  qa_id: string;
+  it_manager_id?: string;
   validation_date: string;
   review_period_months: number;
   next_review_date: string;
