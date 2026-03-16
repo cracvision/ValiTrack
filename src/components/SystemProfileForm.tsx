@@ -191,7 +191,6 @@ export function SystemProfileForm({ open, onOpenChange, onSubmit, editingSystem 
     setAutoValue(period);
 
     if (period !== null) {
-      setManualOverride(false);
       form.setValue('review_period_months', period);
       setFlashPeriod(true);
       setTimeout(() => setFlashPeriod(false), 1000);
