@@ -15,6 +15,7 @@ import {
 } from '@/components/ui/alert-dialog';
 import { Skeleton } from '@/components/ui/skeleton';
 import { SystemProfileForm } from '@/components/SystemProfileForm';
+import { SystemProfileDetailDialog } from '@/components/SystemProfileDetailDialog';
 import { useSystemProfiles } from '@/hooks/useSystemProfiles';
 import { toast } from '@/hooks/use-toast';
 import { GXP_SHORT_LABELS, ENVIRONMENT_SHORT_LABELS, GAMP_SHORT_LABELS, SYSTEM_ENVIRONMENT_OPTIONS } from '@/lib/gxpClassifications';
@@ -56,6 +57,7 @@ export default function SystemProfiles() {
   const [deleteId, setDeleteId] = useState<string | null>(null);
   const [filterEnvironment, setFilterEnvironment] = useState<string>('all');
   const [filterStatus, setFilterStatus] = useState<string>('all');
+  const [viewingSystem, setViewingSystem] = useState<SystemProfile | null>(null);
 
   const filtered = systems.filter((s) => {
     if (filterEnvironment !== 'all' && s.system_environment !== filterEnvironment) return false;
@@ -200,7 +202,7 @@ export default function SystemProfiles() {
               </TableHeader>
               <TableBody>
                 {filtered.map((system) => (
-                  <TableRow key={system.id}>
+                  <TableRow key={system.id} className="cursor-pointer hover:bg-muted/50" onClick={() => setViewingSystem(system)}>
                     <TableCell>
                       <div>
                         <p className="font-medium text-foreground">{system.name}</p>
@@ -239,10 +241,10 @@ export default function SystemProfiles() {
                     </TableCell>
                     <TableCell>
                       <div className="flex gap-1">
-                        <Button variant="ghost" size="icon" className="h-7 w-7" onClick={() => handleEdit(system)}>
+                        <Button variant="ghost" size="icon" className="h-7 w-7" onClick={(e) => { e.stopPropagation(); handleEdit(system); }}>
                           <Pencil className="h-3.5 w-3.5" />
                         </Button>
-                        <Button variant="ghost" size="icon" className="h-7 w-7 text-destructive hover:text-destructive" onClick={() => setDeleteId(system.id)}>
+                        <Button variant="ghost" size="icon" className="h-7 w-7 text-destructive hover:text-destructive" onClick={(e) => { e.stopPropagation(); setDeleteId(system.id); }}>
                           <Trash2 className="h-3.5 w-3.5" />
                         </Button>
                       </div>
@@ -254,6 +256,16 @@ export default function SystemProfiles() {
           </CardContent>
         </Card>
       )}
+
+      <SystemProfileDetailDialog
+        system={viewingSystem}
+        open={!!viewingSystem}
+        onOpenChange={(open) => { if (!open) setViewingSystem(null); }}
+        onEdit={(system) => {
+          setViewingSystem(null);
+          handleEdit(system);
+        }}
+      />
 
       <SystemProfileForm
         open={formOpen}
