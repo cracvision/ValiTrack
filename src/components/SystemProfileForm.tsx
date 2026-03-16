@@ -201,7 +201,6 @@ export function SystemProfileForm({ open, onOpenChange, onSubmit, editingSystem 
   useEffect(() => {
     if (open) {
       isInitialMount.current = true;
-      setManualOverride(false);
       setFlashPeriod(false);
     }
   }, [open]);
