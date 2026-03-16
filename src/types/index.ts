@@ -1,7 +1,7 @@
 // ValiTrack - Domain Types
 
 export type SystemCategory = 'LIMS' | 'ERP' | 'DCS' | 'MES' | 'QMS' | 'DMS' | 'SCADA' | 'CDS' | 'ELN' | 'Other';
-export type GxPClassification = 'GxP Critical' | 'GxP Non-Critical' | 'Non-GxP';
+export type GxPClassification = 'GMP' | 'GLP' | 'GCP' | 'GDP' | 'GVP' | 'NON_GXP_CRITICAL' | 'NON_GXP_STANDARD';
 export type RiskLevel = 'High' | 'Medium' | 'Low';
 export type SystemStatus = 'Active' | 'Retired' | 'Under Validation';
 

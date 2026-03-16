@@ -5,12 +5,17 @@ import { Button } from '@/components/ui/button';
 import { Server, ClipboardCheck, AlertTriangle, CalendarClock, Plus } from 'lucide-react';
 import { useLocalStorage } from '@/hooks/useLocalStorage';
 import { useNavigate } from 'react-router-dom';
-import type { SystemProfile } from '@/types';
+import { GXP_SHORT_LABELS } from '@/lib/gxpClassifications';
+import type { SystemProfile, GxPClassification } from '@/types';
 
 const classificationColor: Record<string, string> = {
-  'GxP Critical': 'bg-destructive/10 text-destructive',
-  'GxP Non-Critical': 'bg-orange-100 text-orange-700',
-  'Non-GxP': 'bg-muted text-muted-foreground',
+  GMP: 'bg-destructive/10 text-destructive',
+  GLP: 'bg-destructive/10 text-destructive',
+  GCP: 'bg-destructive/10 text-destructive',
+  GDP: 'bg-orange-100 text-orange-700',
+  GVP: 'bg-destructive/10 text-destructive',
+  NON_GXP_CRITICAL: 'bg-orange-100 text-orange-700',
+  NON_GXP_STANDARD: 'bg-muted text-muted-foreground',
 };
 
 const statusColor: Record<string, string> = {
@@ -19,13 +24,16 @@ const statusColor: Record<string, string> = {
   'Under Validation': 'bg-primary/10 text-primary',
 };
 
+// GxP-regulated classifications for the "GxP Critical" stat card
+const GXP_REGULATED: GxPClassification[] = ['GMP', 'GLP', 'GCP', 'GDP', 'GVP'];
+
 export default function Dashboard() {
   const { t } = useTranslation();
   const [systems] = useLocalStorage<SystemProfile[]>('gxp_systems', []);
   const navigate = useNavigate();
 
   const activeSystems = systems.filter((s) => s.status === 'Active');
-  const gxpCritical = systems.filter((s) => s.gxp_classification === 'GxP Critical');
+  const gxpRegulated = systems.filter((s) => GXP_REGULATED.includes(s.gxp_classification as GxPClassification));
   const highRisk = systems.filter((s) => s.risk_level === 'High');
 
   const now = new Date();
@@ -51,7 +59,7 @@ export default function Dashboard() {
     },
     {
       title: t('dashboard.gxpCritical'),
-      value: gxpCritical.length,
+      value: gxpRegulated.length,
       icon: AlertTriangle,
       description: t('dashboard.requireReview'),
     },
@@ -136,8 +144,8 @@ export default function Dashboard() {
                         {t('dashboard.wasDue', { date: new Date(system.next_review_date).toLocaleDateString(), owner: system.system_owner_id })}
                       </p>
                     </div>
-                    <Badge variant="secondary" className={classificationColor[system.gxp_classification]}>
-                      {system.gxp_classification}
+                    <Badge variant="secondary" className={classificationColor[system.gxp_classification] ?? 'bg-muted text-muted-foreground'}>
+                      {GXP_SHORT_LABELS[system.gxp_classification as GxPClassification] ?? system.gxp_classification}
                     </Badge>
                   </div>
                 ))}
@@ -187,8 +195,8 @@ export default function Dashboard() {
                       {system.system_identifier} · {system.system_category} · {system.vendor_name}
                     </p>
                   </div>
-                  <Badge variant="secondary" className={classificationColor[system.gxp_classification]}>
-                    {system.gxp_classification}
+                  <Badge variant="secondary" className={classificationColor[system.gxp_classification] ?? 'bg-muted text-muted-foreground'}>
+                    {GXP_SHORT_LABELS[system.gxp_classification as GxPClassification] ?? system.gxp_classification}
                   </Badge>
                 </div>
               ))}

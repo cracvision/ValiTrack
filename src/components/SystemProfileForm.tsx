@@ -1,3 +1,4 @@
+import { useEffect, useRef, useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
@@ -27,12 +28,14 @@ import {
 } from '@/components/ui/select';
 import { Separator } from '@/components/ui/separator';
 import { useRoleUsers, type RoleUser } from '@/hooks/useRoleUsers';
+import { GXP_OPTIONS, getReviewPeriod } from '@/lib/gxpClassifications';
 import type { SystemProfile, SystemCategory, GxPClassification, RiskLevel, SystemStatus } from '@/types';
 
 const systemCategories: SystemCategory[] = ['LIMS', 'ERP', 'DCS', 'MES', 'QMS', 'DMS', 'SCADA', 'CDS', 'ELN', 'Other'];
-const gxpClassifications: GxPClassification[] = ['GxP Critical', 'GxP Non-Critical', 'Non-GxP'];
 const riskLevels: RiskLevel[] = ['High', 'Medium', 'Low'];
 const systemStatuses: SystemStatus[] = ['Active', 'Retired', 'Under Validation'];
+
+const gxpValues = GXP_OPTIONS.map((o) => o.value) as [string, ...string[]];
 
 const formSchema = z.object({
   name: z.string().trim().min(1, 'System name is required').max(200),
@@ -40,7 +43,7 @@ const formSchema = z.object({
   system_category: z.enum(['LIMS', 'ERP', 'DCS', 'MES', 'QMS', 'DMS', 'SCADA', 'CDS', 'ELN', 'Other']),
   description: z.string().trim().max(1000).optional().default(''),
   intended_use: z.string().trim().min(1, 'Intended use is required').max(2000),
-  gxp_classification: z.enum(['GxP Critical', 'GxP Non-Critical', 'Non-GxP']),
+  gxp_classification: z.enum(gxpValues) as z.ZodEnum<[GxPClassification, ...GxPClassification[]]>,
   risk_level: z.enum(['High', 'Medium', 'Low']),
   status: z.enum(['Active', 'Retired', 'Under Validation']),
   vendor_name: z.string().trim().min(1, 'Vendor name is required').max(200),
@@ -124,6 +127,11 @@ export function SystemProfileForm({ open, onOpenChange, onSubmit, editingSystem 
   const { users: qaUsers, loading: loadingQA } = useRoleUsers('quality_assurance');
   const { users: itManagers, loading: loadingIT } = useRoleUsers('it_manager');
 
+  const [manualOverride, setManualOverride] = useState(false);
+  const [autoValue, setAutoValue] = useState<number | null>(null);
+  const [flashPeriod, setFlashPeriod] = useState(false);
+  const isInitialMount = useRef(true);
+
   const form = useForm<FormValues>({
     resolver: zodResolver(formSchema),
     defaultValues: editingSystem
@@ -152,20 +160,53 @@ export function SystemProfileForm({ open, onOpenChange, onSubmit, editingSystem 
           system_category: 'Other' as SystemCategory,
           description: '',
           intended_use: '',
-          gxp_classification: 'GxP Critical' as GxPClassification,
+          gxp_classification: 'GMP' as GxPClassification,
           risk_level: 'Medium' as RiskLevel,
           status: 'Active' as SystemStatus,
           vendor_name: '',
           vendor_contact: '',
           vendor_contract_ref: '',
           validation_date: '',
-          review_period_months: 12,
+          review_period_months: 24,
           system_owner_id: '',
           system_admin_id: '',
           qa_id: '',
           it_manager_id: '',
         },
   });
+
+  const watchClassification = form.watch('gxp_classification');
+  const watchRisk = form.watch('risk_level');
+
+  // Auto-populate review period when classification or risk changes
+  useEffect(() => {
+    if (isInitialMount.current) {
+      isInitialMount.current = false;
+      // Calculate initial auto value without setting form
+      const initial = getReviewPeriod(watchClassification as GxPClassification, watchRisk as RiskLevel);
+      setAutoValue(initial);
+      return;
+    }
+
+    const period = getReviewPeriod(watchClassification as GxPClassification, watchRisk as RiskLevel);
+    setAutoValue(period);
+
+    if (period !== null) {
+      setManualOverride(false);
+      form.setValue('review_period_months', period);
+      setFlashPeriod(true);
+      setTimeout(() => setFlashPeriod(false), 1000);
+    }
+  }, [watchClassification, watchRisk]);
+
+  // Reset state when dialog opens/closes
+  useEffect(() => {
+    if (open) {
+      isInitialMount.current = true;
+      setManualOverride(false);
+      setFlashPeriod(false);
+    }
+  }, [open]);
 
   const handleSubmit = (values: FormValues) => {
     const now = new Date().toISOString();
@@ -288,8 +329,13 @@ export function SystemProfileForm({ open, onOpenChange, onSubmit, editingSystem 
                     <Select onValueChange={field.onChange} defaultValue={field.value}>
                       <FormControl><SelectTrigger><SelectValue /></SelectTrigger></FormControl>
                       <SelectContent>
-                        {gxpClassifications.map((c) => (
-                          <SelectItem key={c} value={c}>{c}</SelectItem>
+                        {GXP_OPTIONS.map((opt) => (
+                          <SelectItem key={opt.value} value={opt.value}>
+                            <div className="flex flex-col">
+                              <span className="font-medium">{opt.label}</span>
+                              <span className="text-xs text-muted-foreground">{opt.description}</span>
+                            </div>
+                          </SelectItem>
                         ))}
                       </SelectContent>
                     </Select>
@@ -361,7 +407,29 @@ export function SystemProfileForm({ open, onOpenChange, onSubmit, editingSystem 
                 <FormField control={form.control} name="review_period_months" render={({ field }) => (
                   <FormItem>
                     <FormLabel>Review Period (months) *</FormLabel>
-                    <FormControl><Input type="number" min={1} max={120} {...field} /></FormControl>
+                    <FormControl>
+                      <Input
+                        type="number"
+                        min={1}
+                        max={120}
+                        {...field}
+                        onChange={(e) => {
+                          field.onChange(e);
+                          const val = parseInt(e.target.value);
+                          if (!isNaN(val) && autoValue !== null && val !== autoValue) {
+                            setManualOverride(true);
+                          } else if (!isNaN(val) && autoValue !== null && val === autoValue) {
+                            setManualOverride(false);
+                          }
+                        }}
+                        className={flashPeriod ? 'ring-2 ring-primary/50 bg-primary/5 transition-all duration-500' : 'transition-all duration-500'}
+                      />
+                    </FormControl>
+                    <p className="text-xs text-muted-foreground">
+                      {manualOverride
+                        ? `Manually overridden (default: ${autoValue} months)`
+                        : 'Auto-calculated based on GxP classification and risk level'}
+                    </p>
                     <FormMessage />
                   </FormItem>
                 )} />
