@@ -141,12 +141,9 @@ export function UserFormDialog({ open, onOpenChange, onSuccess }: UserFormDialog
               <SelectTrigger><SelectValue placeholder={t('userForm.selectRole')} /></SelectTrigger>
               <SelectContent>
                 {ROLE_OPTIONS.map((r) => (
-                  <SelectItem key={r.value} value={r.value}>
-                    <div className="flex flex-col">
-                      <span>{r.label}</span>
-                      <span className="text-xs text-muted-foreground">{t(`userForm.roleDescriptions.${r.value}`)}</span>
-                    </div>
-                  </SelectItem>
+                  <SelectItemWithDescription key={r.value} value={r.value} description={t(`userForm.roleDescriptions.${r.value}`)}>
+                    <span>{r.label}</span>
+                  </SelectItemWithDescription>
                 ))}
               </SelectContent>
             </Select>
