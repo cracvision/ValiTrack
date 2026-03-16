@@ -57,6 +57,7 @@ export default function SystemProfiles() {
   const [deleteId, setDeleteId] = useState<string | null>(null);
   const [filterEnvironment, setFilterEnvironment] = useState<string>('all');
   const [filterStatus, setFilterStatus] = useState<string>('all');
+  const [viewingSystem, setViewingSystem] = useState<SystemProfile | null>(null);
 
   const filtered = systems.filter((s) => {
     if (filterEnvironment !== 'all' && s.system_environment !== filterEnvironment) return false;
