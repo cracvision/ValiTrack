@@ -311,7 +311,7 @@ export function SystemProfileForm({ open, onOpenChange, onSubmit, editingSystem 
                 <FormField control={form.control} name="system_environment" render={({ field }) => (
                   <FormItem>
                     <FormLabel>System Environment *</FormLabel>
-                    <Select onValueChange={field.onChange} defaultValue={field.value || undefined}>
+                    <Select onValueChange={field.onChange} value={field.value || undefined}>
                       <FormControl><SelectTrigger><SelectValue placeholder="Select the system environment" /></SelectTrigger></FormControl>
                       <SelectContent>
                         {SYSTEM_ENVIRONMENT_OPTIONS.map((opt) => (
