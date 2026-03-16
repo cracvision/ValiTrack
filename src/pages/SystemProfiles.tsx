@@ -31,8 +31,8 @@ import {
 import { SystemProfileForm } from '@/components/SystemProfileForm';
 import { useLocalStorage } from '@/hooks/useLocalStorage';
 import { toast } from '@/hooks/use-toast';
-import { GXP_SHORT_LABELS } from '@/lib/gxpClassifications';
-import type { SystemProfile, GxPClassification } from '@/types';
+import { GXP_SHORT_LABELS, ENVIRONMENT_SHORT_LABELS, GAMP_SHORT_LABELS, SYSTEM_ENVIRONMENT_OPTIONS } from '@/lib/gxpClassifications';
+import type { SystemProfile, GxPClassification, SystemEnvironment, GampCategory } from '@/types';
 
 const classificationColor: Record<string, string> = {
   GMP: 'bg-destructive/10 text-destructive',
@@ -56,16 +56,23 @@ const statusColor: Record<string, string> = {
   'Under Validation': 'bg-primary/10 text-primary',
 };
 
+const gampColor: Record<string, string> = {
+  '1': 'bg-green-100 text-green-700',
+  '3': 'bg-muted text-muted-foreground',
+  '4': 'bg-orange-100 text-orange-700',
+  '5': 'bg-destructive/10 text-destructive',
+};
+
 export default function SystemProfiles() {
   const [systems, setSystems] = useLocalStorage<SystemProfile[]>('gxp_systems', []);
   const [formOpen, setFormOpen] = useState(false);
   const [editingSystem, setEditingSystem] = useState<SystemProfile | null>(null);
   const [deleteId, setDeleteId] = useState<string | null>(null);
-  const [filterCategory, setFilterCategory] = useState<string>('all');
+  const [filterEnvironment, setFilterEnvironment] = useState<string>('all');
   const [filterStatus, setFilterStatus] = useState<string>('all');
 
   const filtered = systems.filter((s) => {
-    if (filterCategory !== 'all' && s.system_category !== filterCategory) return false;
+    if (filterEnvironment !== 'all' && s.system_environment !== filterEnvironment) return false;
     if (filterStatus !== 'all' && s.status !== filterStatus) return false;
     return true;
   });
@@ -143,14 +150,14 @@ export default function SystemProfiles() {
                 {filtered.length} of {systems.length} system{systems.length !== 1 ? 's' : ''}
               </CardTitle>
               <div className="flex gap-2">
-                <Select value={filterCategory} onValueChange={setFilterCategory}>
-                  <SelectTrigger className="w-[140px] h-8 text-xs">
-                    <SelectValue placeholder="Category" />
+                <Select value={filterEnvironment} onValueChange={setFilterEnvironment}>
+                  <SelectTrigger className="w-[160px] h-8 text-xs">
+                    <SelectValue placeholder="Environment" />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="all">All Categories</SelectItem>
-                    {['LIMS', 'ERP', 'DCS', 'MES', 'QMS', 'DMS', 'SCADA', 'CDS', 'ELN', 'Other'].map((c) => (
-                      <SelectItem key={c} value={c}>{c}</SelectItem>
+                    <SelectItem value="all">All Environments</SelectItem>
+                    {SYSTEM_ENVIRONMENT_OPTIONS.map((e) => (
+                      <SelectItem key={e.value} value={e.value}>{e.label}</SelectItem>
                     ))}
                   </SelectContent>
                 </Select>
@@ -173,8 +180,9 @@ export default function SystemProfiles() {
               <TableHeader>
                 <TableRow>
                   <TableHead>System</TableHead>
-                  <TableHead>Category</TableHead>
+                  <TableHead>Environment</TableHead>
                   <TableHead>Classification</TableHead>
+                  <TableHead>GAMP</TableHead>
                   <TableHead>Risk</TableHead>
                   <TableHead>Status</TableHead>
                   <TableHead>Next Review</TableHead>
@@ -191,11 +199,18 @@ export default function SystemProfiles() {
                       </div>
                     </TableCell>
                     <TableCell>
-                      <span className="text-sm text-foreground">{system.system_category}</span>
+                      <span className="text-sm text-foreground">
+                        {ENVIRONMENT_SHORT_LABELS[system.system_environment as SystemEnvironment] ?? system.system_environment}
+                      </span>
                     </TableCell>
                     <TableCell>
                       <Badge variant="secondary" className={classificationColor[system.gxp_classification] ?? 'bg-muted text-muted-foreground'}>
                         {GXP_SHORT_LABELS[system.gxp_classification as GxPClassification] ?? system.gxp_classification}
+                      </Badge>
+                    </TableCell>
+                    <TableCell>
+                      <Badge variant="secondary" className={gampColor[system.gamp_category] ?? 'bg-muted text-muted-foreground'}>
+                        {GAMP_SHORT_LABELS[system.gamp_category as GampCategory] ?? system.gamp_category}
                       </Badge>
                     </TableCell>
                     <TableCell>
