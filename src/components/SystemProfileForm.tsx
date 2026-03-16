@@ -156,17 +156,17 @@ export function SystemProfileForm({ open, onOpenChange, onSubmit, editingSystem 
       : {
           name: '',
           system_identifier: '',
-          system_category: 'Other' as SystemCategory,
+          system_category: '' as SystemCategory,
           description: '',
           intended_use: '',
           gxp_classification: '' as GxPClassification,
           risk_level: '' as RiskLevel,
-          status: 'Active' as SystemStatus,
+          status: '' as SystemStatus,
           vendor_name: '',
           vendor_contact: '',
           vendor_contract_ref: '',
           validation_date: '',
-          review_period_months: 24,
+          review_period_months: '' as unknown as number,
           system_owner_id: '',
           system_admin_id: '',
           qa_id: '',
@@ -268,8 +268,8 @@ export function SystemProfileForm({ open, onOpenChange, onSubmit, editingSystem 
                 <FormField control={form.control} name="system_category" render={({ field }) => (
                   <FormItem>
                     <FormLabel>Category *</FormLabel>
-                    <Select onValueChange={field.onChange} defaultValue={field.value}>
-                      <FormControl><SelectTrigger><SelectValue /></SelectTrigger></FormControl>
+                    <Select onValueChange={field.onChange} defaultValue={field.value || undefined}>
+                      <FormControl><SelectTrigger><SelectValue placeholder="Select the system category" /></SelectTrigger></FormControl>
                       <SelectContent>
                         {systemCategories.map((cat) => (
                           <SelectItem key={cat} value={cat}>{cat}</SelectItem>
@@ -282,8 +282,8 @@ export function SystemProfileForm({ open, onOpenChange, onSubmit, editingSystem 
                 <FormField control={form.control} name="status" render={({ field }) => (
                   <FormItem>
                     <FormLabel>Status *</FormLabel>
-                    <Select onValueChange={field.onChange} defaultValue={field.value}>
-                      <FormControl><SelectTrigger><SelectValue /></SelectTrigger></FormControl>
+                    <Select onValueChange={field.onChange} defaultValue={field.value || undefined}>
+                      <FormControl><SelectTrigger><SelectValue placeholder="Select the system status" /></SelectTrigger></FormControl>
                       <SelectContent>
                         {systemStatuses.map((s) => (
                           <SelectItem key={s} value={s}>{s}</SelectItem>
@@ -408,12 +408,14 @@ export function SystemProfileForm({ open, onOpenChange, onSubmit, editingSystem 
                       <Input
                         type="number"
                         {...field}
+                        value={field.value || ''}
+                        placeholder="Auto-calculated"
                         readOnly
                         className={`${flashPeriod ? 'ring-2 ring-primary/50 bg-primary/5 transition-all duration-500' : 'transition-all duration-500'} read-only:bg-muted/50 read-only:cursor-default`}
                       />
                     </FormControl>
                     <p className="text-xs text-muted-foreground">
-                      Auto-calculated based on GxP classification and risk level
+                      {field.value ? 'Auto-calculated based on GxP classification and risk level' : 'Select GxP classification and risk level to calculate'}
                     </p>
                     <FormMessage />
                   </FormItem>
