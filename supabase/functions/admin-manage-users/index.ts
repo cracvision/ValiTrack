@@ -56,41 +56,8 @@ Deno.serve(async (req) => {
     switch (action) {
       // ───────── LIST USERS ─────────
       case "list_users": {
-        // Use the private view via raw SQL (service_role bypasses schema restrictions)
         const { data, error } = await admin.rpc("get_admin_users_list" as any);
-        
-        if (error) {
-          // Fallback: manual join if the function doesn't exist yet
-          const { data: appUsers, error: usersErr } = await admin
-            .from("app_users")
-            .select("*")
-            .order("created_at", { ascending: false });
-
-          if (usersErr) return json({ error: usersErr.message }, 500);
-
-          const { data: allRoles } = await admin.from("user_roles").select("*");
-          const { data: allLangs } = await admin.from("user_language_preference").select("*");
-
-          const users = (appUsers || []).map((u: any) => ({
-            user_id: u.id,
-            full_name: u.full_name,
-            username: u.username,
-            email: u.email,
-            is_blocked: u.is_blocked,
-            blocked_reason: u.blocked_reason,
-            account_expires_at: u.account_expires_at,
-            must_change_password: u.must_change_password,
-            registered_at: u.created_at,
-            language_code: (allLangs || []).find((l: any) => l.user_id === u.id)?.language_code || null,
-            roles: (allRoles || [])
-              .filter((r: any) => r.user_id === u.id)
-              .map((r: any) => r.role)
-              .join(","),
-          }));
-
-          return json({ users });
-        }
-
+        if (error) return json({ error: error.message }, 500);
         return json({ users: data });
       }
 
