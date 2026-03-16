@@ -95,7 +95,7 @@ function RoleSelectField({ form, name, label, users, loading, required }: RoleSe
         <FormLabel>{label}{required ? ' *' : ''}</FormLabel>
         <Select
           onValueChange={field.onChange}
-          defaultValue={field.value || undefined}
+          value={field.value || undefined}
           disabled={loading || !hasUsers}
         >
           <FormControl>

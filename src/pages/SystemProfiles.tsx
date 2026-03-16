@@ -257,6 +257,16 @@ export default function SystemProfiles() {
         </Card>
       )}
 
+      <SystemProfileDetailDialog
+        system={viewingSystem}
+        open={!!viewingSystem}
+        onOpenChange={(open) => { if (!open) setViewingSystem(null); }}
+        onEdit={(system) => {
+          setViewingSystem(null);
+          handleEdit(system);
+        }}
+      />
+
       <SystemProfileForm
         open={formOpen}
         onOpenChange={(open) => {
