@@ -140,6 +140,99 @@ export type Database = {
         }
         Relationships: []
       }
+      system_profiles: {
+        Row: {
+          created_at: string
+          created_by: string
+          deleted_at: string | null
+          deleted_by: string | null
+          description: string
+          gamp_category: string
+          gxp_classification: string
+          id: string
+          intended_use: string
+          is_deleted: boolean
+          it_manager_id: string | null
+          name: string
+          next_review_date: string
+          owner_id: string
+          qa_id: string
+          review_period_months: number
+          risk_level: string
+          status: string
+          system_admin_id: string
+          system_environment: string
+          system_identifier: string
+          system_owner_id: string
+          updated_at: string
+          updated_by: string | null
+          validation_date: string
+          vendor_contact: string
+          vendor_contract_ref: string
+          vendor_name: string
+        }
+        Insert: {
+          created_at?: string
+          created_by: string
+          deleted_at?: string | null
+          deleted_by?: string | null
+          description?: string
+          gamp_category: string
+          gxp_classification: string
+          id?: string
+          intended_use?: string
+          is_deleted?: boolean
+          it_manager_id?: string | null
+          name: string
+          next_review_date: string
+          owner_id?: string
+          qa_id?: string
+          review_period_months?: number
+          risk_level: string
+          status?: string
+          system_admin_id?: string
+          system_environment: string
+          system_identifier: string
+          system_owner_id?: string
+          updated_at?: string
+          updated_by?: string | null
+          validation_date: string
+          vendor_contact?: string
+          vendor_contract_ref?: string
+          vendor_name?: string
+        }
+        Update: {
+          created_at?: string
+          created_by?: string
+          deleted_at?: string | null
+          deleted_by?: string | null
+          description?: string
+          gamp_category?: string
+          gxp_classification?: string
+          id?: string
+          intended_use?: string
+          is_deleted?: boolean
+          it_manager_id?: string | null
+          name?: string
+          next_review_date?: string
+          owner_id?: string
+          qa_id?: string
+          review_period_months?: number
+          risk_level?: string
+          status?: string
+          system_admin_id?: string
+          system_environment?: string
+          system_identifier?: string
+          system_owner_id?: string
+          updated_at?: string
+          updated_by?: string | null
+          validation_date?: string
+          vendor_contact?: string
+          vendor_contract_ref?: string
+          vendor_name?: string
+        }
+        Relationships: []
+      }
       user_language_preference: {
         Row: {
           created_at: string

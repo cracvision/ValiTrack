@@ -2,11 +2,12 @@ import { useTranslation } from 'react-i18next';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
+import { Skeleton } from '@/components/ui/skeleton';
 import { Server, ClipboardCheck, AlertTriangle, CalendarClock, Plus } from 'lucide-react';
-import { useLocalStorage } from '@/hooks/useLocalStorage';
+import { useSystemProfiles } from '@/hooks/useSystemProfiles';
 import { useNavigate } from 'react-router-dom';
 import { GXP_SHORT_LABELS } from '@/lib/gxpClassifications';
-import type { SystemProfile, GxPClassification } from '@/types';
+import type { GxPClassification } from '@/types';
 
 const classificationColor: Record<string, string> = {
   GMP: 'bg-destructive/10 text-destructive',
@@ -24,12 +25,11 @@ const statusColor: Record<string, string> = {
   'Under Validation': 'bg-primary/10 text-primary',
 };
 
-// GxP-regulated classifications for the "GxP Critical" stat card
 const GXP_REGULATED: GxPClassification[] = ['GMP', 'GLP', 'GCP', 'GDP', 'GVP'];
 
 export default function Dashboard() {
   const { t } = useTranslation();
-  const [systems] = useLocalStorage<SystemProfile[]>('gxp_systems', []);
+  const { systems, loading } = useSystemProfiles();
   const navigate = useNavigate();
 
   const activeSystems = systems.filter((s) => s.status === 'Active');
@@ -78,6 +78,28 @@ export default function Dashboard() {
         : t('dashboard.onSchedule'),
     },
   ];
+
+  if (loading) {
+    return (
+      <div className="space-y-6">
+        <div>
+          <Skeleton className="h-8 w-64 mb-2" />
+          <Skeleton className="h-4 w-48" />
+        </div>
+        <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
+          {Array.from({ length: 4 }).map((_, i) => (
+            <Card key={i}>
+              <CardContent className="p-6">
+                <Skeleton className="h-4 w-24 mb-4" />
+                <Skeleton className="h-8 w-12 mb-2" />
+                <Skeleton className="h-3 w-32" />
+              </CardContent>
+            </Card>
+          ))}
+        </div>
+      </div>
+    );
+  }
 
   if (systems.length === 0) {
     return (

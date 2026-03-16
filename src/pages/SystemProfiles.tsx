@@ -4,32 +4,18 @@ import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
+  Table, TableBody, TableCell, TableHead, TableHeader, TableRow,
 } from '@/components/ui/table';
 import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
+  Select, SelectContent, SelectItem, SelectTrigger, SelectValue,
 } from '@/components/ui/select';
 import {
-  AlertDialog,
-  AlertDialogAction,
-  AlertDialogCancel,
-  AlertDialogContent,
-  AlertDialogDescription,
-  AlertDialogFooter,
-  AlertDialogHeader,
-  AlertDialogTitle,
+  AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent,
+  AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle,
 } from '@/components/ui/alert-dialog';
+import { Skeleton } from '@/components/ui/skeleton';
 import { SystemProfileForm } from '@/components/SystemProfileForm';
-import { useLocalStorage } from '@/hooks/useLocalStorage';
+import { useSystemProfiles } from '@/hooks/useSystemProfiles';
 import { toast } from '@/hooks/use-toast';
 import { GXP_SHORT_LABELS, ENVIRONMENT_SHORT_LABELS, GAMP_SHORT_LABELS, SYSTEM_ENVIRONMENT_OPTIONS } from '@/lib/gxpClassifications';
 import type { SystemProfile, GxPClassification, SystemEnvironment, GampCategory } from '@/types';
@@ -64,7 +50,7 @@ const gampColor: Record<string, string> = {
 };
 
 export default function SystemProfiles() {
-  const [systems, setSystems] = useLocalStorage<SystemProfile[]>('gxp_systems', []);
+  const { systems, loading, addSystem, updateSystem, deleteSystem } = useSystemProfiles();
   const [formOpen, setFormOpen] = useState(false);
   const [editingSystem, setEditingSystem] = useState<SystemProfile | null>(null);
   const [deleteId, setDeleteId] = useState<string | null>(null);
@@ -77,18 +63,18 @@ export default function SystemProfiles() {
     return true;
   });
 
-  const handleSubmit = (system: SystemProfile) => {
-    setSystems((prev) => {
-      const exists = prev.find((s) => s.id === system.id);
-      if (exists) {
-        return prev.map((s) => (s.id === system.id ? system : s));
-      }
-      return [...prev, system];
-    });
-    toast({
-      title: editingSystem ? 'System updated' : 'System created',
-      description: `${system.name} (${system.system_identifier}) has been saved.`,
-    });
+  const handleSubmit = async (system: SystemProfile) => {
+    const isEdit = !!editingSystem;
+    const success = isEdit
+      ? await updateSystem(system)
+      : await addSystem(system);
+
+    if (success) {
+      toast({
+        title: isEdit ? 'System updated' : 'System created',
+        description: `${system.name} (${system.system_identifier}) has been saved.`,
+      });
+    }
     setEditingSystem(null);
   };
 
@@ -97,21 +83,44 @@ export default function SystemProfiles() {
     setFormOpen(true);
   };
 
-  const handleDelete = () => {
+  const handleDelete = async () => {
     if (!deleteId) return;
     const system = systems.find((s) => s.id === deleteId);
-    setSystems((prev) => prev.filter((s) => s.id !== deleteId));
+    const success = await deleteSystem(deleteId);
     setDeleteId(null);
-    toast({
-      title: 'System deleted',
-      description: `${system?.name} has been removed.`,
-    });
+    if (success) {
+      toast({
+        title: 'System deleted',
+        description: `${system?.name} has been removed.`,
+      });
+    }
   };
 
   const handleNewSystem = () => {
     setEditingSystem(null);
     setFormOpen(true);
   };
+
+  if (loading) {
+    return (
+      <div className="space-y-6">
+        <div className="flex items-center justify-between">
+          <div>
+            <Skeleton className="h-8 w-48 mb-2" />
+            <Skeleton className="h-4 w-72" />
+          </div>
+          <Skeleton className="h-10 w-40" />
+        </div>
+        <Card>
+          <CardContent className="p-6 space-y-4">
+            {Array.from({ length: 3 }).map((_, i) => (
+              <Skeleton key={i} className="h-12 w-full" />
+            ))}
+          </CardContent>
+        </Card>
+      </div>
+    );
+  }
 
   return (
     <div className="space-y-6">
