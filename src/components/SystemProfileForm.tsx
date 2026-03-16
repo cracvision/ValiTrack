@@ -407,25 +407,13 @@ export function SystemProfileForm({ open, onOpenChange, onSubmit, editingSystem 
                     <FormControl>
                       <Input
                         type="number"
-                        min={1}
-                        max={120}
                         {...field}
-                        onChange={(e) => {
-                          field.onChange(e);
-                          const val = parseInt(e.target.value);
-                          if (!isNaN(val) && autoValue !== null && val !== autoValue) {
-                            setManualOverride(true);
-                          } else if (!isNaN(val) && autoValue !== null && val === autoValue) {
-                            setManualOverride(false);
-                          }
-                        }}
-                        className={flashPeriod ? 'ring-2 ring-primary/50 bg-primary/5 transition-all duration-500' : 'transition-all duration-500'}
+                        readOnly
+                        className={`${flashPeriod ? 'ring-2 ring-primary/50 bg-primary/5 transition-all duration-500' : 'transition-all duration-500'} read-only:bg-muted/50 read-only:cursor-default`}
                       />
                     </FormControl>
                     <p className="text-xs text-muted-foreground">
-                      {manualOverride
-                        ? `Manually overridden (default: ${autoValue} months)`
-                        : 'Auto-calculated based on GxP classification and risk level'}
+                      Auto-calculated based on GxP classification and risk level
                     </p>
                     <FormMessage />
                   </FormItem>
