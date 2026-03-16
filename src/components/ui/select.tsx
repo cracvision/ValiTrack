@@ -162,6 +162,7 @@ export {
   SelectContent,
   SelectLabel,
   SelectItem,
+  SelectItemWithDescription,
   SelectSeparator,
   SelectScrollUpButton,
   SelectScrollDownButton,
