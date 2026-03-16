@@ -15,6 +15,7 @@ import {
 } from '@/components/ui/alert-dialog';
 import { Skeleton } from '@/components/ui/skeleton';
 import { SystemProfileForm } from '@/components/SystemProfileForm';
+import { SystemProfileDetailDialog } from '@/components/SystemProfileDetailDialog';
 import { useSystemProfiles } from '@/hooks/useSystemProfiles';
 import { toast } from '@/hooks/use-toast';
 import { GXP_SHORT_LABELS, ENVIRONMENT_SHORT_LABELS, GAMP_SHORT_LABELS, SYSTEM_ENVIRONMENT_OPTIONS } from '@/lib/gxpClassifications';
