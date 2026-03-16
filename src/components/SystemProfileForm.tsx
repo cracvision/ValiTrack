@@ -127,7 +127,6 @@ export function SystemProfileForm({ open, onOpenChange, onSubmit, editingSystem 
   const { users: qaUsers, loading: loadingQA } = useRoleUsers('quality_assurance');
   const { users: itManagers, loading: loadingIT } = useRoleUsers('it_manager');
 
-  const [manualOverride, setManualOverride] = useState(false);
   const [autoValue, setAutoValue] = useState<number | null>(null);
   const [flashPeriod, setFlashPeriod] = useState(false);
   const isInitialMount = useRef(true);
@@ -160,8 +159,8 @@ export function SystemProfileForm({ open, onOpenChange, onSubmit, editingSystem 
           system_category: 'Other' as SystemCategory,
           description: '',
           intended_use: '',
-          gxp_classification: 'GMP' as GxPClassification,
-          risk_level: 'Medium' as RiskLevel,
+          gxp_classification: '' as GxPClassification,
+          risk_level: '' as RiskLevel,
           status: 'Active' as SystemStatus,
           vendor_name: '',
           vendor_contact: '',
@@ -192,7 +191,6 @@ export function SystemProfileForm({ open, onOpenChange, onSubmit, editingSystem 
     setAutoValue(period);
 
     if (period !== null) {
-      setManualOverride(false);
       form.setValue('review_period_months', period);
       setFlashPeriod(true);
       setTimeout(() => setFlashPeriod(false), 1000);
@@ -203,7 +201,6 @@ export function SystemProfileForm({ open, onOpenChange, onSubmit, editingSystem 
   useEffect(() => {
     if (open) {
       isInitialMount.current = true;
-      setManualOverride(false);
       setFlashPeriod(false);
     }
   }, [open]);
@@ -326,8 +323,8 @@ export function SystemProfileForm({ open, onOpenChange, onSubmit, editingSystem 
                 <FormField control={form.control} name="gxp_classification" render={({ field }) => (
                   <FormItem>
                     <FormLabel>GxP Classification *</FormLabel>
-                    <Select onValueChange={field.onChange} defaultValue={field.value}>
-                      <FormControl><SelectTrigger><SelectValue /></SelectTrigger></FormControl>
+                    <Select onValueChange={field.onChange} defaultValue={field.value || undefined}>
+                      <FormControl><SelectTrigger><SelectValue placeholder="Choose the corresponding classification" /></SelectTrigger></FormControl>
                       <SelectContent>
                         {GXP_OPTIONS.map((opt) => (
                           <SelectItem key={opt.value} value={opt.value}>
@@ -345,8 +342,8 @@ export function SystemProfileForm({ open, onOpenChange, onSubmit, editingSystem 
                 <FormField control={form.control} name="risk_level" render={({ field }) => (
                   <FormItem>
                     <FormLabel>Risk Level *</FormLabel>
-                    <Select onValueChange={field.onChange} defaultValue={field.value}>
-                      <FormControl><SelectTrigger><SelectValue /></SelectTrigger></FormControl>
+                    <Select onValueChange={field.onChange} defaultValue={field.value || undefined}>
+                      <FormControl><SelectTrigger><SelectValue placeholder="Choose the risk level" /></SelectTrigger></FormControl>
                       <SelectContent>
                         {riskLevels.map((r) => (
                           <SelectItem key={r} value={r}>{r}</SelectItem>
@@ -410,25 +407,13 @@ export function SystemProfileForm({ open, onOpenChange, onSubmit, editingSystem 
                     <FormControl>
                       <Input
                         type="number"
-                        min={1}
-                        max={120}
                         {...field}
-                        onChange={(e) => {
-                          field.onChange(e);
-                          const val = parseInt(e.target.value);
-                          if (!isNaN(val) && autoValue !== null && val !== autoValue) {
-                            setManualOverride(true);
-                          } else if (!isNaN(val) && autoValue !== null && val === autoValue) {
-                            setManualOverride(false);
-                          }
-                        }}
-                        className={flashPeriod ? 'ring-2 ring-primary/50 bg-primary/5 transition-all duration-500' : 'transition-all duration-500'}
+                        readOnly
+                        className={`${flashPeriod ? 'ring-2 ring-primary/50 bg-primary/5 transition-all duration-500' : 'transition-all duration-500'} read-only:bg-muted/50 read-only:cursor-default`}
                       />
                     </FormControl>
                     <p className="text-xs text-muted-foreground">
-                      {manualOverride
-                        ? `Manually overridden (default: ${autoValue} months)`
-                        : 'Auto-calculated based on GxP classification and risk level'}
+                      Auto-calculated based on GxP classification and risk level
                     </p>
                     <FormMessage />
                   </FormItem>
