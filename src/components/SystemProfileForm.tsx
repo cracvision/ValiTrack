@@ -390,7 +390,7 @@ export function SystemProfileForm({ open, onOpenChange, onSubmit, editingSystem 
                 <FormField control={form.control} name="risk_level" render={({ field }) => (
                   <FormItem>
                     <FormLabel>Risk Level *</FormLabel>
-                    <Select onValueChange={field.onChange} defaultValue={field.value || undefined}>
+                    <Select onValueChange={field.onChange} value={field.value || undefined}>
                       <FormControl><SelectTrigger><SelectValue placeholder="Choose the risk level" /></SelectTrigger></FormControl>
                       <SelectContent>
                         {riskLevels.map((r) => (
