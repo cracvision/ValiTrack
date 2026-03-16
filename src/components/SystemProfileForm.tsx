@@ -316,12 +316,9 @@ export function SystemProfileForm({ open, onOpenChange, onSubmit, editingSystem 
                       <FormControl><SelectTrigger><SelectValue placeholder="Select the system environment" /></SelectTrigger></FormControl>
                       <SelectContent>
                         {SYSTEM_ENVIRONMENT_OPTIONS.map((opt) => (
-                          <SelectItem key={opt.value} value={opt.value}>
-                            <div className="flex flex-col">
-                              <span className="font-medium">{opt.label}</span>
-                              <span className="text-xs text-muted-foreground">{opt.description}</span>
-                            </div>
-                          </SelectItem>
+                          <SelectItemWithDescription key={opt.value} value={opt.value} description={opt.description}>
+                            <span className="font-medium">{opt.label}</span>
+                          </SelectItemWithDescription>
                         ))}
                       </SelectContent>
                     </Select>
