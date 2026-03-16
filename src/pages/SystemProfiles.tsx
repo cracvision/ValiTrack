@@ -31,12 +31,17 @@ import {
 import { SystemProfileForm } from '@/components/SystemProfileForm';
 import { useLocalStorage } from '@/hooks/useLocalStorage';
 import { toast } from '@/hooks/use-toast';
-import type { SystemProfile } from '@/types';
+import { GXP_SHORT_LABELS } from '@/lib/gxpClassifications';
+import type { SystemProfile, GxPClassification } from '@/types';
 
 const classificationColor: Record<string, string> = {
-  'GxP Critical': 'bg-destructive/10 text-destructive',
-  'GxP Non-Critical': 'bg-orange-100 text-orange-700',
-  'Non-GxP': 'bg-muted text-muted-foreground',
+  GMP: 'bg-destructive/10 text-destructive',
+  GLP: 'bg-destructive/10 text-destructive',
+  GCP: 'bg-destructive/10 text-destructive',
+  GDP: 'bg-orange-100 text-orange-700',
+  GVP: 'bg-destructive/10 text-destructive',
+  NON_GXP_CRITICAL: 'bg-orange-100 text-orange-700',
+  NON_GXP_STANDARD: 'bg-muted text-muted-foreground',
 };
 
 const riskColor: Record<string, string> = {
@@ -189,8 +194,8 @@ export default function SystemProfiles() {
                       <span className="text-sm text-foreground">{system.system_category}</span>
                     </TableCell>
                     <TableCell>
-                      <Badge variant="secondary" className={classificationColor[system.gxp_classification]}>
-                        {system.gxp_classification}
+                      <Badge variant="secondary" className={classificationColor[system.gxp_classification] ?? 'bg-muted text-muted-foreground'}>
+                        {GXP_SHORT_LABELS[system.gxp_classification as GxPClassification] ?? system.gxp_classification}
                       </Badge>
                     </TableCell>
                     <TableCell>
