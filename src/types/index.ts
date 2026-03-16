@@ -18,7 +18,8 @@ export interface SystemProfile {
   id: string;
   name: string;
   system_identifier: string;
-  system_category: SystemCategory;
+  system_environment: SystemEnvironment;
+  gamp_category: GampCategory;
   description: string;
   intended_use: string;
   gxp_classification: GxPClassification;
