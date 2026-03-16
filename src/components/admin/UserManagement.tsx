@@ -28,6 +28,7 @@ const ROLE_LABELS: Record<string, string> = {
   system_administrator: 'System Admin',
   business_owner: 'Business Owner',
   quality_assurance: 'Quality Assurance',
+  it_manager: 'IT Manager',
 };
 
 export interface UserData {

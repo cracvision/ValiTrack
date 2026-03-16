@@ -26,6 +26,7 @@ const ROLE_OPTIONS = [
   { value: 'system_administrator', label: 'System Administrator' },
   { value: 'business_owner', label: 'Business Owner' },
   { value: 'quality_assurance', label: 'Quality Assurance' },
+  { value: 'it_manager', label: 'IT Manager' },
 ] as const;
 
 const LANGUAGE_OPTIONS = [

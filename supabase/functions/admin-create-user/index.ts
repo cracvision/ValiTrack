@@ -61,7 +61,7 @@ Deno.serve(async (req) => {
     }
 
     // Validate role
-    const validRoles = ['super_user', 'system_owner', 'system_administrator', 'business_owner', 'quality_assurance'];
+    const validRoles = ['super_user', 'system_owner', 'system_administrator', 'business_owner', 'quality_assurance', 'it_manager'];
     if (!validRoles.includes(role)) {
       return new Response(JSON.stringify({ error: `Invalid role. Valid: ${validRoles.join(', ')}` }), {
         status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' },

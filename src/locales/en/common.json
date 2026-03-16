@@ -142,7 +142,8 @@
       "system_owner": "Owner of the system under periodic review",
       "system_administrator": "Administrator of the system under review",
       "business_owner": "Business process owner",
-      "quality_assurance": "Quality assurance"
+      "quality_assurance": "Quality assurance",
+      "it_manager": "IT department manager for the system under review"
     }
   },
   "password": {

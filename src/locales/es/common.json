@@ -142,7 +142,8 @@
       "system_owner": "Dueño del sistema bajo revisión periódica",
       "system_administrator": "Administrador del sistema bajo revisión",
       "business_owner": "Responsable del negocio",
-      "quality_assurance": "Garantía de calidad"
+      "quality_assurance": "Garantía de calidad",
+      "it_manager": "Gerente del departamento de IT del sistema bajo revisión"
     }
   },
   "password": {

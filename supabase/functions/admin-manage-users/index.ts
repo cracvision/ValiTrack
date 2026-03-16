@@ -211,7 +211,7 @@ Deno.serve(async (req) => {
 
         // Update role if provided
         if (role) {
-          const validRoles = ['super_user', 'system_owner', 'system_administrator', 'business_owner', 'quality_assurance'];
+          const validRoles = ['super_user', 'system_owner', 'system_administrator', 'business_owner', 'quality_assurance', 'it_manager'];
           if (!validRoles.includes(role)) return json({ error: "Invalid role" }, 400);
 
           await admin.from("user_roles").delete().eq("user_id", user_id);
