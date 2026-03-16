@@ -1,4 +1,4 @@
-// GxP Periodic Review - Domain Types
+// ValiTrack - Domain Types
 
 export type SystemCategory = 'LIMS' | 'ERP' | 'DCS' | 'MES' | 'QMS' | 'DMS' | 'SCADA' | 'CDS' | 'ELN' | 'Other';
 export type GxPClassification = 'GxP Critical' | 'GxP Non-Critical' | 'Non-GxP';

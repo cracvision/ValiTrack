@@ -25,7 +25,7 @@
   "dashboard": {
     "title": "Panel",
     "subtitle": "Gestión de revisiones periódicas de sistemas computarizados",
-    "welcome": "Bienvenido a GxP Periodic Review",
+    "welcome": "Bienvenido a ValiTrack",
     "welcomeDesc": "Comienza registrando tu primer sistema computarizado. Una vez registrado, podrás rastrear el estado de validación, programar revisiones periódicas y gestionar la documentación de cumplimiento.",
     "registerFirst": "Registrar Primer Sistema",
     "overviewSubtitle": "Resumen del estado de revisiones periódicas de sistemas computarizados",

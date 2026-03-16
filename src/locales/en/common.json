@@ -1,8 +1,8 @@
 {
   "app": {
-    "name": "GxP Review",
+    "name": "ValiTrack",
     "subtitle": "Periodic Review Manager",
-    "headerTitle": "GxP Periodic Review Management"
+    "headerTitle": "ValiTrack — Periodic Review Management"
   },
   "nav": {
     "main": "Main",
@@ -25,7 +25,7 @@
   "dashboard": {
     "title": "Dashboard",
     "subtitle": "GxP Computerized System Periodic Review Management",
-    "welcome": "Welcome to GxP Periodic Review",
+    "welcome": "Welcome to ValiTrack",
     "welcomeDesc": "Start by registering your first computerized system. Once registered, you can track validation status, schedule periodic reviews, and manage compliance documentation.",
     "registerFirst": "Register First System",
     "overviewSubtitle": "Overview of computerized system periodic review status",
