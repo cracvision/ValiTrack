@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useRef } from 'react';
 import { useTranslation } from 'react-i18next';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
@@ -49,6 +49,33 @@ interface UserManagementProps {
   currentUserId: string;
 }
 
+async function callAdmin(body: Record<string, unknown>) {
+  const { data: sessionData } = await supabase.auth.getSession();
+  if (!sessionData.session) throw new Error('No active session');
+  const { data, error } = await supabase.functions.invoke('admin-manage-users', { body });
+  if (error) throw new Error(error.message);
+  if (data?.error) throw new Error(data.error);
+  return data;
+}
+
+async function callAdminWithRetry(body: Record<string, unknown>, timeoutMs = 8000) {
+  const controller = new AbortController();
+  const timer = setTimeout(() => controller.abort(), timeoutMs);
+
+  try {
+    const result = await callAdmin(body);
+    clearTimeout(timer);
+    return result;
+  } catch (err: any) {
+    clearTimeout(timer);
+    // Retry once on timeout or network error
+    if (err.name === 'AbortError' || err.message?.includes('Failed to fetch') || err.message?.includes('network')) {
+      return await callAdmin(body);
+    }
+    throw err;
+  }
+}
+
 export function UserManagement({ currentUserId }: UserManagementProps) {
   const { t } = useTranslation();
   const { toast } = useToast();
@@ -61,32 +88,25 @@ export function UserManagement({ currentUserId }: UserManagementProps) {
   const [unblockTarget, setUnblockTarget] = useState<UserData | null>(null);
   const [actionLoading, setActionLoading] = useState(false);
 
-  const callAdmin = useCallback(async (body: Record<string, unknown>) => {
-    // Guard: don't call edge function if there's no active session
-    const { data: sessionData } = await supabase.auth.getSession();
-    if (!sessionData.session) {
-      throw new Error('No active session');
-    }
-    const { data, error } = await supabase.functions.invoke('admin-manage-users', { body });
-    if (error) throw new Error(error.message);
-    if (data?.error) throw new Error(data.error);
-    return data;
-  }, []);
+  // Use refs for toast/t to avoid re-creating fetchUsers on every render
+  const toastRef = useRef(toast);
+  const tRef = useRef(t);
+  useEffect(() => { toastRef.current = toast; }, [toast]);
+  useEffect(() => { tRef.current = t; }, [t]);
 
   const fetchUsers = useCallback(async () => {
     try {
       setLoading(true);
-      const data = await callAdmin({ action: 'list_users' });
+      const data = await callAdminWithRetry({ action: 'list_users' });
       setUsers(data.users ?? []);
     } catch (err: any) {
-      // Silently ignore "No active session" errors (happens during logout)
       if (err.message !== 'No active session') {
-        toast({ title: t('common.error'), description: err.message, variant: 'destructive' });
+        toastRef.current({ title: tRef.current('common.error'), description: err.message, variant: 'destructive' });
       }
     } finally {
       setLoading(false);
     }
-  }, [callAdmin, toast, t]);
+  }, []);
 
   useEffect(() => { fetchUsers(); }, [fetchUsers]);
 
