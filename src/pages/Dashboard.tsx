@@ -192,7 +192,7 @@ export default function Dashboard() {
                   <div className="space-y-1">
                     <p className="text-sm font-medium text-foreground">{system.name}</p>
                     <p className="text-xs text-muted-foreground">
-                      {system.system_identifier} · {system.system_category} · {system.vendor_name}
+                      {system.system_identifier} · {system.vendor_name}
                     </p>
                   </div>
                   <Badge variant="secondary" className={classificationColor[system.gxp_classification] ?? 'bg-muted text-muted-foreground'}>

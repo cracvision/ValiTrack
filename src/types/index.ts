@@ -1,6 +1,7 @@
 // ValiTrack - Domain Types
 
-export type SystemCategory = 'LIMS' | 'ERP' | 'DCS' | 'MES' | 'QMS' | 'DMS' | 'SCADA' | 'CDS' | 'ELN' | 'Other';
+export type SystemEnvironment = 'manufacturing' | 'laboratory' | 'quality' | 'enterprise' | 'clinical' | 'infrastructure';
+export type GampCategory = '1' | '3' | '4' | '5';
 export type GxPClassification = 'GMP' | 'GLP' | 'GCP' | 'GDP' | 'GVP' | 'NON_GXP_CRITICAL' | 'NON_GXP_STANDARD';
 export type RiskLevel = 'High' | 'Medium' | 'Low';
 export type SystemStatus = 'Active' | 'Retired' | 'Under Validation';
@@ -17,7 +18,8 @@ export interface SystemProfile {
   id: string;
   name: string;
   system_identifier: string;
-  system_category: SystemCategory;
+  system_environment: SystemEnvironment;
+  gamp_category: GampCategory;
   description: string;
   intended_use: string;
   gxp_classification: GxPClassification;

@@ -28,10 +28,15 @@ import {
 } from '@/components/ui/select';
 import { Separator } from '@/components/ui/separator';
 import { useRoleUsers, type RoleUser } from '@/hooks/useRoleUsers';
-import { GXP_OPTIONS, getReviewPeriod } from '@/lib/gxpClassifications';
-import type { SystemProfile, SystemCategory, GxPClassification, RiskLevel, SystemStatus } from '@/types';
+import {
+  GXP_OPTIONS,
+  getReviewPeriod,
+  SYSTEM_ENVIRONMENT_OPTIONS,
+  GAMP_CATEGORY_OPTIONS,
+  suggestReviewLevel,
+} from '@/lib/gxpClassifications';
+import type { SystemProfile, SystemEnvironment, GxPClassification, RiskLevel, SystemStatus, GampCategory } from '@/types';
 
-const systemCategories: SystemCategory[] = ['LIMS', 'ERP', 'DCS', 'MES', 'QMS', 'DMS', 'SCADA', 'CDS', 'ELN', 'Other'];
 const riskLevels: RiskLevel[] = ['High', 'Medium', 'Low'];
 const systemStatuses: SystemStatus[] = ['Active', 'Retired', 'Under Validation'];
 
@@ -40,11 +45,12 @@ const gxpValues = GXP_OPTIONS.map((o) => o.value) as [string, ...string[]];
 const formSchema = z.object({
   name: z.string().trim().min(1, 'System name is required').max(200),
   system_identifier: z.string().trim().min(1, 'System identifier is required').max(50),
-  system_category: z.enum(['LIMS', 'ERP', 'DCS', 'MES', 'QMS', 'DMS', 'SCADA', 'CDS', 'ELN', 'Other']),
+  system_environment: z.enum(['manufacturing', 'laboratory', 'quality', 'enterprise', 'clinical', 'infrastructure']),
   description: z.string().trim().max(1000).optional().default(''),
   intended_use: z.string().trim().min(1, 'Intended use is required').max(2000),
   gxp_classification: z.enum(gxpValues) as z.ZodEnum<[GxPClassification, ...GxPClassification[]]>,
   risk_level: z.enum(['High', 'Medium', 'Low']),
+  gamp_category: z.enum(['1', '3', '4', '5']),
   status: z.enum(['Active', 'Retired', 'Under Validation']),
   vendor_name: z.string().trim().min(1, 'Vendor name is required').max(200),
   vendor_contact: z.string().trim().max(200).optional().default(''),
@@ -129,7 +135,9 @@ export function SystemProfileForm({ open, onOpenChange, onSubmit, editingSystem 
 
   const [autoValue, setAutoValue] = useState<number | null>(null);
   const [flashPeriod, setFlashPeriod] = useState(false);
+  const [flashReviewLevel, setFlashReviewLevel] = useState(false);
   const isInitialMount = useRef(true);
+  const isInitialReviewLevel = useRef(true);
 
   const form = useForm<FormValues>({
     resolver: zodResolver(formSchema),
@@ -137,11 +145,12 @@ export function SystemProfileForm({ open, onOpenChange, onSubmit, editingSystem 
       ? {
           name: editingSystem.name,
           system_identifier: editingSystem.system_identifier,
-          system_category: editingSystem.system_category,
+          system_environment: editingSystem.system_environment,
           description: editingSystem.description,
           intended_use: editingSystem.intended_use,
           gxp_classification: editingSystem.gxp_classification,
           risk_level: editingSystem.risk_level,
+          gamp_category: editingSystem.gamp_category,
           status: editingSystem.status,
           vendor_name: editingSystem.vendor_name,
           vendor_contact: editingSystem.vendor_contact,
@@ -156,11 +165,12 @@ export function SystemProfileForm({ open, onOpenChange, onSubmit, editingSystem 
       : {
           name: '',
           system_identifier: '',
-          system_category: '' as SystemCategory,
+          system_environment: '' as SystemEnvironment,
           description: '',
           intended_use: '',
           gxp_classification: '' as GxPClassification,
           risk_level: '' as RiskLevel,
+          gamp_category: '' as GampCategory,
           status: '' as SystemStatus,
           vendor_name: '',
           vendor_contact: '',
@@ -176,12 +186,12 @@ export function SystemProfileForm({ open, onOpenChange, onSubmit, editingSystem 
 
   const watchClassification = form.watch('gxp_classification');
   const watchRisk = form.watch('risk_level');
+  const watchGamp = form.watch('gamp_category');
 
   // Auto-populate review period when classification or risk changes
   useEffect(() => {
     if (isInitialMount.current) {
       isInitialMount.current = false;
-      // Calculate initial auto value without setting form
       const initial = getReviewPeriod(watchClassification as GxPClassification, watchRisk as RiskLevel);
       setAutoValue(initial);
       return;
@@ -201,9 +211,15 @@ export function SystemProfileForm({ open, onOpenChange, onSubmit, editingSystem 
   useEffect(() => {
     if (open) {
       isInitialMount.current = true;
+      isInitialReviewLevel.current = true;
       setFlashPeriod(false);
+      setFlashReviewLevel(false);
     }
   }, [open]);
+
+  const reviewLevelSuggestion = (watchRisk && watchGamp)
+    ? suggestReviewLevel(watchRisk as RiskLevel, watchGamp as GampCategory)
+    : null;
 
   const handleSubmit = (values: FormValues) => {
     const now = new Date().toISOString();
@@ -211,7 +227,8 @@ export function SystemProfileForm({ open, onOpenChange, onSubmit, editingSystem 
       id: editingSystem?.id ?? crypto.randomUUID(),
       name: values.name,
       system_identifier: values.system_identifier,
-      system_category: values.system_category,
+      system_environment: values.system_environment,
+      gamp_category: values.gamp_category,
       description: values.description ?? '',
       intended_use: values.intended_use,
       gxp_classification: values.gxp_classification,
@@ -265,14 +282,19 @@ export function SystemProfileForm({ open, onOpenChange, onSubmit, editingSystem 
                     <FormMessage />
                   </FormItem>
                 )} />
-                <FormField control={form.control} name="system_category" render={({ field }) => (
+                <FormField control={form.control} name="system_environment" render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Category *</FormLabel>
+                    <FormLabel>System Environment *</FormLabel>
                     <Select onValueChange={field.onChange} defaultValue={field.value || undefined}>
-                      <FormControl><SelectTrigger><SelectValue placeholder="Select the system category" /></SelectTrigger></FormControl>
+                      <FormControl><SelectTrigger><SelectValue placeholder="Select the system environment" /></SelectTrigger></FormControl>
                       <SelectContent>
-                        {systemCategories.map((cat) => (
-                          <SelectItem key={cat} value={cat}>{cat}</SelectItem>
+                        {SYSTEM_ENVIRONMENT_OPTIONS.map((opt) => (
+                          <SelectItem key={opt.value} value={opt.value}>
+                            <div className="flex flex-col">
+                              <span className="font-medium">{opt.label}</span>
+                              <span className="text-xs text-muted-foreground">{opt.description}</span>
+                            </div>
+                          </SelectItem>
                         ))}
                       </SelectContent>
                     </Select>
@@ -353,6 +375,36 @@ export function SystemProfileForm({ open, onOpenChange, onSubmit, editingSystem 
                     <FormMessage />
                   </FormItem>
                 )} />
+                <FormField control={form.control} name="gamp_category" render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>GAMP Category *</FormLabel>
+                    <Select onValueChange={field.onChange} defaultValue={field.value || undefined}>
+                      <FormControl><SelectTrigger><SelectValue placeholder="Select the GAMP category" /></SelectTrigger></FormControl>
+                      <SelectContent>
+                        {GAMP_CATEGORY_OPTIONS.map((opt) => (
+                          <SelectItem key={opt.value} value={opt.value}>
+                            <div className="flex flex-col">
+                              <span className="font-medium">{opt.label}</span>
+                              <span className="text-xs text-muted-foreground">{opt.description}</span>
+                            </div>
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                    <FormMessage />
+                  </FormItem>
+                )} />
+                <div>
+                  <FormLabel className="text-sm font-medium">Review Level</FormLabel>
+                  <div className={`mt-2 flex h-10 items-center rounded-md border border-input bg-muted/50 px-3 text-sm ${flashReviewLevel ? 'ring-2 ring-primary/50 bg-primary/5 transition-all duration-500' : 'transition-all duration-500'}`}>
+                    {reviewLevelSuggestion ? `Level ${reviewLevelSuggestion}` : '—'}
+                  </div>
+                  <p className="text-xs text-muted-foreground mt-1">
+                    {reviewLevelSuggestion
+                      ? 'Suggested based on risk level and GAMP category'
+                      : 'Select risk level and GAMP category to calculate'}
+                  </p>
+                </div>
               </div>
             </div>
 
