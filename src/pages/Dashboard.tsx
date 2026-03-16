@@ -160,7 +160,7 @@ export default function Dashboard() {
                     <div className="space-y-1">
                       <p className="text-sm font-medium text-foreground">{system.name}</p>
                       <p className="text-xs text-muted-foreground">
-                        {t('dashboard.due', { date: new Date(system.next_review_date).toLocaleDateString(), owner: system.owner_name })}
+                        {t('dashboard.due', { date: new Date(system.next_review_date).toLocaleDateString(), owner: system.system_owner_id })}
                       </p>
                     </div>
                     <Badge variant="secondary" className={statusColor[system.status]}>

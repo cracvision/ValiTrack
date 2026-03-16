@@ -26,6 +26,7 @@ import {
   SelectValue,
 } from '@/components/ui/select';
 import { Separator } from '@/components/ui/separator';
+import { useRoleUsers, type RoleUser } from '@/hooks/useRoleUsers';
 import type { SystemProfile, SystemCategory, GxPClassification, RiskLevel, SystemStatus } from '@/types';
 
 const systemCategories: SystemCategory[] = ['LIMS', 'ERP', 'DCS', 'MES', 'QMS', 'DMS', 'SCADA', 'CDS', 'ELN', 'Other'];
@@ -45,9 +46,15 @@ const formSchema = z.object({
   vendor_name: z.string().trim().min(1, 'Vendor name is required').max(200),
   vendor_contact: z.string().trim().max(200).optional().default(''),
   vendor_contract_ref: z.string().trim().max(100).optional().default(''),
-  owner_name: z.string().trim().min(1, 'Owner name is required').max(200),
   validation_date: z.string().min(1, 'Validation date is required'),
   review_period_months: z.coerce.number().min(1, 'Must be at least 1 month').max(120, 'Cannot exceed 120 months'),
+  system_owner_id: z.string().min(1, 'System Owner is required'),
+  system_admin_id: z.string().min(1, 'System Administrator is required'),
+  qa_id: z.string().min(1, 'Quality Assurance is required'),
+  it_manager_id: z.string().optional().default(''),
+}).refine((data) => data.system_owner_id !== data.qa_id, {
+  message: 'System Owner and QA cannot be the same person (separation of duties)',
+  path: ['qa_id'],
 });
 
 type FormValues = z.infer<typeof formSchema>;
@@ -58,6 +65,52 @@ function calculateNextReviewDate(validationDate: string, periodMonths: number): 
   return date.toISOString().split('T')[0];
 }
 
+function formatUserLabel(user: RoleUser): string {
+  return user.username ? `${user.full_name} (@${user.username})` : user.full_name;
+}
+
+interface RoleSelectFieldProps {
+  form: ReturnType<typeof useForm<FormValues>>;
+  name: 'system_owner_id' | 'system_admin_id' | 'qa_id' | 'it_manager_id';
+  label: string;
+  users: RoleUser[];
+  loading: boolean;
+  required?: boolean;
+}
+
+function RoleSelectField({ form, name, label, users, loading, required }: RoleSelectFieldProps) {
+  const hasUsers = users.length > 0;
+  return (
+    <FormField control={form.control} name={name} render={({ field }) => (
+      <FormItem>
+        <FormLabel>{label}{required ? ' *' : ''}</FormLabel>
+        <Select
+          onValueChange={field.onChange}
+          defaultValue={field.value || undefined}
+          disabled={loading || !hasUsers}
+        >
+          <FormControl>
+            <SelectTrigger>
+              <SelectValue placeholder={loading ? 'Loading...' : !hasUsers ? 'No users with this role' : `Select ${label}`} />
+            </SelectTrigger>
+          </FormControl>
+          <SelectContent>
+            {!required && hasUsers && (
+              <SelectItem value="__none__">— None —</SelectItem>
+            )}
+            {users.map((user) => (
+              <SelectItem key={user.id} value={user.id}>
+                {formatUserLabel(user)}
+              </SelectItem>
+            ))}
+          </SelectContent>
+        </Select>
+        <FormMessage />
+      </FormItem>
+    )} />
+  );
+}
+
 interface SystemProfileFormProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
@@ -66,6 +119,11 @@ interface SystemProfileFormProps {
 }
 
 export function SystemProfileForm({ open, onOpenChange, onSubmit, editingSystem }: SystemProfileFormProps) {
+  const { users: systemOwners, loading: loadingOwners } = useRoleUsers('system_owner');
+  const { users: systemAdmins, loading: loadingAdmins } = useRoleUsers('system_administrator');
+  const { users: qaUsers, loading: loadingQA } = useRoleUsers('quality_assurance');
+  const { users: itManagers, loading: loadingIT } = useRoleUsers('it_manager');
+
   const form = useForm<FormValues>({
     resolver: zodResolver(formSchema),
     defaultValues: editingSystem
@@ -81,9 +139,12 @@ export function SystemProfileForm({ open, onOpenChange, onSubmit, editingSystem 
           vendor_name: editingSystem.vendor_name,
           vendor_contact: editingSystem.vendor_contact,
           vendor_contract_ref: editingSystem.vendor_contract_ref,
-          owner_name: editingSystem.owner_name,
           validation_date: editingSystem.validation_date,
           review_period_months: editingSystem.review_period_months,
+          system_owner_id: editingSystem.system_owner_id,
+          system_admin_id: editingSystem.system_admin_id,
+          qa_id: editingSystem.qa_id,
+          it_manager_id: editingSystem.it_manager_id ?? '',
         }
       : {
           name: '',
@@ -97,9 +158,12 @@ export function SystemProfileForm({ open, onOpenChange, onSubmit, editingSystem 
           vendor_name: '',
           vendor_contact: '',
           vendor_contract_ref: '',
-          owner_name: '',
           validation_date: '',
           review_period_months: 12,
+          system_owner_id: '',
+          system_admin_id: '',
+          qa_id: '',
+          it_manager_id: '',
         },
   });
 
@@ -118,8 +182,11 @@ export function SystemProfileForm({ open, onOpenChange, onSubmit, editingSystem 
       vendor_name: values.vendor_name,
       vendor_contact: values.vendor_contact ?? '',
       vendor_contract_ref: values.vendor_contract_ref ?? '',
-      owner_id: editingSystem?.owner_id ?? crypto.randomUUID(),
-      owner_name: values.owner_name,
+      owner_id: values.system_owner_id,
+      system_owner_id: values.system_owner_id,
+      system_admin_id: values.system_admin_id,
+      qa_id: values.qa_id,
+      it_manager_id: values.it_manager_id && values.it_manager_id !== '__none__' ? values.it_manager_id : undefined,
       validation_date: values.validation_date,
       review_period_months: values.review_period_months,
       next_review_date: calculateNextReviewDate(values.validation_date, values.review_period_months),
@@ -283,14 +350,7 @@ export function SystemProfileForm({ open, onOpenChange, onSubmit, editingSystem 
             {/* Review Schedule */}
             <div>
               <h3 className="text-sm font-semibold text-foreground mb-3">Review Schedule</h3>
-              <div className="grid gap-4 sm:grid-cols-3">
-                <FormField control={form.control} name="owner_name" render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>System Owner *</FormLabel>
-                    <FormControl><Input placeholder="Owner name" {...field} /></FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )} />
+              <div className="grid gap-4 sm:grid-cols-2">
                 <FormField control={form.control} name="validation_date" render={({ field }) => (
                   <FormItem>
                     <FormLabel>Last Validation Date *</FormLabel>
@@ -305,6 +365,52 @@ export function SystemProfileForm({ open, onOpenChange, onSubmit, editingSystem 
                     <FormMessage />
                   </FormItem>
                 )} />
+              </div>
+            </div>
+
+            <Separator />
+
+            {/* Role Assignments */}
+            <div>
+              <h3 className="text-sm font-semibold text-foreground mb-1">Role Assignments</h3>
+              <p className="text-xs text-muted-foreground mb-3">
+                Assign users responsible for this system's periodic review process.
+              </p>
+              <p className="text-xs text-muted-foreground mb-4">
+                The System Owner and QA Approver must be different users to ensure separation of duties.
+              </p>
+              <div className="grid gap-4 sm:grid-cols-2">
+                <RoleSelectField
+                  form={form}
+                  name="system_owner_id"
+                  label="System Owner"
+                  users={systemOwners}
+                  loading={loadingOwners}
+                  required
+                />
+                <RoleSelectField
+                  form={form}
+                  name="system_admin_id"
+                  label="System Administrator"
+                  users={systemAdmins}
+                  loading={loadingAdmins}
+                  required
+                />
+                <RoleSelectField
+                  form={form}
+                  name="qa_id"
+                  label="Quality Assurance"
+                  users={qaUsers}
+                  loading={loadingQA}
+                  required
+                />
+                <RoleSelectField
+                  form={form}
+                  name="it_manager_id"
+                  label="IT Manager"
+                  users={itManagers}
+                  loading={loadingIT}
+                />
               </div>
             </div>
 
