@@ -1,8 +1,8 @@
 {
   "app": {
-    "name": "GxP Review",
+    "name": "ValiTrack",
     "subtitle": "Periodic Review Manager",
-    "headerTitle": "GxP Periodic Review Management"
+    "headerTitle": "ValiTrack — Periodic Review Management"
   },
   "nav": {
     "main": "Main",
