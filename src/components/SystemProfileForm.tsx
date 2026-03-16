@@ -408,12 +408,14 @@ export function SystemProfileForm({ open, onOpenChange, onSubmit, editingSystem 
                       <Input
                         type="number"
                         {...field}
+                        value={field.value || ''}
+                        placeholder="Auto-calculated"
                         readOnly
                         className={`${flashPeriod ? 'ring-2 ring-primary/50 bg-primary/5 transition-all duration-500' : 'transition-all duration-500'} read-only:bg-muted/50 read-only:cursor-default`}
                       />
                     </FormControl>
                     <p className="text-xs text-muted-foreground">
-                      Auto-calculated based on GxP classification and risk level
+                      {field.value ? 'Auto-calculated based on GxP classification and risk level' : 'Select GxP classification and risk level to calculate'}
                     </p>
                     <FormMessage />
                   </FormItem>
