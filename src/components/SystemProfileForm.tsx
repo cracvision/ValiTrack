@@ -268,8 +268,8 @@ export function SystemProfileForm({ open, onOpenChange, onSubmit, editingSystem 
                 <FormField control={form.control} name="system_category" render={({ field }) => (
                   <FormItem>
                     <FormLabel>Category *</FormLabel>
-                    <Select onValueChange={field.onChange} defaultValue={field.value}>
-                      <FormControl><SelectTrigger><SelectValue /></SelectTrigger></FormControl>
+                    <Select onValueChange={field.onChange} defaultValue={field.value || undefined}>
+                      <FormControl><SelectTrigger><SelectValue placeholder="Select the system category" /></SelectTrigger></FormControl>
                       <SelectContent>
                         {systemCategories.map((cat) => (
                           <SelectItem key={cat} value={cat}>{cat}</SelectItem>
