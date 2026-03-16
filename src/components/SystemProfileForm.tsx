@@ -127,7 +127,6 @@ export function SystemProfileForm({ open, onOpenChange, onSubmit, editingSystem 
   const { users: qaUsers, loading: loadingQA } = useRoleUsers('quality_assurance');
   const { users: itManagers, loading: loadingIT } = useRoleUsers('it_manager');
 
-  const [manualOverride, setManualOverride] = useState(false);
   const [autoValue, setAutoValue] = useState<number | null>(null);
   const [flashPeriod, setFlashPeriod] = useState(false);
   const isInitialMount = useRef(true);
