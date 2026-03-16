@@ -207,6 +207,32 @@ export function SystemProfileForm({ open, onOpenChange, onSubmit, editingSystem 
     }
   }, [watchClassification, watchRisk]);
 
+  // Reset form when editingSystem changes
+  useEffect(() => {
+    if (editingSystem) {
+      form.reset({
+        name: editingSystem.name,
+        system_identifier: editingSystem.system_identifier,
+        system_environment: editingSystem.system_environment,
+        description: editingSystem.description,
+        intended_use: editingSystem.intended_use,
+        gxp_classification: editingSystem.gxp_classification,
+        risk_level: editingSystem.risk_level,
+        gamp_category: editingSystem.gamp_category,
+        status: editingSystem.status,
+        vendor_name: editingSystem.vendor_name,
+        vendor_contact: editingSystem.vendor_contact,
+        vendor_contract_ref: editingSystem.vendor_contract_ref,
+        validation_date: editingSystem.validation_date,
+        review_period_months: editingSystem.review_period_months,
+        system_owner_id: editingSystem.system_owner_id,
+        system_admin_id: editingSystem.system_admin_id,
+        qa_id: editingSystem.qa_id,
+        it_manager_id: editingSystem.it_manager_id ?? '',
+      });
+    }
+  }, [editingSystem, form]);
+
   // Reset state when dialog opens/closes
   useEffect(() => {
     if (open) {
