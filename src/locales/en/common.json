@@ -117,7 +117,21 @@
     "auditFeed": {
       "noActivity": "No recent activity"
     },
-    "noRecentActivity": "No recent activity"
+    "noRecentActivity": "No recent activity",
+    "auditActions": {
+      "user_created": "Created a user account",
+      "user_updated": "Updated a user profile",
+      "user_deleted": "Deleted a user account",
+      "user_blocked": "Blocked a user account",
+      "user_unblocked": "Unblocked a user account",
+      "system_created": "Registered a new system",
+      "system_updated": "Updated a system profile",
+      "system_deleted": "Removed a system profile",
+      "login": "Logged in",
+      "logout": "Logged out",
+      "password_changed": "Changed password",
+      "unknown": "Performed an action"
+    }
   },
   "pages": {
     "reviewCases": {
