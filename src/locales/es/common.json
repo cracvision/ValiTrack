@@ -44,7 +44,80 @@
     "wasDue": "Venció: {{date}} · {{owner}}",
     "due": "Vence: {{date}} · {{owner}}",
     "registeredSystems": "Sistemas Registrados",
-    "viewAll": "Ver los {{count}} sistemas →"
+    "viewAll": "Ver los {{count}} sistemas →",
+    "greeting": {
+      "morning": "Buenos días, {{name}}",
+      "afternoon": "Buenas tardes, {{name}}",
+      "evening": "Buenas noches, {{name}}"
+    },
+    "subtitle": {
+      "super_user": "Vista general de la plataforma y salud del sistema",
+      "system_owner": "Tus sistemas y revisiones pendientes",
+      "quality_assurance": "Estado de cumplimiento y aprobaciones pendientes",
+      "system_administrator": "Tus tareas técnicas y estado del sistema",
+      "business_owner": "Sistemas de procesos de negocio bajo revisión",
+      "it_manager": "Gobernanza de IT y supervisión de infraestructura"
+    },
+    "mySystems": {
+      "title": "Mis sistemas",
+      "allSystems": "Todos los sistemas",
+      "subtitle": "Sistemas donde tienes un rol asignado",
+      "empty": "Aún no tienes sistemas asignados. Contacta a tu administrador para que te asigne a un sistema.",
+      "viewAll": "Ver todos los sistemas"
+    },
+    "myTasks": {
+      "title": "Mis tareas",
+      "subtitle": "Tareas asignadas a ti en todos los sistemas",
+      "empty": "Aún no tienes tareas asignadas. Las tareas aparecerán aquí cuando se inicien revisiones periódicas para tus sistemas."
+    },
+    "pendingApprovals": {
+      "title": "Pendientes de mi aprobación",
+      "subtitle": "Revisiones y documentos esperando tu firma",
+      "empty": "Nada que aprobar por ahora. Las solicitudes de aprobación aparecerán aquí cuando las revisiones lleguen a tu paso en la cadena de aprobación."
+    },
+    "findings": {
+      "title": "Hallazgos que requieren atención",
+      "subtitle": "Hallazgos críticos y mayores abiertos en tus sistemas",
+      "empty": "Sin hallazgos abiertos. Los hallazgos aparecerán aquí cuando se identifiquen problemas durante las revisiones periódicas."
+    },
+    "compliance": {
+      "title": "Resumen de cumplimiento",
+      "onTimeRate": "Revisiones completadas a tiempo",
+      "approachingReview": "Sistemas próximos a revisión",
+      "underReview": "Sistemas bajo revisión"
+    },
+    "recentActivity": {
+      "title": "Actividad reciente",
+      "subtitle": "Últimas acciones en la plataforma",
+      "viewAuditLog": "Ver registro de auditoría completo"
+    },
+    "reviewStatus": {
+      "no_review": "Sin historial de revisión",
+      "compliant": "Cumplimiento",
+      "approaching": "Próximo a vencer",
+      "in_progress": "Revisión en progreso",
+      "pending_approval": "Pendiente de aprobación",
+      "overdue": "Vencido"
+    },
+    "nextAction": {
+      "compliant": "Próxima revisión: {{date}} — {{timeaway}}",
+      "approaching": "Planificar e iniciar revisión — dentro de {{days}} días",
+      "overdue": "Iniciar revisión periódica de inmediato",
+      "in_progress": "{{task}} — vence en {{days}} días",
+      "pending_approval": "Esperando aprobación de QA",
+      "no_review": "Sin historial de revisión periódica. Programar primera revisión."
+    },
+    "phases": {
+      "draft": "Borrador",
+      "in_preparation": "En prep.",
+      "in_progress": "En progreso",
+      "under_review": "Revisión",
+      "approved": "Aprobado"
+    },
+    "auditFeed": {
+      "noActivity": "Sin actividad reciente"
+    },
+    "noRecentActivity": "Sin actividad reciente"
   },
   "pages": {
     "reviewCases": {

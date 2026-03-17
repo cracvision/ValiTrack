@@ -44,7 +44,80 @@
     "wasDue": "Was due: {{date}} · {{owner}}",
     "due": "Due: {{date}} · {{owner}}",
     "registeredSystems": "Registered Systems",
-    "viewAll": "View all {{count}} systems →"
+    "viewAll": "View all {{count}} systems →",
+    "greeting": {
+      "morning": "Good morning, {{name}}",
+      "afternoon": "Good afternoon, {{name}}",
+      "evening": "Good evening, {{name}}"
+    },
+    "subtitle": {
+      "super_user": "Platform overview and system health",
+      "system_owner": "Your systems and pending reviews",
+      "quality_assurance": "Compliance status and pending approvals",
+      "system_administrator": "Your technical tasks and system status",
+      "business_owner": "Business process systems under review",
+      "it_manager": "IT governance and infrastructure oversight"
+    },
+    "mySystems": {
+      "title": "My systems",
+      "allSystems": "All systems",
+      "subtitle": "Systems where you have an assigned role",
+      "empty": "No systems assigned to you yet. Contact your administrator to be assigned to a system.",
+      "viewAll": "View all systems"
+    },
+    "myTasks": {
+      "title": "My tasks",
+      "subtitle": "Tasks assigned to you across all systems",
+      "empty": "No tasks assigned yet. Tasks will appear here when periodic reviews are initiated for your systems."
+    },
+    "pendingApprovals": {
+      "title": "Pending my approval",
+      "subtitle": "Reviews and documents awaiting your sign-off",
+      "empty": "Nothing to approve right now. Approval requests will appear here when reviews reach your step in the approval chain."
+    },
+    "findings": {
+      "title": "Findings requiring attention",
+      "subtitle": "Open critical and major findings across your systems",
+      "empty": "No open findings. Findings will appear here when issues are identified during periodic reviews."
+    },
+    "compliance": {
+      "title": "Compliance snapshot",
+      "onTimeRate": "Reviews completed on time",
+      "approachingReview": "Systems approaching review",
+      "underReview": "Systems under review"
+    },
+    "recentActivity": {
+      "title": "Recent activity",
+      "subtitle": "Latest actions across the platform",
+      "viewAuditLog": "View full audit log"
+    },
+    "reviewStatus": {
+      "no_review": "No review history",
+      "compliant": "Compliant",
+      "approaching": "Approaching due date",
+      "in_progress": "Review in progress",
+      "pending_approval": "Pending approval",
+      "overdue": "Overdue"
+    },
+    "nextAction": {
+      "compliant": "Next review due {{date}} — {{timeaway}}",
+      "approaching": "Plan and initiate review — within {{days}} days",
+      "overdue": "Initiate periodic review immediately",
+      "in_progress": "{{task}} — due in {{days}} days",
+      "pending_approval": "Awaiting QA approval",
+      "no_review": "No periodic review history. Schedule first review."
+    },
+    "phases": {
+      "draft": "Draft",
+      "in_preparation": "In prep",
+      "in_progress": "In progress",
+      "under_review": "Review",
+      "approved": "Approved"
+    },
+    "auditFeed": {
+      "noActivity": "No recent activity"
+    },
+    "noRecentActivity": "No recent activity"
   },
   "pages": {
     "reviewCases": {
