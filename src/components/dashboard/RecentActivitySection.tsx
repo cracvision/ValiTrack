@@ -6,6 +6,25 @@ import { DashboardSectionHeader } from './DashboardSectionHeader';
 import { useRecentAuditLog } from '@/hooks/useSystemAuditLog';
 import { getRelativeTime } from '@/lib/relativeTime';
 
+function getInitials(name: string): string {
+  return name
+    .split(/\s+/)
+    .filter(Boolean)
+    .slice(0, 2)
+    .map(w => w[0].toUpperCase())
+    .join('');
+}
+
+function humanizeAction(action: string, t: (key: string) => string): string {
+  const key = `dashboard.auditActions.${action}`;
+  const translated = t(key);
+  // If i18next returns the key itself, it means no translation exists — fallback
+  if (translated === key) {
+    return action.replace(/_/g, ' ').replace(/^./, c => c.toUpperCase());
+  }
+  return translated;
+}
+
 export function RecentActivitySection() {
   const { t } = useTranslation();
   const navigate = useNavigate();
@@ -33,19 +52,25 @@ export function RecentActivitySection() {
         </p>
       ) : (
         <div className="divide-y divide-border">
-          {entries.map((entry) => (
-            <div key={entry.id} className="flex items-center gap-3 py-2.5">
-              <div className="h-7 w-7 rounded-full bg-muted flex items-center justify-center shrink-0">
-                <span className="text-xs font-medium text-muted-foreground">
-                  {(entry.user_id ?? '?').substring(0, 2).toUpperCase()}
+          {entries.map((entry) => {
+            const displayName = entry.full_name || 'System';
+            const initials = getInitials(displayName);
+            return (
+              <div key={entry.id} className="flex items-center gap-3 py-2.5">
+                <div className="h-7 w-7 rounded-full bg-muted flex items-center justify-center shrink-0">
+                  <span className="text-[11px] font-medium text-muted-foreground">
+                    {initials}
+                  </span>
+                </div>
+                <span className="text-sm text-foreground flex-1 truncate">
+                  {displayName} · {humanizeAction(entry.action, t)}
+                </span>
+                <span className="text-xs text-muted-foreground font-mono shrink-0">
+                  {getRelativeTime(entry.created_at)}
                 </span>
               </div>
-              <span className="text-sm text-foreground flex-1 truncate">{entry.action}</span>
-              <span className="text-xs text-muted-foreground font-mono shrink-0">
-                {getRelativeTime(entry.created_at)}
-              </span>
-            </div>
-          ))}
+            );
+          })}
         </div>
       )}
       <div className="mt-3">

@@ -119,7 +119,7 @@ export default function Dashboard() {
       <PendingApprovalsSection />
 
       {/* Findings — only for SO and QA */}
-      {(isSystemOwner || isQA) && <FindingsAlertSection />}
+      {(isSuperUser || isSystemOwner || isQA) && <FindingsAlertSection />}
 
       {/* Super User: Recent Activity */}
       {isSuperUser && <RecentActivitySection />}

@@ -117,7 +117,21 @@
     "auditFeed": {
       "noActivity": "Sin actividad reciente"
     },
-    "noRecentActivity": "Sin actividad reciente"
+    "noRecentActivity": "Sin actividad reciente",
+    "auditActions": {
+      "user_created": "Creó una cuenta de usuario",
+      "user_updated": "Actualizó un perfil de usuario",
+      "user_deleted": "Eliminó una cuenta de usuario",
+      "user_blocked": "Bloqueó una cuenta de usuario",
+      "user_unblocked": "Desbloqueó una cuenta de usuario",
+      "system_created": "Registró un nuevo sistema",
+      "system_updated": "Actualizó un perfil de sistema",
+      "system_deleted": "Eliminó un perfil de sistema",
+      "login": "Inició sesión",
+      "logout": "Cerró sesión",
+      "password_changed": "Cambió contraseña",
+      "unknown": "Realizó una acción"
+    }
   },
   "pages": {
     "reviewCases": {
