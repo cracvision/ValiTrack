@@ -1,236 +1,128 @@
 import { useTranslation } from 'react-i18next';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Badge } from '@/components/ui/badge';
-import { Button } from '@/components/ui/button';
+import { useAuth } from '@/hooks/useAuth';
+import { useDashboardSystems } from '@/hooks/useDashboardSystems';
 import { Skeleton } from '@/components/ui/skeleton';
-import { Server, ClipboardCheck, AlertTriangle, CalendarClock, Plus } from 'lucide-react';
-import { useSystemProfiles } from '@/hooks/useSystemProfiles';
-import { useNavigate } from 'react-router-dom';
-import { GXP_SHORT_LABELS } from '@/lib/gxpClassifications';
-import type { GxPClassification } from '@/types';
+import { Card } from '@/components/ui/card';
+import { MySystemsSection } from '@/components/dashboard/MySystemsSection';
+import { MyTasksSection } from '@/components/dashboard/MyTasksSection';
+import { PendingApprovalsSection } from '@/components/dashboard/PendingApprovalsSection';
+import { FindingsAlertSection } from '@/components/dashboard/FindingsAlertSection';
+import { PlatformHealthSection } from '@/components/dashboard/PlatformHealthSection';
+import { ComplianceSnapshotSection } from '@/components/dashboard/ComplianceSnapshotSection';
+import { RecentActivitySection } from '@/components/dashboard/RecentActivitySection';
 
-const classificationColor: Record<string, string> = {
-  GMP: 'bg-destructive/10 text-destructive',
-  GLP: 'bg-destructive/10 text-destructive',
-  GCP: 'bg-destructive/10 text-destructive',
-  GDP: 'bg-orange-100 text-orange-700',
-  GVP: 'bg-destructive/10 text-destructive',
-  NON_GXP_CRITICAL: 'bg-orange-100 text-orange-700',
-  NON_GXP_STANDARD: 'bg-muted text-muted-foreground',
-};
+function getGreetingKey(): string {
+  const hour = new Date().getHours();
+  if (hour < 12) return 'dashboard.greeting.morning';
+  if (hour < 18) return 'dashboard.greeting.afternoon';
+  return 'dashboard.greeting.evening';
+}
 
-const statusColor: Record<string, string> = {
-  Active: 'bg-green-100 text-green-700',
-  Retired: 'bg-muted text-muted-foreground',
-  'Under Validation': 'bg-primary/10 text-primary',
-};
+function getRoleSubtitleKey(roles: string[]): string {
+  if (roles.includes('super_user')) return 'dashboard.subtitle.super_user';
+  if (roles.includes('quality_assurance')) return 'dashboard.subtitle.quality_assurance';
+  if (roles.includes('system_owner')) return 'dashboard.subtitle.system_owner';
+  if (roles.includes('system_administrator')) return 'dashboard.subtitle.system_administrator';
+  if (roles.includes('business_owner')) return 'dashboard.subtitle.business_owner';
+  if (roles.includes('it_manager')) return 'dashboard.subtitle.it_manager';
+  return 'dashboard.subtitle.system_owner';
+}
 
-const GXP_REGULATED: GxPClassification[] = ['GMP', 'GLP', 'GCP', 'GDP', 'GVP'];
-
-export default function Dashboard() {
-  const { t } = useTranslation();
-  const { systems, loading } = useSystemProfiles();
-  const navigate = useNavigate();
-
-  const activeSystems = systems.filter((s) => s.status === 'Active');
-  const gxpRegulated = systems.filter((s) => GXP_REGULATED.includes(s.gxp_classification as GxPClassification));
-  const highRisk = systems.filter((s) => s.risk_level === 'High');
-
-  const now = new Date();
-  const in90Days = new Date();
-  in90Days.setDate(in90Days.getDate() + 90);
-  const upcomingReviews = systems
-    .filter((s) => {
-      const reviewDate = new Date(s.next_review_date);
-      return s.status === 'Active' && reviewDate >= now && reviewDate <= in90Days;
-    })
-    .sort((a, b) => new Date(a.next_review_date).getTime() - new Date(b.next_review_date).getTime());
-
-  const overdueReviews = systems.filter((s) => {
-    return s.status === 'Active' && new Date(s.next_review_date) < now;
-  });
-
-  const stats = [
-    {
-      title: t('dashboard.totalSystems'),
-      value: systems.length,
-      icon: Server,
-      description: t('dashboard.active', { count: activeSystems.length }),
-    },
-    {
-      title: t('dashboard.gxpCritical'),
-      value: gxpRegulated.length,
-      icon: AlertTriangle,
-      description: t('dashboard.requireReview'),
-    },
-    {
-      title: t('dashboard.highRisk'),
-      value: highRisk.length,
-      icon: ClipboardCheck,
-      description: t('dashboard.enhancedOversight'),
-    },
-    {
-      title: t('dashboard.reviewsDue90'),
-      value: upcomingReviews.length + overdueReviews.length,
-      icon: CalendarClock,
-      description: overdueReviews.length > 0
-        ? t('dashboard.overdue', { count: overdueReviews.length })
-        : t('dashboard.onSchedule'),
-    },
-  ];
-
-  if (loading) {
-    return (
-      <div className="space-y-6">
-        <div>
-          <Skeleton className="h-8 w-64 mb-2" />
-          <Skeleton className="h-4 w-48" />
-        </div>
-        <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
-          {Array.from({ length: 4 }).map((_, i) => (
-            <Card key={i}>
-              <CardContent className="p-6">
-                <Skeleton className="h-4 w-24 mb-4" />
-                <Skeleton className="h-8 w-12 mb-2" />
-                <Skeleton className="h-3 w-32" />
-              </CardContent>
-            </Card>
-          ))}
-        </div>
-      </div>
-    );
-  }
-
-  if (systems.length === 0) {
-    return (
-      <div className="space-y-6">
-        <div>
-          <h1 className="text-2xl font-bold text-foreground">{t('dashboard.title')}</h1>
-          <p className="text-sm text-muted-foreground">{t('dashboard.subtitle')}</p>
-        </div>
-        <Card>
-          <CardContent className="flex flex-col items-center justify-center py-20">
-            <Server className="h-16 w-16 text-muted-foreground/30 mb-4" />
-            <h2 className="text-xl font-semibold text-foreground mb-2">{t('dashboard.welcome')}</h2>
-            <p className="text-sm text-muted-foreground text-center max-w-md mb-6">
-              {t('dashboard.welcomeDesc')}
-            </p>
-            <Button onClick={() => navigate('/systems')}>
-              <Plus className="mr-2 h-4 w-4" />
-              {t('dashboard.registerFirst')}
-            </Button>
-          </CardContent>
-        </Card>
-      </div>
-    );
-  }
-
+function DashboardSkeleton({ isSuperUser }: { isSuperUser: boolean }) {
   return (
     <div className="space-y-6">
       <div>
-        <h1 className="text-2xl font-bold text-foreground">{t('dashboard.title')}</h1>
-        <p className="text-sm text-muted-foreground">{t('dashboard.overviewSubtitle')}</p>
+        <Skeleton className="h-8 w-72 mb-2" />
+        <Skeleton className="h-4 w-48" />
       </div>
-
-      <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
-        {stats.map((stat) => (
-          <Card key={stat.title}>
-            <CardHeader className="flex flex-row items-center justify-between pb-2">
-              <CardTitle className="text-sm font-medium text-muted-foreground">{stat.title}</CardTitle>
-              <stat.icon className="h-4 w-4 text-muted-foreground" />
-            </CardHeader>
-            <CardContent>
-              <div className="text-3xl font-bold text-foreground">{stat.value}</div>
-              <p className="text-xs text-muted-foreground mt-1">{stat.description}</p>
-            </CardContent>
+      {isSuperUser && (
+        <div className="grid gap-4 grid-cols-2 lg:grid-cols-4">
+          {Array.from({ length: 4 }).map((_, i) => (
+            <Card key={i} className="p-6">
+              <Skeleton className="h-4 w-24 mb-4" />
+              <Skeleton className="h-8 w-12 mb-2" />
+              <Skeleton className="h-3 w-32" />
+            </Card>
+          ))}
+        </div>
+      )}
+      <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4">
+        {Array.from({ length: 3 }).map((_, i) => (
+          <Card key={i} className="p-6">
+            <Skeleton className="h-5 w-40 mb-2" />
+            <Skeleton className="h-3 w-24 mb-4" />
+            <div className="flex gap-1.5 mb-3">
+              <Skeleton className="h-5 w-12" />
+              <Skeleton className="h-5 w-14" />
+              <Skeleton className="h-5 w-10" />
+            </div>
+            <Skeleton className="h-8 w-full mb-3" />
+            <Skeleton className="h-6 w-full" />
           </Card>
         ))}
       </div>
+    </div>
+  );
+}
 
-      <div className="grid gap-6 lg:grid-cols-2">
-        {overdueReviews.length > 0 && (
-          <Card className="border-destructive/30">
-            <CardHeader>
-              <CardTitle className="text-base text-destructive flex items-center gap-2">
-                <AlertTriangle className="h-4 w-4" />
-                {t('dashboard.overdueReviews')}
-              </CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className="space-y-3">
-                {overdueReviews.map((system) => (
-                  <div key={system.id} className="flex items-center justify-between rounded-lg border border-destructive/20 bg-destructive/5 p-3">
-                    <div className="space-y-1">
-                      <p className="text-sm font-medium text-foreground">{system.name}</p>
-                      <p className="text-xs text-muted-foreground">
-                        {t('dashboard.wasDue', { date: new Date(system.next_review_date).toLocaleDateString(), owner: system.system_owner_id })}
-                      </p>
-                    </div>
-                    <Badge variant="secondary" className={classificationColor[system.gxp_classification] ?? 'bg-muted text-muted-foreground'}>
-                      {GXP_SHORT_LABELS[system.gxp_classification as GxPClassification] ?? system.gxp_classification}
-                    </Badge>
-                  </div>
-                ))}
-              </div>
-            </CardContent>
-          </Card>
-        )}
+export default function Dashboard() {
+  const { t } = useTranslation();
+  const { profile, roles } = useAuth();
+  const { data: systems, isLoading } = useDashboardSystems();
 
-        <Card>
-          <CardHeader>
-            <CardTitle className="text-base">{t('dashboard.upcomingReviews')}</CardTitle>
-          </CardHeader>
-          <CardContent>
-            {upcomingReviews.length === 0 ? (
-              <p className="text-sm text-muted-foreground py-4 text-center">{t('dashboard.noReviewsDue')}</p>
-            ) : (
-              <div className="space-y-3">
-                {upcomingReviews.map((system) => (
-                  <div key={system.id} className="flex items-center justify-between rounded-lg border border-border p-3">
-                    <div className="space-y-1">
-                      <p className="text-sm font-medium text-foreground">{system.name}</p>
-                      <p className="text-xs text-muted-foreground">
-                        {t('dashboard.due', { date: new Date(system.next_review_date).toLocaleDateString(), owner: system.system_owner_id })}
-                      </p>
-                    </div>
-                    <Badge variant="secondary" className={statusColor[system.status]}>
-                      {system.status}
-                    </Badge>
-                  </div>
-                ))}
-              </div>
-            )}
-          </CardContent>
-        </Card>
+  const isSuperUser = roles.includes('super_user');
+  const isQA = roles.includes('quality_assurance');
+  const isSystemOwner = roles.includes('system_owner');
 
-        <Card>
-          <CardHeader>
-            <CardTitle className="text-base">{t('dashboard.registeredSystems')}</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="space-y-3">
-              {systems.slice(0, 6).map((system) => (
-                <div key={system.id} className="flex items-center justify-between rounded-lg border border-border p-3">
-                  <div className="space-y-1">
-                    <p className="text-sm font-medium text-foreground">{system.name}</p>
-                    <p className="text-xs text-muted-foreground">
-                      {system.system_identifier} · {system.vendor_name}
-                    </p>
-                  </div>
-                  <Badge variant="secondary" className={classificationColor[system.gxp_classification] ?? 'bg-muted text-muted-foreground'}>
-                    {GXP_SHORT_LABELS[system.gxp_classification as GxPClassification] ?? system.gxp_classification}
-                  </Badge>
-                </div>
-              ))}
-              {systems.length > 6 && (
-                <Button variant="link" className="w-full text-xs" onClick={() => navigate('/systems')}>
-                  {t('dashboard.viewAll', { count: systems.length })}
-                </Button>
-              )}
-            </div>
-          </CardContent>
-        </Card>
+  const firstName = profile?.full_name?.split(' ')[0] ?? '';
+  const greetingKey = getGreetingKey();
+  const subtitleKey = getRoleSubtitleKey(roles);
+
+  if (isLoading) {
+    return <DashboardSkeleton isSuperUser={isSuperUser} />;
+  }
+
+  const allSystems = systems ?? [];
+
+  return (
+    <div className="space-y-8">
+      {/* Header */}
+      <div>
+        <h1 className="text-2xl font-semibold text-foreground">
+          {t(greetingKey, { name: firstName })}
+        </h1>
+        <p className="text-sm text-muted-foreground">{t(subtitleKey)}</p>
       </div>
+
+      {/* Super User: Platform Health KPIs */}
+      {isSuperUser && <PlatformHealthSection systems={allSystems} />}
+
+      {/* My Systems — for non-super users */}
+      {!isSuperUser && (
+        <MySystemsSection systems={allSystems} userRoles={roles} />
+      )}
+
+      {/* Super User sees all systems below KPIs */}
+      {isSuperUser && (
+        <MySystemsSection
+          systems={allSystems}
+          userRoles={roles}
+          title={t('dashboard.mySystems.allSystems')}
+        />
+      )}
+
+      {/* QA: Compliance Snapshot */}
+      {isQA && <ComplianceSnapshotSection systems={allSystems} />}
+
+      {/* Phase B empty states */}
+      <MyTasksSection />
+      <PendingApprovalsSection />
+
+      {/* Findings — only for SO and QA */}
+      {(isSystemOwner || isQA) && <FindingsAlertSection />}
+
+      {/* Super User: Recent Activity */}
+      {isSuperUser && <RecentActivitySection />}
     </div>
   );
 }
