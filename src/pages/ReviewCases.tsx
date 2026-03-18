@@ -19,6 +19,8 @@ export default function ReviewCases() {
   const { t } = useTranslation();
   const navigate = useNavigate();
   const [createOpen, setCreateOpen] = useState(false);
+  const { roles } = useAuth();
+  const canCreate = roles.includes('system_owner') || roles.includes('super_user');
   const [statusFilter, setStatusFilter] = useState<string>('all');
 
   const filters = statusFilter !== 'all' ? { status: statusFilter as ReviewStatus } : undefined;
