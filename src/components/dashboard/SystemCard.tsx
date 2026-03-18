@@ -140,7 +140,9 @@ export function SystemCard({ system }: SystemCardProps) {
       </div>
 
       {/* Phase stepper - only for in_progress/pending_approval */}
-      {showStepper && <ReviewPhaseStepper currentPhase={null} />}
+      {showStepper && system.activeReviewCaseStatus && (
+        <ReviewPhaseStepper currentPhase={system.activeReviewCaseStatus as any} />
+      )}
 
       {/* Next action bar */}
       <NextActionBar system={system} />
