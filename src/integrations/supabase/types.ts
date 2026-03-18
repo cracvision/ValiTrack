@@ -365,6 +365,7 @@ export type Database = {
       }
       system_profiles: {
         Row: {
+          business_owner_id: string | null
           created_at: string
           created_by: string
           deleted_at: string | null
@@ -395,6 +396,7 @@ export type Database = {
           vendor_name: string
         }
         Insert: {
+          business_owner_id?: string | null
           created_at?: string
           created_by: string
           deleted_at?: string | null
@@ -425,6 +427,7 @@ export type Database = {
           vendor_name?: string
         }
         Update: {
+          business_owner_id?: string | null
           created_at?: string
           created_by?: string
           deleted_at?: string | null
