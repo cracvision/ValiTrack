@@ -133,6 +133,128 @@
       "unknown": "Realizó una acción"
     }
   },
+  "reviews": {
+    "pageTitle": "Casos de Revisión",
+    "pageSubtitle": "Gestión del flujo de trabajo de revisiones periódicas",
+    "newReview": "Nueva revisión",
+    "empty": "Aún no hay casos de revisión. Crea una revisión periódica para comenzar.",
+    "status": {
+      "draft": "Borrador",
+      "in_preparation": "En preparación",
+      "in_progress": "En progreso",
+      "under_review": "Bajo revisión",
+      "approved": "Aprobado",
+      "rejected": "Rechazado"
+    },
+    "level": {
+      "1": "Nivel 1",
+      "1_desc": "Básico — revisión basada en checklist",
+      "2": "Nivel 2",
+      "2_desc": "Intermedio — evaluación de calidad documental",
+      "3": "Nivel 3",
+      "3_desc": "Detallado — integral con pruebas de desafío"
+    },
+    "conclusion": {
+      "remains_validated": "Permanece validado",
+      "requires_remediation": "Requiere remediación",
+      "requires_revalidation": "Requiere revalidación"
+    },
+    "filters": {
+      "allStatuses": "Todos los estados"
+    },
+    "table": {
+      "system": "Sistema",
+      "title": "Título",
+      "period": "Período de Revisión",
+      "level": "Nivel",
+      "status": "Estado",
+      "dueDate": "Fecha Límite",
+      "initiatedBy": "Iniciado Por"
+    },
+    "create": {
+      "title": "Crear Caso de Revisión",
+      "step1Desc": "Selecciona un sistema para iniciar una revisión periódica.",
+      "step2Desc": "Revisa y confirma los detalles antes de crear.",
+      "selectSystem": "Sistema",
+      "selectSystemPlaceholder": "Seleccionar un sistema...",
+      "defaultTitle": "Revisión Periódica",
+      "reviewTitle": "Título de la Revisión",
+      "periodStart": "Inicio del Período",
+      "periodEnd": "Fin del Período",
+      "level": "Nivel de Revisión",
+      "dueDate": "Fecha Límite",
+      "next": "Siguiente",
+      "back": "Atrás",
+      "submit": "Crear Revisión",
+      "success": "Caso de revisión creado",
+      "sodError": "El System Owner y QA no pueden ser la misma persona. Actualiza las asignaciones de roles del perfil de sistema antes de crear una revisión."
+    },
+    "actions": {
+      "startPreparation": "Iniciar preparación",
+      "beginReview": "Comenzar revisión",
+      "returnToDraft": "Volver a borrador",
+      "returnToPreparation": "Volver a preparación",
+      "submitForApproval": "Enviar para aprobación",
+      "approve": "Aprobar",
+      "reject": "Rechazar",
+      "transitionSuccess": "Estado actualizado",
+      "rejectTitle": "Rechazar Revisión",
+      "rejectDesc": "Proporciona una razón para rechazar esta revisión. Es obligatorio.",
+      "reason": "Razón",
+      "reasonPlaceholder": "Explica por qué se rechaza esta revisión...",
+      "confirmReject": "Rechazar",
+      "approveTitle": "Aprobar Revisión",
+      "approveDesc": "Selecciona una conclusión para esta revisión periódica.",
+      "conclusion": "Conclusión",
+      "selectConclusion": "Seleccionar conclusión...",
+      "conclusionNotes": "Notas (opcional)",
+      "conclusionNotesPlaceholder": "Notas adicionales sobre la conclusión...",
+      "confirmApprove": "Aprobar"
+    },
+    "detail": {
+      "backToList": "Casos de revisión",
+      "notFound": "Caso de revisión no encontrado.",
+      "reviewDetails": "Detalles de la Revisión",
+      "period": "Período de Revisión",
+      "level": "Nivel de Revisión",
+      "dueDate": "Fecha Límite",
+      "initiatedBy": "Iniciado Por",
+      "created": "Creado",
+      "roleAssignments": "Asignación de Roles",
+      "roles": {
+        "systemOwner": "System Owner",
+        "systemAdmin": "Administrador del Sistema",
+        "qa": "Garantía de Calidad",
+        "businessOwner": "Responsable del Negocio",
+        "itManager": "Gerente de IT"
+      },
+      "frozenSnapshot": "Snapshot del Sistema",
+      "frozenSnapshotDesc": "Datos del perfil del sistema capturados al momento de crear la revisión.",
+      "snapshot": {
+        "name": "Nombre del Sistema",
+        "gxp": "Clasificación GxP",
+        "gamp": "Categoría GAMP",
+        "risk": "Nivel de Riesgo",
+        "vendor": "Proveedor",
+        "validationDate": "Fecha de Validación",
+        "intendedUse": "Uso Previsto"
+      },
+      "statusHistory": "Historial de Estado",
+      "tasksTitle": "Tareas de Revisión",
+      "tasksPlaceholder": "Las tareas se generarán automáticamente cuando esta revisión avance al estado En Preparación.",
+      "tasksPreview": "Esta revisión {{level}} generará aproximadamente {{count}} tareas en {{groups}} áreas de revisión."
+    },
+    "taskGroups": {
+      "INIT": "Iniciación",
+      "ITSM": "Gestión de Servicios de TI",
+      "QMS": "Gestión de Calidad",
+      "SEC": "Seguridad",
+      "INFRA": "Infraestructura",
+      "DOC": "Documentación",
+      "AI_EVAL": "Evaluación IA",
+      "APPR": "Aprobación"
+    }
+  },
   "pages": {
     "reviewCases": {
       "title": "Casos de Revisión",

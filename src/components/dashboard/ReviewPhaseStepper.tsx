@@ -27,7 +27,7 @@ export function ReviewPhaseStepper({ currentPhase }: ReviewPhaseStepperProps) {
               key={phase}
               className={cn(
                 'flex-1 rounded-full',
-                isActive ? 'h-1.5 bg-blue-600' : 'h-1',
+                isActive ? 'h-1.5 bg-primary' : 'h-1',
                 isCompleted && 'bg-green-600',
                 !isCompleted && !isActive && 'bg-muted',
               )}
@@ -43,7 +43,7 @@ export function ReviewPhaseStepper({ currentPhase }: ReviewPhaseStepperProps) {
               key={phase}
               className={cn(
                 'flex-1 text-[10px] text-center',
-                isActive ? 'text-blue-600 font-medium' : 'text-muted-foreground',
+                isActive ? 'text-primary font-medium' : 'text-muted-foreground',
               )}
             >
               {t(`dashboard.phases.${phase}`)}

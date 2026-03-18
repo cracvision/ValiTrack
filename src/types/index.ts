@@ -6,13 +6,20 @@ export type GxPClassification = 'GMP' | 'GLP' | 'GCP' | 'GDP' | 'GVP' | 'NON_GXP
 export type RiskLevel = 'High' | 'Medium' | 'Low';
 export type SystemStatus = 'Active' | 'Retired' | 'Under Validation';
 
-export type ReviewStatus = 'Draft' | 'Under Review' | 'Pending QA' | 'Completed';
+export type ReviewStatus = 'draft' | 'in_preparation' | 'in_progress' | 'under_review' | 'approved' | 'rejected';
+export type ReviewLevel = '1' | '2' | '3';
+export type ReviewConclusion = 'remains_validated' | 'requires_remediation' | 'requires_revalidation';
+export type TaskGroup = 'INIT' | 'ITSM' | 'QMS' | 'SEC' | 'INFRA' | 'DOC' | 'AI_EVAL' | 'APPR';
+export type TaskPhase = 'initiation' | 'evidence_gathering' | 'ai_evaluation' | 'approval';
+export type TaskExecutionType = 'manual' | 'ai_assisted' | 'auto_generated';
+export type TaskStatus = 'pending' | 'in_progress' | 'completed' | 'blocked' | 'skipped';
+
 export type FindingSeverity = 'Critical' | 'Major' | 'Minor' | 'Observation';
 export type FindingStatus = 'Open' | 'In Progress' | 'Closed';
 export type ActionItemStatus = 'Open' | 'In Progress' | 'Completed' | 'Verified';
 export type EvidenceCategory = 'SOP' | 'Change Control' | 'Validation Report' | 'Audit Report' | 'Training Record' | 'Other';
 
-export type AppRole = 'super_user' | 'system_owner' | 'system_administrator' | 'business_owner' | 'quality_assurance';
+export type AppRole = 'super_user' | 'system_owner' | 'system_administrator' | 'business_owner' | 'quality_assurance' | 'it_manager';
 
 export interface SystemProfile {
   id: string;
@@ -43,14 +50,83 @@ export interface SystemProfile {
 export interface ReviewCase {
   id: string;
   system_id: string;
-  system_name: string;
   title: string;
-  status: ReviewStatus;
-  reviewer_id: string;
-  reviewer_name: string;
+  review_period_start: string;
+  review_period_end: string;
+  review_level: ReviewLevel;
   due_date: string;
-  completion_date?: string;
+  status: ReviewStatus;
+  conclusion?: ReviewConclusion;
+  conclusion_notes?: string;
+  frozen_system_snapshot: Record<string, unknown>;
+  initiated_by: string;
+  system_owner_id: string;
+  system_admin_id: string;
+  qa_id: string;
+  business_owner_id: string;
+  it_manager_id?: string;
+  completed_at?: string;
   created_at: string;
+  created_by: string;
+  updated_at: string;
+  updated_by?: string;
+  is_deleted: boolean;
+  // Joined fields for display
+  system_name?: string;
+  system_identifier?: string;
+}
+
+export interface ReviewCaseTransition {
+  id: string;
+  review_case_id: string;
+  from_status: string | null;
+  to_status: string;
+  reason?: string;
+  transitioned_by: string;
+  created_at: string;
+  // Joined
+  transitioned_by_name?: string;
+}
+
+export interface ReviewTask {
+  id: string;
+  review_case_id: string;
+  template_id?: string;
+  task_group: TaskGroup;
+  title: string;
+  description: string;
+  assigned_to: string;
+  approved_by_user?: string;
+  status: TaskStatus;
+  phase: TaskPhase;
+  execution_type: TaskExecutionType;
+  due_date: string;
+  started_at?: string;
+  completed_at?: string;
+  completion_notes?: string;
+  sort_order: number;
+  created_at: string;
+  created_by: string;
+  updated_at: string;
+  is_deleted: boolean;
+  // Joined
+  assigned_to_name?: string;
+  approved_by_name?: string;
+}
+
+export interface TaskTemplate {
+  id: string;
+  code: string;
+  task_group: TaskGroup;
+  title: string;
+  description: string;
+  default_assignee_role: string;
+  default_approver_role: string;
+  phase: TaskPhase;
+  execution_type: TaskExecutionType;
+  review_level_min: number;
+  sort_order: number;
+  is_active: boolean;
 }
 
 export interface EvidenceItem {

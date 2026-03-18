@@ -140,6 +140,229 @@ export type Database = {
         }
         Relationships: []
       }
+      review_case_transitions: {
+        Row: {
+          created_at: string
+          from_status: string | null
+          id: string
+          reason: string | null
+          review_case_id: string
+          to_status: string
+          transitioned_by: string
+        }
+        Insert: {
+          created_at?: string
+          from_status?: string | null
+          id?: string
+          reason?: string | null
+          review_case_id: string
+          to_status: string
+          transitioned_by: string
+        }
+        Update: {
+          created_at?: string
+          from_status?: string | null
+          id?: string
+          reason?: string | null
+          review_case_id?: string
+          to_status?: string
+          transitioned_by?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "review_case_transitions_review_case_id_fkey"
+            columns: ["review_case_id"]
+            isOneToOne: false
+            referencedRelation: "review_cases"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      review_cases: {
+        Row: {
+          business_owner_id: string
+          completed_at: string | null
+          conclusion: string | null
+          conclusion_notes: string | null
+          created_at: string
+          created_by: string
+          deleted_at: string | null
+          deleted_by: string | null
+          due_date: string
+          frozen_system_snapshot: Json
+          id: string
+          initiated_by: string
+          is_deleted: boolean
+          it_manager_id: string | null
+          qa_id: string
+          review_level: string
+          review_period_end: string
+          review_period_start: string
+          status: string
+          system_admin_id: string
+          system_id: string
+          system_owner_id: string
+          title: string
+          updated_at: string
+          updated_by: string | null
+        }
+        Insert: {
+          business_owner_id: string
+          completed_at?: string | null
+          conclusion?: string | null
+          conclusion_notes?: string | null
+          created_at?: string
+          created_by: string
+          deleted_at?: string | null
+          deleted_by?: string | null
+          due_date: string
+          frozen_system_snapshot: Json
+          id?: string
+          initiated_by: string
+          is_deleted?: boolean
+          it_manager_id?: string | null
+          qa_id: string
+          review_level: string
+          review_period_end: string
+          review_period_start: string
+          status?: string
+          system_admin_id: string
+          system_id: string
+          system_owner_id: string
+          title: string
+          updated_at?: string
+          updated_by?: string | null
+        }
+        Update: {
+          business_owner_id?: string
+          completed_at?: string | null
+          conclusion?: string | null
+          conclusion_notes?: string | null
+          created_at?: string
+          created_by?: string
+          deleted_at?: string | null
+          deleted_by?: string | null
+          due_date?: string
+          frozen_system_snapshot?: Json
+          id?: string
+          initiated_by?: string
+          is_deleted?: boolean
+          it_manager_id?: string | null
+          qa_id?: string
+          review_level?: string
+          review_period_end?: string
+          review_period_start?: string
+          status?: string
+          system_admin_id?: string
+          system_id?: string
+          system_owner_id?: string
+          title?: string
+          updated_at?: string
+          updated_by?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "review_cases_system_id_fkey"
+            columns: ["system_id"]
+            isOneToOne: false
+            referencedRelation: "system_profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      review_tasks: {
+        Row: {
+          approved_by_user: string | null
+          assigned_to: string
+          completed_at: string | null
+          completion_notes: string | null
+          created_at: string
+          created_by: string
+          deleted_at: string | null
+          deleted_by: string | null
+          description: string
+          due_date: string
+          execution_type: string
+          id: string
+          is_deleted: boolean
+          phase: string
+          review_case_id: string
+          sort_order: number
+          started_at: string | null
+          status: string
+          task_group: string
+          template_id: string | null
+          title: string
+          updated_at: string
+          updated_by: string | null
+        }
+        Insert: {
+          approved_by_user?: string | null
+          assigned_to: string
+          completed_at?: string | null
+          completion_notes?: string | null
+          created_at?: string
+          created_by: string
+          deleted_at?: string | null
+          deleted_by?: string | null
+          description?: string
+          due_date: string
+          execution_type?: string
+          id?: string
+          is_deleted?: boolean
+          phase: string
+          review_case_id: string
+          sort_order?: number
+          started_at?: string | null
+          status?: string
+          task_group: string
+          template_id?: string | null
+          title: string
+          updated_at?: string
+          updated_by?: string | null
+        }
+        Update: {
+          approved_by_user?: string | null
+          assigned_to?: string
+          completed_at?: string | null
+          completion_notes?: string | null
+          created_at?: string
+          created_by?: string
+          deleted_at?: string | null
+          deleted_by?: string | null
+          description?: string
+          due_date?: string
+          execution_type?: string
+          id?: string
+          is_deleted?: boolean
+          phase?: string
+          review_case_id?: string
+          sort_order?: number
+          started_at?: string | null
+          status?: string
+          task_group?: string
+          template_id?: string | null
+          title?: string
+          updated_at?: string
+          updated_by?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "review_tasks_review_case_id_fkey"
+            columns: ["review_case_id"]
+            isOneToOne: false
+            referencedRelation: "review_cases"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "review_tasks_template_id_fkey"
+            columns: ["template_id"]
+            isOneToOne: false
+            referencedRelation: "task_templates"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       system_profiles: {
         Row: {
           created_at: string
@@ -230,6 +453,72 @@ export type Database = {
           vendor_contact?: string
           vendor_contract_ref?: string
           vendor_name?: string
+        }
+        Relationships: []
+      }
+      task_templates: {
+        Row: {
+          code: string
+          created_at: string
+          created_by: string
+          default_approver_role: string
+          default_assignee_role: string
+          deleted_at: string | null
+          deleted_by: string | null
+          description: string
+          execution_type: string
+          id: string
+          is_active: boolean
+          is_deleted: boolean
+          phase: string
+          review_level_min: number
+          sort_order: number
+          task_group: string
+          title: string
+          updated_at: string
+          updated_by: string | null
+        }
+        Insert: {
+          code: string
+          created_at?: string
+          created_by: string
+          default_approver_role: string
+          default_assignee_role: string
+          deleted_at?: string | null
+          deleted_by?: string | null
+          description?: string
+          execution_type?: string
+          id?: string
+          is_active?: boolean
+          is_deleted?: boolean
+          phase: string
+          review_level_min?: number
+          sort_order?: number
+          task_group: string
+          title: string
+          updated_at?: string
+          updated_by?: string | null
+        }
+        Update: {
+          code?: string
+          created_at?: string
+          created_by?: string
+          default_approver_role?: string
+          default_assignee_role?: string
+          deleted_at?: string | null
+          deleted_by?: string | null
+          description?: string
+          execution_type?: string
+          id?: string
+          is_active?: boolean
+          is_deleted?: boolean
+          phase?: string
+          review_level_min?: number
+          sort_order?: number
+          task_group?: string
+          title?: string
+          updated_at?: string
+          updated_by?: string | null
         }
         Relationships: []
       }

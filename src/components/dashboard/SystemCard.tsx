@@ -95,7 +95,7 @@ function NextActionBar({ system }: { system: DashboardSystem }) {
 export function SystemCard({ system }: SystemCardProps) {
   const navigate = useNavigate();
   const isOverdue = system.reviewStatus === 'overdue';
-  const showStepper = system.reviewStatus === 'in_progress' || system.reviewStatus === 'pending_approval';
+  const showStepper = system.activeReviewCaseStatus && !['approved', 'rejected'].includes(system.activeReviewCaseStatus);
 
   return (
     <div
@@ -140,7 +140,9 @@ export function SystemCard({ system }: SystemCardProps) {
       </div>
 
       {/* Phase stepper - only for in_progress/pending_approval */}
-      {showStepper && <ReviewPhaseStepper currentPhase={null} />}
+      {showStepper && system.activeReviewCaseStatus && (
+        <ReviewPhaseStepper currentPhase={system.activeReviewCaseStatus as any} />
+      )}
 
       {/* Next action bar */}
       <NextActionBar system={system} />
