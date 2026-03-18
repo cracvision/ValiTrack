@@ -134,6 +134,7 @@ export function SystemProfileForm({ open, onOpenChange, onSubmit, editingSystem 
   const { users: systemAdmins, loading: loadingAdmins } = useRoleUsers('system_administrator');
   const { users: qaUsers, loading: loadingQA } = useRoleUsers('quality_assurance');
   const { users: itManagers, loading: loadingIT } = useRoleUsers('it_manager');
+  const { users: businessOwners, loading: loadingBO } = useRoleUsers('business_owner');
 
   const [autoValue, setAutoValue] = useState<number | null>(null);
   const [flashPeriod, setFlashPeriod] = useState(false);
