@@ -133,6 +133,128 @@
       "unknown": "Performed an action"
     }
   },
+  "reviews": {
+    "pageTitle": "Review Cases",
+    "pageSubtitle": "Periodic review workflow management",
+    "newReview": "New review",
+    "empty": "No review cases yet. Create a periodic review to begin.",
+    "status": {
+      "draft": "Draft",
+      "in_preparation": "In preparation",
+      "in_progress": "In progress",
+      "under_review": "Under review",
+      "approved": "Approved",
+      "rejected": "Rejected"
+    },
+    "level": {
+      "1": "Level 1",
+      "1_desc": "Basic — checklist-based review",
+      "2": "Level 2",
+      "2_desc": "Intermediate — documentation quality evaluation",
+      "3": "Level 3",
+      "3_desc": "Detailed — comprehensive with challenge testing"
+    },
+    "conclusion": {
+      "remains_validated": "Remains validated",
+      "requires_remediation": "Requires remediation",
+      "requires_revalidation": "Requires revalidation"
+    },
+    "filters": {
+      "allStatuses": "All statuses"
+    },
+    "table": {
+      "system": "System",
+      "title": "Title",
+      "period": "Review Period",
+      "level": "Level",
+      "status": "Status",
+      "dueDate": "Due Date",
+      "initiatedBy": "Initiated By"
+    },
+    "create": {
+      "title": "Create Review Case",
+      "step1Desc": "Select a system to begin a periodic review.",
+      "step2Desc": "Review and confirm the details before creating.",
+      "selectSystem": "System",
+      "selectSystemPlaceholder": "Select a system...",
+      "defaultTitle": "Periodic Review",
+      "reviewTitle": "Review Title",
+      "periodStart": "Period Start",
+      "periodEnd": "Period End",
+      "level": "Review Level",
+      "dueDate": "Due Date",
+      "next": "Next",
+      "back": "Back",
+      "submit": "Create Review",
+      "success": "Review case created",
+      "sodError": "System Owner and QA cannot be the same person. Update the system profile role assignments before creating a review."
+    },
+    "actions": {
+      "startPreparation": "Start preparation",
+      "beginReview": "Begin review",
+      "returnToDraft": "Return to draft",
+      "returnToPreparation": "Return to preparation",
+      "submitForApproval": "Submit for approval",
+      "approve": "Approve",
+      "reject": "Reject",
+      "transitionSuccess": "Status updated",
+      "rejectTitle": "Reject Review",
+      "rejectDesc": "Provide a reason for rejecting this review. This is mandatory.",
+      "reason": "Reason",
+      "reasonPlaceholder": "Explain why this review is being rejected...",
+      "confirmReject": "Reject",
+      "approveTitle": "Approve Review",
+      "approveDesc": "Select a conclusion for this periodic review.",
+      "conclusion": "Conclusion",
+      "selectConclusion": "Select conclusion...",
+      "conclusionNotes": "Notes (optional)",
+      "conclusionNotesPlaceholder": "Additional notes about the conclusion...",
+      "confirmApprove": "Approve"
+    },
+    "detail": {
+      "backToList": "Review cases",
+      "notFound": "Review case not found.",
+      "reviewDetails": "Review Details",
+      "period": "Review Period",
+      "level": "Review Level",
+      "dueDate": "Due Date",
+      "initiatedBy": "Initiated By",
+      "created": "Created",
+      "roleAssignments": "Role Assignments",
+      "roles": {
+        "systemOwner": "System Owner",
+        "systemAdmin": "System Administrator",
+        "qa": "Quality Assurance",
+        "businessOwner": "Business Owner",
+        "itManager": "IT Manager"
+      },
+      "frozenSnapshot": "System Snapshot",
+      "frozenSnapshotDesc": "System profile data captured at review creation time.",
+      "snapshot": {
+        "name": "System Name",
+        "gxp": "GxP Classification",
+        "gamp": "GAMP Category",
+        "risk": "Risk Level",
+        "vendor": "Vendor",
+        "validationDate": "Validation Date",
+        "intendedUse": "Intended Use"
+      },
+      "statusHistory": "Status History",
+      "tasksTitle": "Review Tasks",
+      "tasksPlaceholder": "Tasks will be auto-generated when this review advances to In Preparation status.",
+      "tasksPreview": "This {{level}} review will generate approximately {{count}} tasks across {{groups}} review areas."
+    },
+    "taskGroups": {
+      "INIT": "Initiation",
+      "ITSM": "IT Service Management",
+      "QMS": "Quality Management",
+      "SEC": "Security",
+      "INFRA": "Infrastructure",
+      "DOC": "Documentation",
+      "AI_EVAL": "AI Evaluation",
+      "APPR": "Approval"
+    }
+  },
   "pages": {
     "reviewCases": {
       "title": "Review Cases",
