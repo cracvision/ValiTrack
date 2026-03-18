@@ -274,6 +274,7 @@ export function SystemProfileForm({ open, onOpenChange, onSubmit, editingSystem 
       system_admin_id: values.system_admin_id,
       qa_id: values.qa_id,
       it_manager_id: values.it_manager_id && values.it_manager_id !== '__none__' ? values.it_manager_id : undefined,
+      business_owner_id: values.business_owner_id && values.business_owner_id !== '__none__' ? values.business_owner_id : undefined,
       validation_date: values.validation_date,
       review_period_months: values.review_period_months,
       next_review_date: calculateNextReviewDate(values.validation_date, values.review_period_months),
