@@ -62,6 +62,7 @@ const formSchema = z.object({
   system_admin_id: z.string().min(1, 'System Administrator is required'),
   qa_id: z.string().min(1, 'Quality Assurance is required'),
   it_manager_id: z.string().optional().default(''),
+  business_owner_id: z.string().optional().default(''),
 }).refine((data) => data.system_owner_id !== data.qa_id, {
   message: 'System Owner and QA cannot be the same person (separation of duties)',
   path: ['qa_id'],
