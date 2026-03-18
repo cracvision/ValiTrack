@@ -138,6 +138,7 @@
     "pageSubtitle": "Periodic review workflow management",
     "newReview": "New review",
     "empty": "No review cases yet. Create a periodic review to begin.",
+    "emptyNoCreate": "You are not currently assigned to any periodic review. Reviews will appear here when you are included in a review workflow.",
     "status": {
       "draft": "Draft",
       "in_preparation": "In preparation",

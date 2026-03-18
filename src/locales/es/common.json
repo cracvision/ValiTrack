@@ -138,6 +138,7 @@
     "pageSubtitle": "Gestión del flujo de trabajo de revisiones periódicas",
     "newReview": "Nueva revisión",
     "empty": "Aún no hay casos de revisión. Crea una revisión periódica para comenzar.",
+    "emptyNoCreate": "Actualmente no estás asignado a ninguna revisión periódica. Las revisiones aparecerán aquí cuando seas incluido en un flujo de revisión.",
     "status": {
       "draft": "Borrador",
       "in_preparation": "En preparación",

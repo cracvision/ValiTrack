@@ -64,7 +64,7 @@ export default function ReviewCases() {
         <div className="flex items-center justify-center rounded-lg border border-dashed border-border bg-card p-16">
           <div className="text-center space-y-3">
             <ClipboardCheck className="mx-auto h-10 w-10 text-muted-foreground/50" />
-            <p className="text-sm text-muted-foreground">{t('reviews.empty')}</p>
+            <p className="text-sm text-muted-foreground">{t(canCreate ? 'reviews.empty' : 'reviews.emptyNoCreate')}</p>
             {canCreate && (
               <Button variant="outline" onClick={() => setCreateOpen(true)}>
                 <Plus className="h-4 w-4 mr-2" />
