@@ -118,14 +118,58 @@ export function useDashboardSystems() {
         ? allSystems
         : allSystems.filter((s) => getUserRelationships(s, userId).length > 0);
 
+      // Fetch latest review case per system
+      const systemIds = filtered.map(s => s.id);
+      let reviewCaseMap: Record<string, { id: string; status: string }> = {};
+
+      if (systemIds.length > 0) {
+        const { data: cases } = await supabase
+          .from('review_cases')
+          .select('id, system_id, status')
+          .eq('is_deleted', false)
+          .in('system_id', systemIds)
+          .order('created_at', { ascending: false });
+
+        if (cases) {
+          // Keep only the latest case per system
+          for (const c of cases as any[]) {
+            if (!reviewCaseMap[c.system_id]) {
+              reviewCaseMap[c.system_id] = { id: c.id, status: c.status };
+            }
+          }
+        }
+      }
+
       const dashboardSystems: DashboardSystem[] = filtered.map((s) => {
-        const { status, daysUntilDue } = computeReviewStatus(s);
+        const activeCase = reviewCaseMap[s.id];
+        const { status: dateStatus, daysUntilDue } = computeReviewStatus(s);
+
+        let reviewStatus: ReviewStatusType;
+
+        if (activeCase) {
+          const cs = activeCase.status as CaseStatus;
+          if (cs === 'draft' || cs === 'in_preparation' || cs === 'in_progress' || cs === 'rejected') {
+            reviewStatus = 'in_progress';
+          } else if (cs === 'under_review') {
+            reviewStatus = 'pending_approval';
+          } else if (cs === 'approved') {
+            // Approved + future next_review → compliant; otherwise fallback
+            reviewStatus = daysUntilDue >= 0 ? 'compliant' : 'overdue';
+          } else {
+            reviewStatus = dateStatus;
+          }
+        } else {
+          reviewStatus = dateStatus;
+        }
+
         return {
           ...s,
-          reviewStatus: status,
+          reviewStatus,
           daysUntilDue,
-          countdownLabel: getCountdownLabel(status, daysUntilDue),
+          countdownLabel: getCountdownLabel(reviewStatus, daysUntilDue),
           userRelationship: isSuperUser ? ['super_user'] : getUserRelationships(s, userId),
+          activeReviewCaseId: activeCase?.id,
+          activeReviewCaseStatus: activeCase?.status as CaseStatus | undefined,
         };
       });
 
