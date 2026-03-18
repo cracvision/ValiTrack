@@ -233,6 +233,7 @@ export function SystemProfileForm({ open, onOpenChange, onSubmit, editingSystem 
         system_owner_id: editingSystem.system_owner_id,
         system_admin_id: editingSystem.system_admin_id,
         qa_id: editingSystem.qa_id,
+        business_owner_id: editingSystem.business_owner_id ?? '',
         it_manager_id: editingSystem.it_manager_id ?? '',
       });
     }
