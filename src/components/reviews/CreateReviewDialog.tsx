@@ -212,7 +212,7 @@ export function CreateReviewDialog({ open, onOpenChange }: CreateReviewDialogPro
             <div className="grid grid-cols-2 gap-4">
               <div className="space-y-2">
                 <Label>{t('reviews.create.level')}</Label>
-                <Input value={levelConfig?.label || ''} disabled />
+                <Input value={levelConfig?.label || ''} readOnly className="cursor-default" />
               </div>
               <div className="space-y-2">
                 <Label>{t('reviews.create.dueDate')}</Label>
