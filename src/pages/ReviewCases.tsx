@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
 import { Plus, ClipboardCheck } from 'lucide-react';
+import { useAuth } from '@/hooks/useAuth';
 import { useReviewCases } from '@/hooks/useReviewCases';
 import { CreateReviewDialog } from '@/components/reviews/CreateReviewDialog';
 import { ReviewStatusBadge } from '@/components/reviews/ReviewStatusBadge';
