@@ -244,8 +244,8 @@ export default function SystemProfiles() {
                         {new Date(system.next_review_date).toLocaleDateString()}
                       </span>
                     </TableCell>
-                    <TableCell>
-                      {canEdit && (
+                    {canEdit && (
+                      <TableCell>
                         <div className="flex gap-1">
                           <Button variant="ghost" size="icon" className="h-7 w-7" onClick={(e) => { e.stopPropagation(); handleEdit(system); }}>
                             <Pencil className="h-3.5 w-3.5" />
@@ -254,8 +254,8 @@ export default function SystemProfiles() {
                             <Trash2 className="h-3.5 w-3.5" />
                           </Button>
                         </div>
-                      )}
-                    </TableCell>
+                      </TableCell>
+                    )}
                   </TableRow>
                 ))}
               </TableBody>
