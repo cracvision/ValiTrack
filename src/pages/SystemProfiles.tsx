@@ -18,6 +18,7 @@ import { SystemProfileForm } from '@/components/SystemProfileForm';
 import { SystemProfileDetailDialog } from '@/components/SystemProfileDetailDialog';
 import { useSystemProfiles } from '@/hooks/useSystemProfiles';
 import { toast } from '@/hooks/use-toast';
+import { useAuth } from '@/hooks/useAuth';
 import { GXP_SHORT_LABELS, ENVIRONMENT_SHORT_LABELS, GAMP_SHORT_LABELS, SYSTEM_ENVIRONMENT_OPTIONS } from '@/lib/gxpClassifications';
 import type { SystemProfile, GxPClassification, SystemEnvironment, GampCategory } from '@/types';
 
@@ -51,7 +52,9 @@ const gampColor: Record<string, string> = {
 };
 
 export default function SystemProfiles() {
+  const { roles } = useAuth();
   const { systems, loading, addSystem, updateSystem, deleteSystem } = useSystemProfiles();
+  const canEdit = roles.includes('system_owner') || roles.includes('super_user');
   const [formOpen, setFormOpen] = useState(false);
   const [editingSystem, setEditingSystem] = useState<SystemProfile | null>(null);
   const [deleteId, setDeleteId] = useState<string | null>(null);
@@ -133,10 +136,12 @@ export default function SystemProfiles() {
             Register and manage your validated computerized systems
           </p>
         </div>
-        <Button onClick={handleNewSystem}>
-          <Plus className="mr-2 h-4 w-4" />
-          New System Profile
-        </Button>
+        {canEdit && (
+          <Button onClick={handleNewSystem}>
+            <Plus className="mr-2 h-4 w-4" />
+            New System Profile
+          </Button>
+        )}
       </div>
 
       {systems.length === 0 ? (
@@ -240,14 +245,16 @@ export default function SystemProfiles() {
                       </span>
                     </TableCell>
                     <TableCell>
-                      <div className="flex gap-1">
-                        <Button variant="ghost" size="icon" className="h-7 w-7" onClick={(e) => { e.stopPropagation(); handleEdit(system); }}>
-                          <Pencil className="h-3.5 w-3.5" />
-                        </Button>
-                        <Button variant="ghost" size="icon" className="h-7 w-7 text-destructive hover:text-destructive" onClick={(e) => { e.stopPropagation(); setDeleteId(system.id); }}>
-                          <Trash2 className="h-3.5 w-3.5" />
-                        </Button>
-                      </div>
+                      {canEdit && (
+                        <div className="flex gap-1">
+                          <Button variant="ghost" size="icon" className="h-7 w-7" onClick={(e) => { e.stopPropagation(); handleEdit(system); }}>
+                            <Pencil className="h-3.5 w-3.5" />
+                          </Button>
+                          <Button variant="ghost" size="icon" className="h-7 w-7 text-destructive hover:text-destructive" onClick={(e) => { e.stopPropagation(); setDeleteId(system.id); }}>
+                            <Trash2 className="h-3.5 w-3.5" />
+                          </Button>
+                        </div>
+                      )}
                     </TableCell>
                   </TableRow>
                 ))}

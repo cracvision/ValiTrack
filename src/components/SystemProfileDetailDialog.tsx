@@ -11,6 +11,7 @@ import {
   SYSTEM_ENVIRONMENT_OPTIONS, GXP_OPTIONS, GAMP_CATEGORY_OPTIONS,
   suggestReviewLevel,
 } from '@/lib/gxpClassifications';
+import { useAuth } from '@/hooks/useAuth';
 import type { SystemProfile, GxPClassification, SystemEnvironment, GampCategory, RiskLevel } from '@/types';
 
 interface Props {
@@ -46,6 +47,8 @@ function UserName({ userId, users }: { userId?: string; users: { id: string; ful
 }
 
 export function SystemProfileDetailDialog({ system, open, onOpenChange, onEdit }: Props) {
+  const { roles } = useAuth();
+  const canEdit = roles.includes('system_owner') || roles.includes('super_user');
   const { users: owners } = useRoleUsers('system_owner');
   const { users: admins } = useRoleUsers('system_administrator');
   const { users: qaUsers } = useRoleUsers('quality_assurance');
@@ -74,18 +77,20 @@ export function SystemProfileDetailDialog({ system, open, onOpenChange, onEdit }
           <SheetDescription className="text-sm text-muted-foreground">{system.system_identifier}</SheetDescription>
         </SheetHeader>
 
-        <Button
-          size="sm"
-          variant="outline"
-          className="absolute right-12 top-4"
-          onClick={() => {
-            onOpenChange(false);
-            onEdit(system);
-          }}
-        >
-          <Pencil className="mr-1.5 h-3.5 w-3.5" />
-          Edit
-        </Button>
+        {canEdit && (
+          <Button
+            size="sm"
+            variant="outline"
+            className="absolute right-12 top-4"
+            onClick={() => {
+              onOpenChange(false);
+              onEdit(system);
+            }}
+          >
+            <Pencil className="mr-1.5 h-3.5 w-3.5" />
+            Edit
+          </Button>
+        )}
 
         <div className="mt-6 space-y-6">
           {/* System Information */}
