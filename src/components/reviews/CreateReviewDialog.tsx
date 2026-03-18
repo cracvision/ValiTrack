@@ -220,6 +220,30 @@ export function CreateReviewDialog({ open, onOpenChange }: CreateReviewDialogPro
               </div>
             </div>
 
+            <Separator />
+
+            <div>
+              <h4 className="text-sm font-semibold text-foreground mb-3">
+                {t('reviews.detail.roleAssignments')}
+              </h4>
+              <div className="grid grid-cols-2 gap-x-6 gap-y-2">
+                {([
+                  ['reviews.detail.roles.systemOwner', selectedSystem?.system_owner_id],
+                  ['reviews.detail.roles.systemAdmin', selectedSystem?.system_admin_id],
+                  ['reviews.detail.roles.qa', selectedSystem?.qa_id],
+                  ['reviews.detail.roles.businessOwner', selectedSystem?.business_owner_id],
+                  ['reviews.detail.roles.itManager', selectedSystem?.it_manager_id],
+                ] as const).map(([labelKey, userId]) => (
+                  <div key={labelKey}>
+                    <p className="text-xs text-muted-foreground">{t(labelKey)}</p>
+                    <p className="text-sm font-medium text-foreground">
+                      {userId ? (userNames[userId] || '—') : '—'}
+                    </p>
+                  </div>
+                ))}
+              </div>
+            </div>
+
             <div className="flex justify-end gap-2">
               <Button variant="outline" onClick={() => setStep(1)}>
                 {t('reviews.create.back')}
