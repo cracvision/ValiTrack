@@ -38,11 +38,11 @@ function SectionTitle({ children }: { children: React.ReactNode }) {
   return <h3 className="text-sm font-semibold text-foreground mb-3">{children}</h3>;
 }
 
-function UserName({ userId, users }: { userId?: string; users: { id: string; full_name: string }[] }) {
+function UserName({ userId, names }: { userId?: string; names: Record<string, string> }) {
   if (!userId) return <p className="text-sm text-muted-foreground">—</p>;
-  const user = users.find((u) => u.id === userId);
-  return user
-    ? <p className="text-sm font-medium text-foreground">{user.full_name}</p>
+  const name = names[userId];
+  return name
+    ? <p className="text-sm font-medium text-foreground">{name}</p>
     : <p className="text-sm text-muted-foreground">—</p>;
 }
 
