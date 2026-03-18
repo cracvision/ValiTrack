@@ -32,7 +32,7 @@ export function TransitionHistory({ transitions }: TransitionHistoryProps) {
                 <ReviewStatusBadge status={tr.to_status as ReviewStatus} />
               </div>
               <span className="text-xs text-muted-foreground">
-                {relativeTime(tr.created_at)}
+                {getRelativeTime(tr.created_at)}
               </span>
             </div>
             {tr.reason && (
