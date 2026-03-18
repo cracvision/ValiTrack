@@ -1,6 +1,6 @@
 import { useTranslation } from 'react-i18next';
 import { ReviewStatusBadge } from './ReviewStatusBadge';
-import { relativeTime } from '@/lib/relativeTime';
+import { getRelativeTime } from '@/lib/relativeTime';
 import type { ReviewCaseTransition, ReviewStatus } from '@/types';
 
 interface TransitionHistoryProps {
