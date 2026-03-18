@@ -5,7 +5,7 @@ import { Separator } from '@/components/ui/separator';
 import {
   Sheet, SheetContent, SheetHeader, SheetTitle, SheetDescription,
 } from '@/components/ui/sheet';
-import { useRoleUsers } from '@/hooks/useRoleUsers';
+import { useResolveUserNames } from '@/hooks/useResolveUserNames';
 import {
   GXP_SHORT_LABELS, ENVIRONMENT_SHORT_LABELS, GAMP_SHORT_LABELS,
   SYSTEM_ENVIRONMENT_OPTIONS, GXP_OPTIONS, GAMP_CATEGORY_OPTIONS,
@@ -38,26 +38,22 @@ function SectionTitle({ children }: { children: React.ReactNode }) {
   return <h3 className="text-sm font-semibold text-foreground mb-3">{children}</h3>;
 }
 
-function UserName({ userId, users }: { userId?: string; users: { id: string; full_name: string }[] }) {
+function UserName({ userId, names }: { userId?: string; names: Record<string, string> }) {
   if (!userId) return <p className="text-sm text-muted-foreground">—</p>;
-  const user = users.find((u) => u.id === userId);
-  return user
-    ? <p className="text-sm font-medium text-foreground">{user.full_name}</p>
+  const name = names[userId];
+  return name
+    ? <p className="text-sm font-medium text-foreground">{name}</p>
     : <p className="text-sm text-muted-foreground">—</p>;
 }
 
 export function SystemProfileDetailDialog({ system, open, onOpenChange, onEdit }: Props) {
   const { roles } = useAuth();
   const canEdit = roles.includes('system_owner') || roles.includes('super_user');
-  const { users: owners } = useRoleUsers('system_owner');
-  const { users: admins } = useRoleUsers('system_administrator');
-  const { users: qaUsers } = useRoleUsers('quality_assurance');
-  const { users: businessOwners } = useRoleUsers('business_owner');
-  const { users: itManagers } = useRoleUsers('it_manager');
+  const { data: userNames = {} } = useResolveUserNames(
+    system ? [system.system_owner_id, system.system_admin_id, system.qa_id, system.business_owner_id, system.it_manager_id] : []
+  );
 
   if (!system) return null;
-
-  const allUsers = [...owners, ...admins, ...qaUsers, ...businessOwners, ...itManagers];
   const envLabel = SYSTEM_ENVIRONMENT_OPTIONS.find((e) => e.value === system.system_environment)?.label
     ?? ENVIRONMENT_SHORT_LABELS[system.system_environment as SystemEnvironment]
     ?? system.system_environment;
@@ -153,23 +149,23 @@ export function SystemProfileDetailDialog({ system, open, onOpenChange, onEdit }
             <div className="grid grid-cols-2 gap-x-6 gap-y-3">
               <div>
                 <p className="text-xs text-muted-foreground">System Owner</p>
-                <UserName userId={system.system_owner_id} users={allUsers} />
+                <UserName userId={system.system_owner_id} names={userNames} />
               </div>
               <div>
                 <p className="text-xs text-muted-foreground">System Administrator</p>
-                <UserName userId={system.system_admin_id} users={allUsers} />
+                <UserName userId={system.system_admin_id} names={userNames} />
               </div>
               <div>
                 <p className="text-xs text-muted-foreground">Quality Assurance</p>
-                <UserName userId={system.qa_id} users={allUsers} />
+                <UserName userId={system.qa_id} names={userNames} />
               </div>
               <div>
                 <p className="text-xs text-muted-foreground">Business Owner</p>
-                <UserName userId={system.business_owner_id} users={allUsers} />
+                <UserName userId={system.business_owner_id} names={userNames} />
               </div>
               <div>
                 <p className="text-xs text-muted-foreground">IT Manager</p>
-                <UserName userId={system.it_manager_id} users={allUsers} />
+                <UserName userId={system.it_manager_id} names={userNames} />
               </div>
             </div>
           </div>

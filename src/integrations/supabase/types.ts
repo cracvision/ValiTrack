@@ -608,6 +608,13 @@ export type Database = {
         }
         Returns: boolean
       }
+      resolve_user_names: {
+        Args: { user_ids: string[] }
+        Returns: {
+          full_name: string
+          id: string
+        }[]
+      }
     }
     Enums: {
       app_role:
