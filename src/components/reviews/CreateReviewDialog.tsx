@@ -9,6 +9,7 @@ import { calculateReviewLevel, REVIEW_LEVEL_CONFIG } from '@/lib/reviewWorkflow'
 import { GAMP_SHORT_LABELS } from '@/lib/gxpClassifications';
 import { GXP_SHORT_LABELS } from '@/lib/gxpClassifications';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from '@/components/ui/dialog';
+import { Separator } from '@/components/ui/separator';
 import { Button } from '@/components/ui/button';
 import { Label } from '@/components/ui/label';
 import { Input } from '@/components/ui/input';
