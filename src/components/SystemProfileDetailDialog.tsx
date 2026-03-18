@@ -11,6 +11,7 @@ import {
   SYSTEM_ENVIRONMENT_OPTIONS, GXP_OPTIONS, GAMP_CATEGORY_OPTIONS,
   suggestReviewLevel,
 } from '@/lib/gxpClassifications';
+import { useAuth } from '@/hooks/useAuth';
 import type { SystemProfile, GxPClassification, SystemEnvironment, GampCategory, RiskLevel } from '@/types';
 
 interface Props {
