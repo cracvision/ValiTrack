@@ -73,7 +73,7 @@ export function useDashboardSystems() {
   const isSuperUser = roles.includes('super_user');
 
   return useQuery({
-    queryKey: ['dashboard-systems', userId],
+    queryKey: ['dashboard-systems', userId, isSuperUser],
     queryFn: async (): Promise<DashboardSystem[]> => {
       if (!userId) return [];
 
@@ -182,7 +182,7 @@ export function useDashboardSystems() {
 
       return dashboardSystems;
     },
-    enabled: !!userId,
+    enabled: !!userId && roles.length > 0,
     staleTime: 2 * 60 * 1000,
   });
 }
