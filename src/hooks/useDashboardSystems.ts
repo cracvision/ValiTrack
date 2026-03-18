@@ -54,7 +54,7 @@ function getUserRelationships(system: SystemProfile, userId: string): string[] {
   if (system.system_admin_id === userId) relationships.push('system_administrator');
   if (system.qa_id === userId) relationships.push('quality_assurance');
   if (system.it_manager_id === userId) relationships.push('it_manager');
-  if (system.owner_id === userId) relationships.push('business_owner');
+  if (system.business_owner_id === userId) relationships.push('business_owner');
   return relationships;
 }
 
