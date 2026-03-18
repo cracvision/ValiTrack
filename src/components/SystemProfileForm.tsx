@@ -62,6 +62,7 @@ const formSchema = z.object({
   system_admin_id: z.string().min(1, 'System Administrator is required'),
   qa_id: z.string().min(1, 'Quality Assurance is required'),
   it_manager_id: z.string().optional().default(''),
+  business_owner_id: z.string().optional().default(''),
 }).refine((data) => data.system_owner_id !== data.qa_id, {
   message: 'System Owner and QA cannot be the same person (separation of duties)',
   path: ['qa_id'],
@@ -81,7 +82,7 @@ function formatUserLabel(user: RoleUser): string {
 
 interface RoleSelectFieldProps {
   form: ReturnType<typeof useForm<FormValues>>;
-  name: 'system_owner_id' | 'system_admin_id' | 'qa_id' | 'it_manager_id';
+  name: 'system_owner_id' | 'system_admin_id' | 'qa_id' | 'business_owner_id' | 'it_manager_id';
   label: string;
   users: RoleUser[];
   loading: boolean;
@@ -133,6 +134,7 @@ export function SystemProfileForm({ open, onOpenChange, onSubmit, editingSystem 
   const { users: systemAdmins, loading: loadingAdmins } = useRoleUsers('system_administrator');
   const { users: qaUsers, loading: loadingQA } = useRoleUsers('quality_assurance');
   const { users: itManagers, loading: loadingIT } = useRoleUsers('it_manager');
+  const { users: businessOwners, loading: loadingBO } = useRoleUsers('business_owner');
 
   const [autoValue, setAutoValue] = useState<number | null>(null);
   const [flashPeriod, setFlashPeriod] = useState(false);
@@ -161,6 +163,7 @@ export function SystemProfileForm({ open, onOpenChange, onSubmit, editingSystem 
           system_owner_id: editingSystem.system_owner_id,
           system_admin_id: editingSystem.system_admin_id,
           qa_id: editingSystem.qa_id,
+          business_owner_id: editingSystem.business_owner_id ?? '',
           it_manager_id: editingSystem.it_manager_id ?? '',
         }
       : {
@@ -181,6 +184,7 @@ export function SystemProfileForm({ open, onOpenChange, onSubmit, editingSystem 
           system_owner_id: '',
           system_admin_id: '',
           qa_id: '',
+          business_owner_id: '',
           it_manager_id: '',
         },
   });
@@ -229,6 +233,7 @@ export function SystemProfileForm({ open, onOpenChange, onSubmit, editingSystem 
         system_owner_id: editingSystem.system_owner_id,
         system_admin_id: editingSystem.system_admin_id,
         qa_id: editingSystem.qa_id,
+        business_owner_id: editingSystem.business_owner_id ?? '',
         it_manager_id: editingSystem.it_manager_id ?? '',
       });
     }
@@ -269,6 +274,7 @@ export function SystemProfileForm({ open, onOpenChange, onSubmit, editingSystem 
       system_admin_id: values.system_admin_id,
       qa_id: values.qa_id,
       it_manager_id: values.it_manager_id && values.it_manager_id !== '__none__' ? values.it_manager_id : undefined,
+      business_owner_id: values.business_owner_id && values.business_owner_id !== '__none__' ? values.business_owner_id : undefined,
       validation_date: values.validation_date,
       review_period_months: values.review_period_months,
       next_review_date: calculateNextReviewDate(values.validation_date, values.review_period_months),
@@ -535,6 +541,13 @@ export function SystemProfileForm({ open, onOpenChange, onSubmit, editingSystem 
                   label="IT Manager"
                   users={itManagers}
                   loading={loadingIT}
+                />
+                <RoleSelectField
+                  form={form}
+                  name="business_owner_id"
+                  label="Business Owner"
+                  users={businessOwners}
+                  loading={loadingBO}
                 />
               </div>
             </div>

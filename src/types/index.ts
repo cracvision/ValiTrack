@@ -39,6 +39,7 @@ export interface SystemProfile {
   system_owner_id: string;
   system_admin_id: string;
   qa_id: string;
+  business_owner_id?: string;
   it_manager_id?: string;
   validation_date: string;
   review_period_months: number;

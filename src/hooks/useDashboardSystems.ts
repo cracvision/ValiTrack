@@ -54,7 +54,7 @@ function getUserRelationships(system: SystemProfile, userId: string): string[] {
   if (system.system_admin_id === userId) relationships.push('system_administrator');
   if (system.qa_id === userId) relationships.push('quality_assurance');
   if (system.it_manager_id === userId) relationships.push('it_manager');
-  if (system.owner_id === userId) relationships.push('business_owner');
+  if (system.business_owner_id === userId) relationships.push('business_owner');
   return relationships;
 }
 
@@ -105,6 +105,7 @@ export function useDashboardSystems() {
         system_owner_id: row.system_owner_id ?? '',
         system_admin_id: row.system_admin_id ?? '',
         qa_id: row.qa_id ?? '',
+        business_owner_id: row.business_owner_id ?? undefined,
         it_manager_id: row.it_manager_id ?? undefined,
         validation_date: row.validation_date,
         review_period_months: row.review_period_months,

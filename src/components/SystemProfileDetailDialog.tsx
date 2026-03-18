@@ -49,11 +49,12 @@ export function SystemProfileDetailDialog({ system, open, onOpenChange, onEdit }
   const { users: owners } = useRoleUsers('system_owner');
   const { users: admins } = useRoleUsers('system_administrator');
   const { users: qaUsers } = useRoleUsers('quality_assurance');
+  const { users: businessOwners } = useRoleUsers('business_owner');
   const { users: itManagers } = useRoleUsers('it_manager');
 
   if (!system) return null;
 
-  const allUsers = [...owners, ...admins, ...qaUsers, ...itManagers];
+  const allUsers = [...owners, ...admins, ...qaUsers, ...businessOwners, ...itManagers];
   const envLabel = SYSTEM_ENVIRONMENT_OPTIONS.find((e) => e.value === system.system_environment)?.label
     ?? ENVIRONMENT_SHORT_LABELS[system.system_environment as SystemEnvironment]
     ?? system.system_environment;
@@ -156,6 +157,10 @@ export function SystemProfileDetailDialog({ system, open, onOpenChange, onEdit }
               <div>
                 <p className="text-xs text-muted-foreground">Quality Assurance</p>
                 <UserName userId={system.qa_id} users={allUsers} />
+              </div>
+              <div>
+                <p className="text-xs text-muted-foreground">Business Owner</p>
+                <UserName userId={system.business_owner_id} users={allUsers} />
               </div>
               <div>
                 <p className="text-xs text-muted-foreground">IT Manager</p>
