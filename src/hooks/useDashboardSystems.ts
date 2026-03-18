@@ -182,7 +182,7 @@ export function useDashboardSystems() {
 
       return dashboardSystems;
     },
-    enabled: !!userId,
+    enabled: !!userId && roles.length > 0,
     staleTime: 2 * 60 * 1000,
   });
 }
