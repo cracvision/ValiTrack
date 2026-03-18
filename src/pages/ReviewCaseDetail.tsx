@@ -26,22 +26,11 @@ export default function ReviewCaseDetail() {
   const { data: transitions = [] } = useReviewTransitions(id);
 
   // Resolve user names for role assignments
-  const roleUserIds = reviewCase
-    ? [reviewCase.system_owner_id, reviewCase.system_admin_id, reviewCase.qa_id, reviewCase.business_owner_id, reviewCase.it_manager_id, reviewCase.initiated_by].filter(Boolean) as string[]
-    : [];
-
-  const { data: userNames = {} } = useQuery({
-    queryKey: ['user-names', roleUserIds],
-    queryFn: async () => {
-      if (roleUserIds.length === 0) return {};
-      const { data } = await supabase
-        .from('app_users')
-        .select('id, full_name')
-        .in('id', roleUserIds);
-      return Object.fromEntries((data || []).map((u: any) => [u.id, u.full_name]));
-    },
-    enabled: roleUserIds.length > 0,
-  });
+  const { data: userNames = {} } = useResolveUserNames(
+    reviewCase
+      ? [reviewCase.system_owner_id, reviewCase.system_admin_id, reviewCase.qa_id, reviewCase.business_owner_id, reviewCase.it_manager_id, reviewCase.initiated_by]
+      : []
+  );
 
   // Count task templates for this review level
   const { data: templateCount = 0 } = useQuery({

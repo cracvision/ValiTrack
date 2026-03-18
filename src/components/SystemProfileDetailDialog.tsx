@@ -149,23 +149,23 @@ export function SystemProfileDetailDialog({ system, open, onOpenChange, onEdit }
             <div className="grid grid-cols-2 gap-x-6 gap-y-3">
               <div>
                 <p className="text-xs text-muted-foreground">System Owner</p>
-                <UserName userId={system.system_owner_id} users={allUsers} />
+                <UserName userId={system.system_owner_id} names={userNames} />
               </div>
               <div>
                 <p className="text-xs text-muted-foreground">System Administrator</p>
-                <UserName userId={system.system_admin_id} users={allUsers} />
+                <UserName userId={system.system_admin_id} names={userNames} />
               </div>
               <div>
                 <p className="text-xs text-muted-foreground">Quality Assurance</p>
-                <UserName userId={system.qa_id} users={allUsers} />
+                <UserName userId={system.qa_id} names={userNames} />
               </div>
               <div>
                 <p className="text-xs text-muted-foreground">Business Owner</p>
-                <UserName userId={system.business_owner_id} users={allUsers} />
+                <UserName userId={system.business_owner_id} names={userNames} />
               </div>
               <div>
                 <p className="text-xs text-muted-foreground">IT Manager</p>
-                <UserName userId={system.it_manager_id} users={allUsers} />
+                <UserName userId={system.it_manager_id} names={userNames} />
               </div>
             </div>
           </div>
