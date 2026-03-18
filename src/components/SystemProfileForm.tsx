@@ -542,6 +542,13 @@ export function SystemProfileForm({ open, onOpenChange, onSubmit, editingSystem 
                   users={itManagers}
                   loading={loadingIT}
                 />
+                <RoleSelectField
+                  form={form}
+                  name="business_owner_id"
+                  label="Business Owner"
+                  users={businessOwners}
+                  loading={loadingBO}
+                />
               </div>
             </div>
 
