@@ -5,7 +5,7 @@ import { Separator } from '@/components/ui/separator';
 import {
   Sheet, SheetContent, SheetHeader, SheetTitle, SheetDescription,
 } from '@/components/ui/sheet';
-import { useRoleUsers } from '@/hooks/useRoleUsers';
+import { useResolveUserNames } from '@/hooks/useResolveUserNames';
 import {
   GXP_SHORT_LABELS, ENVIRONMENT_SHORT_LABELS, GAMP_SHORT_LABELS,
   SYSTEM_ENVIRONMENT_OPTIONS, GXP_OPTIONS, GAMP_CATEGORY_OPTIONS,
