@@ -103,6 +103,7 @@ export function useSystemProfiles(): UseSystemProfilesReturn {
         system_admin_id: system.system_admin_id,
         qa_id: system.qa_id,
         it_manager_id: system.it_manager_id ?? null,
+        business_owner_id: system.business_owner_id ?? null,
         validation_date: system.validation_date,
         review_period_months: system.review_period_months,
         next_review_date: system.next_review_date,
