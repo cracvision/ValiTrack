@@ -47,6 +47,8 @@ function UserName({ userId, users }: { userId?: string; users: { id: string; ful
 }
 
 export function SystemProfileDetailDialog({ system, open, onOpenChange, onEdit }: Props) {
+  const { roles } = useAuth();
+  const canEdit = roles.includes('system_owner') || roles.includes('super_user');
   const { users: owners } = useRoleUsers('system_owner');
   const { users: admins } = useRoleUsers('system_administrator');
   const { users: qaUsers } = useRoleUsers('quality_assurance');
