@@ -11,7 +11,7 @@ import { ReviewWorkflowStepper } from '@/components/reviews/ReviewWorkflowSteppe
 import { ReviewActionButtons } from '@/components/reviews/ReviewActionButtons';
 import { TransitionHistory } from '@/components/reviews/TransitionHistory';
 import { REVIEW_LEVEL_CONFIG, CONCLUSION_CONFIG } from '@/lib/reviewWorkflow';
-import { GXP_SHORT_LABELS } from '@/lib/gxpClassifications';
+import { GXP_SHORT_LABELS, GAMP_SHORT_LABELS } from '@/lib/gxpClassifications';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Skeleton } from '@/components/ui/skeleton';
