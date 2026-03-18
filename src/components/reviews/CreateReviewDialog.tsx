@@ -6,6 +6,7 @@ import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/hooks/useAuth';
 import { useCreateReviewCase } from '@/hooks/useReviewCases';
 import { calculateReviewLevel, REVIEW_LEVEL_CONFIG } from '@/lib/reviewWorkflow';
+import { GAMP_SHORT_LABELS } from '@/lib/gxpClassifications';
 import { GXP_SHORT_LABELS } from '@/lib/gxpClassifications';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
@@ -14,7 +15,7 @@ import { Input } from '@/components/ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Badge } from '@/components/ui/badge';
 import { toast } from '@/hooks/use-toast';
-import type { SystemProfile, GxPClassification } from '@/types';
+import type { SystemProfile, GxPClassification, GampCategory } from '@/types';
 
 interface CreateReviewDialogProps {
   open: boolean;
@@ -154,7 +155,7 @@ export function CreateReviewDialog({ open, onOpenChange }: CreateReviewDialogPro
                     {GXP_SHORT_LABELS[selectedSystem.gxp_classification as GxPClassification] ?? selectedSystem.gxp_classification}
                   </Badge>
                   <Badge variant="secondary" className="text-xs">{selectedSystem.risk_level}</Badge>
-                  <Badge variant="secondary" className="text-xs">GAMP {selectedSystem.gamp_category}</Badge>
+                  <Badge variant="secondary" className="text-xs">{GAMP_SHORT_LABELS[selectedSystem.gamp_category as GampCategory]}</Badge>
                 </div>
                 {levelConfig && (
                   <p className="text-muted-foreground">
