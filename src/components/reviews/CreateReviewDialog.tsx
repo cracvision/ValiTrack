@@ -155,7 +155,7 @@ export function CreateReviewDialog({ open, onOpenChange }: CreateReviewDialogPro
                     {GXP_SHORT_LABELS[selectedSystem.gxp_classification as GxPClassification] ?? selectedSystem.gxp_classification}
                   </Badge>
                   <Badge variant="secondary" className="text-xs">{selectedSystem.risk_level}</Badge>
-                  <Badge variant="secondary" className="text-xs">GAMP {selectedSystem.gamp_category}</Badge>
+                  <Badge variant="secondary" className="text-xs">{GAMP_SHORT_LABELS[selectedSystem.gamp_category as GampCategory]}</Badge>
                 </div>
                 {levelConfig && (
                   <p className="text-muted-foreground">
