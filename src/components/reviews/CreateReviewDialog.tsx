@@ -9,12 +9,14 @@ import { calculateReviewLevel, REVIEW_LEVEL_CONFIG } from '@/lib/reviewWorkflow'
 import { GAMP_SHORT_LABELS } from '@/lib/gxpClassifications';
 import { GXP_SHORT_LABELS } from '@/lib/gxpClassifications';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from '@/components/ui/dialog';
+import { Separator } from '@/components/ui/separator';
 import { Button } from '@/components/ui/button';
 import { Label } from '@/components/ui/label';
 import { Input } from '@/components/ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Badge } from '@/components/ui/badge';
 import { toast } from '@/hooks/use-toast';
+import { useResolveUserNames } from '@/hooks/useResolveUserNames';
 import type { SystemProfile, GxPClassification, GampCategory } from '@/types';
 
 interface CreateReviewDialogProps {
@@ -120,6 +122,16 @@ export function CreateReviewDialog({ open, onOpenChange }: CreateReviewDialogPro
 
   const levelConfig = reviewLevel ? REVIEW_LEVEL_CONFIG[reviewLevel as '1' | '2' | '3'] : null;
 
+  const { data: userNames = {} } = useResolveUserNames(
+    selectedSystem ? [
+      selectedSystem.system_owner_id,
+      selectedSystem.system_admin_id,
+      selectedSystem.qa_id,
+      selectedSystem.business_owner_id,
+      selectedSystem.it_manager_id,
+    ] : []
+  );
+
   return (
     <Dialog open={open} onOpenChange={handleOpenChange}>
       <DialogContent className="sm:max-w-lg">
@@ -205,6 +217,30 @@ export function CreateReviewDialog({ open, onOpenChange }: CreateReviewDialogPro
               <div className="space-y-2">
                 <Label>{t('reviews.create.dueDate')}</Label>
                 <Input type="date" value={dueDate} onChange={e => setDueDate(e.target.value)} />
+              </div>
+            </div>
+
+            <Separator />
+
+            <div>
+              <h4 className="text-sm font-semibold text-foreground mb-3">
+                {t('reviews.detail.roleAssignments')}
+              </h4>
+              <div className="grid grid-cols-2 gap-x-6 gap-y-2">
+                {([
+                  ['reviews.detail.roles.systemOwner', selectedSystem?.system_owner_id],
+                  ['reviews.detail.roles.systemAdmin', selectedSystem?.system_admin_id],
+                  ['reviews.detail.roles.qa', selectedSystem?.qa_id],
+                  ['reviews.detail.roles.businessOwner', selectedSystem?.business_owner_id],
+                  ['reviews.detail.roles.itManager', selectedSystem?.it_manager_id],
+                ] as const).map(([labelKey, userId]) => (
+                  <div key={labelKey}>
+                    <p className="text-xs text-muted-foreground">{t(labelKey)}</p>
+                    <p className="text-sm font-medium text-foreground">
+                      {userId ? (userNames[userId] || '—') : '—'}
+                    </p>
+                  </div>
+                ))}
               </div>
             </div>
 
