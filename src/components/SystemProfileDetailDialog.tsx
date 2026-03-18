@@ -77,18 +77,20 @@ export function SystemProfileDetailDialog({ system, open, onOpenChange, onEdit }
           <SheetDescription className="text-sm text-muted-foreground">{system.system_identifier}</SheetDescription>
         </SheetHeader>
 
-        <Button
-          size="sm"
-          variant="outline"
-          className="absolute right-12 top-4"
-          onClick={() => {
-            onOpenChange(false);
-            onEdit(system);
-          }}
-        >
-          <Pencil className="mr-1.5 h-3.5 w-3.5" />
-          Edit
-        </Button>
+        {canEdit && (
+          <Button
+            size="sm"
+            variant="outline"
+            className="absolute right-12 top-4"
+            onClick={() => {
+              onOpenChange(false);
+              onEdit(system);
+            }}
+          >
+            <Pencil className="mr-1.5 h-3.5 w-3.5" />
+            Edit
+          </Button>
+        )}
 
         <div className="mt-6 space-y-6">
           {/* System Information */}
