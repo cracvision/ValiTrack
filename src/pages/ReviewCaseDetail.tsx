@@ -11,11 +11,11 @@ import { ReviewWorkflowStepper } from '@/components/reviews/ReviewWorkflowSteppe
 import { ReviewActionButtons } from '@/components/reviews/ReviewActionButtons';
 import { TransitionHistory } from '@/components/reviews/TransitionHistory';
 import { REVIEW_LEVEL_CONFIG, CONCLUSION_CONFIG } from '@/lib/reviewWorkflow';
-import { GXP_SHORT_LABELS } from '@/lib/gxpClassifications';
+import { GXP_SHORT_LABELS, GAMP_SHORT_LABELS } from '@/lib/gxpClassifications';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Skeleton } from '@/components/ui/skeleton';
-import type { ReviewLevel, ReviewConclusion, GxPClassification } from '@/types';
+import type { ReviewLevel, ReviewConclusion, GxPClassification, GampCategory } from '@/types';
 
 export default function ReviewCaseDetail() {
   const { t } = useTranslation();
@@ -177,7 +177,7 @@ export default function ReviewCaseDetail() {
             <dt className="text-muted-foreground">{t('reviews.detail.snapshot.gxp')}</dt>
             <dd>{GXP_SHORT_LABELS[snapshot.gxp_classification as GxPClassification] ?? snapshot.gxp_classification}</dd>
             <dt className="text-muted-foreground">{t('reviews.detail.snapshot.gamp')}</dt>
-            <dd>GAMP {snapshot.gamp_category}</dd>
+            <dd>{GAMP_SHORT_LABELS[snapshot.gamp_category as GampCategory] ?? snapshot.gamp_category}</dd>
             <dt className="text-muted-foreground">{t('reviews.detail.snapshot.risk')}</dt>
             <dd>{snapshot.risk_level}</dd>
             <dt className="text-muted-foreground">{t('reviews.detail.snapshot.vendor')}</dt>
