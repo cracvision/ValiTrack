@@ -202,7 +202,7 @@ export default function SystemProfiles() {
                   <TableHead>Risk</TableHead>
                   <TableHead>Status</TableHead>
                   <TableHead>Next Review</TableHead>
-                  <TableHead className="w-[80px]">Actions</TableHead>
+                  {canEdit && <TableHead className="w-[80px]">Actions</TableHead>}
                 </TableRow>
               </TableHeader>
               <TableBody>
