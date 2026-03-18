@@ -5,6 +5,7 @@ import { ArrowLeft, Info } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { useReviewCase } from '@/hooks/useReviewCase';
 import { useReviewTransitions } from '@/hooks/useReviewTransitions';
+import { useResolveUserNames } from '@/hooks/useResolveUserNames';
 import { ReviewStatusBadge } from '@/components/reviews/ReviewStatusBadge';
 import { ReviewWorkflowStepper } from '@/components/reviews/ReviewWorkflowStepper';
 import { ReviewActionButtons } from '@/components/reviews/ReviewActionButtons';
