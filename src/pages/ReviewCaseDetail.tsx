@@ -15,7 +15,7 @@ import { GXP_SHORT_LABELS, GAMP_SHORT_LABELS } from '@/lib/gxpClassifications';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Skeleton } from '@/components/ui/skeleton';
-import type { ReviewLevel, ReviewConclusion, GxPClassification } from '@/types';
+import type { ReviewLevel, ReviewConclusion, GxPClassification, GampCategory } from '@/types';
 
 export default function ReviewCaseDetail() {
   const { t } = useTranslation();
