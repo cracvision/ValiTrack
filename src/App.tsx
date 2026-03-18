@@ -12,6 +12,7 @@ import ResetPassword from "./pages/ResetPassword";
 import Dashboard from "./pages/Dashboard";
 import SystemProfiles from "./pages/SystemProfiles";
 import ReviewCases from "./pages/ReviewCases";
+import ReviewCaseDetail from "./pages/ReviewCaseDetail";
 import EvidenceVault from "./pages/EvidenceVault";
 import FindingsActions from "./pages/FindingsActions";
 import Reports from "./pages/Reports";
@@ -44,6 +45,7 @@ const App = () => (
                     <Route path="/dashboard" element={<Dashboard />} />
                     <Route path="/systems" element={<SystemProfiles />} />
                     <Route path="/reviews" element={<ReviewCases />} />
+                    <Route path="/reviews/:id" element={<ReviewCaseDetail />} />
                     <Route path="/evidence" element={<EvidenceVault />} />
                     <Route path="/findings" element={<FindingsActions />} />
                     <Route path="/reports" element={<Reports />} />
