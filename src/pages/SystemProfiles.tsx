@@ -52,7 +52,9 @@ const gampColor: Record<string, string> = {
 };
 
 export default function SystemProfiles() {
+  const { roles } = useAuth();
   const { systems, loading, addSystem, updateSystem, deleteSystem } = useSystemProfiles();
+  const canEdit = roles.includes('system_owner') || roles.includes('super_user');
   const [formOpen, setFormOpen] = useState(false);
   const [editingSystem, setEditingSystem] = useState<SystemProfile | null>(null);
   const [deleteId, setDeleteId] = useState<string | null>(null);
