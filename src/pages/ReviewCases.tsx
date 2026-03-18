@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
 import { Plus, ClipboardCheck } from 'lucide-react';
+import { useAuth } from '@/hooks/useAuth';
 import { useReviewCases } from '@/hooks/useReviewCases';
 import { CreateReviewDialog } from '@/components/reviews/CreateReviewDialog';
 import { ReviewStatusBadge } from '@/components/reviews/ReviewStatusBadge';
@@ -18,6 +19,8 @@ export default function ReviewCases() {
   const { t } = useTranslation();
   const navigate = useNavigate();
   const [createOpen, setCreateOpen] = useState(false);
+  const { roles } = useAuth();
+  const canCreate = roles.includes('system_owner') || roles.includes('super_user');
   const [statusFilter, setStatusFilter] = useState<string>('all');
 
   const filters = statusFilter !== 'all' ? { status: statusFilter as ReviewStatus } : undefined;
@@ -31,10 +34,12 @@ export default function ReviewCases() {
           <h1 className="text-2xl font-bold text-foreground">{t('reviews.pageTitle')}</h1>
           <p className="text-sm text-muted-foreground">{t('reviews.pageSubtitle')}</p>
         </div>
-        <Button onClick={() => setCreateOpen(true)}>
-          <Plus className="h-4 w-4 mr-2" />
-          {t('reviews.newReview')}
-        </Button>
+        {canCreate && (
+          <Button onClick={() => setCreateOpen(true)}>
+            <Plus className="h-4 w-4 mr-2" />
+            {t('reviews.newReview')}
+          </Button>
+        )}
       </div>
 
       {/* Filters */}
@@ -60,10 +65,12 @@ export default function ReviewCases() {
           <div className="text-center space-y-3">
             <ClipboardCheck className="mx-auto h-10 w-10 text-muted-foreground/50" />
             <p className="text-sm text-muted-foreground">{t('reviews.empty')}</p>
-            <Button variant="outline" onClick={() => setCreateOpen(true)}>
-              <Plus className="h-4 w-4 mr-2" />
-              {t('reviews.newReview')}
-            </Button>
+            {canCreate && (
+              <Button variant="outline" onClick={() => setCreateOpen(true)}>
+                <Plus className="h-4 w-4 mr-2" />
+                {t('reviews.newReview')}
+              </Button>
+            )}
           </div>
         </div>
       ) : (
