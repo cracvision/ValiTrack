@@ -16,6 +16,8 @@ export interface DashboardSystem extends SystemProfile {
   daysUntilDue: number;
   countdownLabel: string;
   userRelationship: string[];
+  activeReviewCaseId?: string;
+  activeReviewCaseStatus?: CaseStatus;
 }
 
 function computeReviewStatus(system: SystemProfile): { status: ReviewStatusType; daysUntilDue: number } {
