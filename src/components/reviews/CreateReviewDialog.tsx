@@ -122,6 +122,16 @@ export function CreateReviewDialog({ open, onOpenChange }: CreateReviewDialogPro
 
   const levelConfig = reviewLevel ? REVIEW_LEVEL_CONFIG[reviewLevel as '1' | '2' | '3'] : null;
 
+  const { data: userNames = {} } = useResolveUserNames(
+    selectedSystem ? [
+      selectedSystem.system_owner_id,
+      selectedSystem.system_admin_id,
+      selectedSystem.qa_id,
+      selectedSystem.business_owner_id,
+      selectedSystem.it_manager_id,
+    ] : []
+  );
+
   return (
     <Dialog open={open} onOpenChange={handleOpenChange}>
       <DialogContent className="sm:max-w-lg">
