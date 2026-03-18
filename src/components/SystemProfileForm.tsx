@@ -184,6 +184,7 @@ export function SystemProfileForm({ open, onOpenChange, onSubmit, editingSystem 
           system_owner_id: '',
           system_admin_id: '',
           qa_id: '',
+          business_owner_id: '',
           it_manager_id: '',
         },
   });
