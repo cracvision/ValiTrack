@@ -82,7 +82,7 @@ function formatUserLabel(user: RoleUser): string {
 
 interface RoleSelectFieldProps {
   form: ReturnType<typeof useForm<FormValues>>;
-  name: 'system_owner_id' | 'system_admin_id' | 'qa_id' | 'it_manager_id';
+  name: 'system_owner_id' | 'system_admin_id' | 'qa_id' | 'business_owner_id' | 'it_manager_id';
   label: string;
   users: RoleUser[];
   loading: boolean;
