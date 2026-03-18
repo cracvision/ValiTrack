@@ -6,6 +6,7 @@ import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/hooks/useAuth';
 import { useCreateReviewCase } from '@/hooks/useReviewCases';
 import { calculateReviewLevel, REVIEW_LEVEL_CONFIG } from '@/lib/reviewWorkflow';
+import { GAMP_SHORT_LABELS } from '@/lib/gxpClassifications';
 import { GXP_SHORT_LABELS } from '@/lib/gxpClassifications';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
