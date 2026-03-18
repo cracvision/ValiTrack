@@ -105,6 +105,7 @@ export function useDashboardSystems() {
         system_owner_id: row.system_owner_id ?? '',
         system_admin_id: row.system_admin_id ?? '',
         qa_id: row.qa_id ?? '',
+        business_owner_id: row.business_owner_id ?? undefined,
         it_manager_id: row.it_manager_id ?? undefined,
         validation_date: row.validation_date,
         review_period_months: row.review_period_months,

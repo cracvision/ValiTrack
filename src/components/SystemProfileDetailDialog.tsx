@@ -159,6 +159,10 @@ export function SystemProfileDetailDialog({ system, open, onOpenChange, onEdit }
                 <UserName userId={system.qa_id} users={allUsers} />
               </div>
               <div>
+                <p className="text-xs text-muted-foreground">Business Owner</p>
+                <UserName userId={system.business_owner_id} users={allUsers} />
+              </div>
+              <div>
                 <p className="text-xs text-muted-foreground">IT Manager</p>
                 <UserName userId={system.it_manager_id} users={allUsers} />
               </div>
