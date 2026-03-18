@@ -73,7 +73,7 @@ export function useDashboardSystems() {
   const isSuperUser = roles.includes('super_user');
 
   return useQuery({
-    queryKey: ['dashboard-systems', userId],
+    queryKey: ['dashboard-systems', userId, isSuperUser],
     queryFn: async (): Promise<DashboardSystem[]> => {
       if (!userId) return [];
 
