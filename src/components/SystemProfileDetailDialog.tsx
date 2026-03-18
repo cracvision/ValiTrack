@@ -49,15 +49,11 @@ function UserName({ userId, names }: { userId?: string; names: Record<string, st
 export function SystemProfileDetailDialog({ system, open, onOpenChange, onEdit }: Props) {
   const { roles } = useAuth();
   const canEdit = roles.includes('system_owner') || roles.includes('super_user');
-  const { users: owners } = useRoleUsers('system_owner');
-  const { users: admins } = useRoleUsers('system_administrator');
-  const { users: qaUsers } = useRoleUsers('quality_assurance');
-  const { users: businessOwners } = useRoleUsers('business_owner');
-  const { users: itManagers } = useRoleUsers('it_manager');
+  const { data: userNames = {} } = useResolveUserNames(
+    system ? [system.system_owner_id, system.system_admin_id, system.qa_id, system.business_owner_id, system.it_manager_id] : []
+  );
 
   if (!system) return null;
-
-  const allUsers = [...owners, ...admins, ...qaUsers, ...businessOwners, ...itManagers];
   const envLabel = SYSTEM_ENVIRONMENT_OPTIONS.find((e) => e.value === system.system_environment)?.label
     ?? ENVIRONMENT_SHORT_LABELS[system.system_environment as SystemEnvironment]
     ?? system.system_environment;
