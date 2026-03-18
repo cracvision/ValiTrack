@@ -34,10 +34,12 @@ export default function ReviewCases() {
           <h1 className="text-2xl font-bold text-foreground">{t('reviews.pageTitle')}</h1>
           <p className="text-sm text-muted-foreground">{t('reviews.pageSubtitle')}</p>
         </div>
-        <Button onClick={() => setCreateOpen(true)}>
-          <Plus className="h-4 w-4 mr-2" />
-          {t('reviews.newReview')}
-        </Button>
+        {canCreate && (
+          <Button onClick={() => setCreateOpen(true)}>
+            <Plus className="h-4 w-4 mr-2" />
+            {t('reviews.newReview')}
+          </Button>
+        )}
       </div>
 
       {/* Filters */}
