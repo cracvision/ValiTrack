@@ -136,10 +136,12 @@ export default function SystemProfiles() {
             Register and manage your validated computerized systems
           </p>
         </div>
-        <Button onClick={handleNewSystem}>
-          <Plus className="mr-2 h-4 w-4" />
-          New System Profile
-        </Button>
+        {canEdit && (
+          <Button onClick={handleNewSystem}>
+            <Plus className="mr-2 h-4 w-4" />
+            New System Profile
+          </Button>
+        )}
       </div>
 
       {systems.length === 0 ? (
