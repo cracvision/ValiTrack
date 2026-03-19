@@ -334,6 +334,7 @@
       "blockedPending": "All reviewer sign-offs must be completed first",
       "blockedObjections": "Objections must be addressed before advancing"
     }
+  },
   "pages": {
     "reviewCases": {
       "title": "Review Cases",
