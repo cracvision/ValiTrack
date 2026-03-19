@@ -96,7 +96,7 @@ function NextActionBar({ system }: { system: DashboardSystem }) {
       icon: Clock,
       bg: 'bg-muted/50',
       text: 'text-muted-foreground',
-      msg: t('dashboard.nextAction.compliant', { date, timeaway: system.countdownLabel }),
+      msg: t('dashboard.nextAction.compliant', { date, timeaway: localizedCountdown }),
     },
     approaching: {
       icon: CalendarDays,
