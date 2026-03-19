@@ -1,24 +1,35 @@
 
 
-## Add rejection alert banner to ReviewCaseDetail
+## Fix two issues in ReviewCaseDetail
 
-### What
-When `reviewCase.status === 'rejected'`, show a red destructive alert banner between the header (line 120) and the workflow stepper (line 123). The banner displays who rejected and why, using data already available from `transitions`.
+### Issue 1: Approval notes not visible in Status History
 
-### Implementation
+**File: `src/hooks/useReviewCase.ts`** (lines 90-99)
 
-**File: `src/pages/ReviewCaseDetail.tsx`**
+When inserting the transition record, build a `reason` string for approvals that includes the conclusion label and notes. Change the insert block:
 
-1. Import `AlertTriangle` from lucide-react and `Alert, AlertTitle, AlertDescription` from `@/components/ui/alert`
-2. After the header block (line 120) and before the stepper (line 123), add a conditional block:
-   - Find the most recent transition where `to_status === 'rejected'` from the already-loaded `transitions` array
-   - Render a destructive-styled Alert with `AlertTriangle` icon
-   - Title: `"{transitioned_by_name} rejected this review: '{reason}'"`
-   - Description: `"Return to draft to make corrections."`
-3. Only renders when `reviewCase.status === 'rejected'` — automatically disappears when status changes back to draft
+```typescript
+// Build reason for the transition record
+let transitionReason = input.reason || null;
+if (input.toStatus === 'approved' && (input.conclusion || input.conclusionNotes)) {
+  const conclusionLabel = input.conclusion?.replace(/_/g, ' ').replace(/\b\w/g, c => c.toUpperCase()) || '';
+  transitionReason = `Conclusion: ${conclusionLabel}.${input.conclusionNotes ? ' ' + input.conclusionNotes : ''}`;
+}
+```
 
-No new hooks, queries, or database changes needed — all data comes from the existing `useReviewTransitions` hook which already resolves user names via the `resolve_user_names` RPC.
+Then use `transitionReason` in the insert. No UI changes needed — `TransitionHistory` already renders `reason`.
 
-### Styling
-Use the existing `Alert` component with `variant="destructive"` plus a light red background (`bg-destructive/10 border-destructive/30`) for the prominent banner look.
+### Issue 2: Approved step shows blue instead of green
+
+**File: `src/components/reviews/ReviewWorkflowStepper.tsx`**
+
+The stepper treats `currentIndex` as the active step, but when `status === 'approved'` (the last step), it should show all steps as completed. Fix: when status is `approved`, set `currentIndex` to `STEPS.length` (beyond the array), so every step gets `idx < currentIndex` → completed (green + checkmark).
+
+```typescript
+const currentIndex = effectiveStatus === 'approved' 
+  ? STEPS.length 
+  : STEPS.indexOf(effectiveStatus);
+```
+
+This makes all 5 bars green with checkmarks when approved.
 
