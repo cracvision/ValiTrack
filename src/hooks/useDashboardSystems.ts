@@ -132,30 +132,6 @@ export function useDashboardSystems() {
           .in('system_id', systemIds)
           .order('created_at', { ascending: false });
 
-        // 🔍 DEBUG: diagnose Business Owner visibility
-        const bepasSystem = allSystems.find(s => s.name?.includes('BePAS') || s.system_identifier?.includes('BePAS'));
-        console.group('🔍 [DEBUG] useDashboardSystems — Business Owner diagnosis');
-        console.log('Current user (auth.uid):', userId);
-        console.log('User roles:', roles);
-        console.log('Systems returned by RLS:', allSystems.map(s => ({ id: s.id, name: s.name, business_owner_id: s.business_owner_id })));
-        if (bepasSystem) {
-          console.log('BePAS-X system found:', { id: bepasSystem.id, name: bepasSystem.name, business_owner_id: bepasSystem.business_owner_id });
-        } else {
-          console.warn('BePAS-X system NOT found in RLS-filtered results');
-        }
-        console.log('Review cases raw response:', { data: cases, error: casesError });
-        if (cases) {
-          const bepasCases = (cases as any[]).filter(c => c.system_id === bepasSystem?.id);
-          console.log('BePAS-X review cases:', bepasCases.map(c => ({
-            id: c.id, status: c.status,
-            business_owner_id: c.business_owner_id,
-            system_owner_id: c.system_owner_id,
-            qa_id: c.qa_id,
-            initiated_by: c.initiated_by,
-            bo_matches_user: c.business_owner_id === userId,
-          })));
-        }
-        console.groupEnd();
 
         if (cases) {
           // Keep only the latest case per system
