@@ -171,7 +171,6 @@ export function SystemCard({ system }: SystemCardProps) {
       <div className="border-t border-b border-border py-1">
         <ReviewStatusIndicator
           status={system.reviewStatus}
-          countdownLabel={system.countdownLabel}
           daysUntilDue={system.daysUntilDue}
         />
       </div>
