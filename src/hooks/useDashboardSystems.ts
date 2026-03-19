@@ -119,13 +119,9 @@ export function useDashboardSystems() {
         updated_at: row.updated_at,
       }));
 
-      // Super users see all systems; others see only assigned systems
-      const filtered = isSuperUser
-        ? allSystems
-        : allSystems.filter((s) => getUserRelationships(s, userId).length > 0);
-
+      // RLS already filters systems by role assignment — no client-side auth filter needed
       // Fetch latest review case per system
-      const systemIds = filtered.map(s => s.id);
+      const systemIds = allSystems.map(s => s.id);
       let reviewCaseMap: Record<string, { id: string; status: string }> = {};
 
       if (systemIds.length > 0) {
