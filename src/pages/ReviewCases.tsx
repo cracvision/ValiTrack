@@ -126,6 +126,9 @@ export default function ReviewCases() {
                     <TableCell className={isOverdue ? 'text-destructive text-sm font-medium' : 'text-sm'}>
                       {rc.due_date}
                     </TableCell>
+                    <TableCell className="text-sm">
+                      {userNames[rc.initiated_by] || '—'}
+                    </TableCell>
                   </TableRow>
                 );
               })}
