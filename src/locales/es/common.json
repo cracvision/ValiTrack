@@ -258,7 +258,9 @@
       "statusHistory": "Historial de Estado",
       "tasksTitle": "Tareas de Revisión",
       "tasksPlaceholder": "Las tareas se generarán automáticamente cuando esta revisión avance al estado En Preparación.",
-      "tasksPreview": "Esta revisión {{level}} generará aproximadamente {{count}} tareas en {{groups}} áreas de revisión."
+      "tasksPreview": "Esta revisión {{level}} generará aproximadamente {{count}} tareas en {{groups}} áreas de revisión.",
+      "rejectedThis": "rechazó esta revisión",
+      "returnToDraft": "Regrese a borrador para realizar correcciones."
     },
     "taskGroups": {
       "INIT": "Iniciación",

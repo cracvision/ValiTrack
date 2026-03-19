@@ -258,7 +258,9 @@
       "statusHistory": "Status History",
       "tasksTitle": "Review Tasks",
       "tasksPlaceholder": "Tasks will be auto-generated when this review advances to In Preparation status.",
-      "tasksPreview": "This {{level}} review will generate approximately {{count}} tasks across {{groups}} review areas."
+      "tasksPreview": "This {{level}} review will generate approximately {{count}} tasks across {{groups}} review areas.",
+      "rejectedThis": "rejected this review",
+      "returnToDraft": "Return to draft to make corrections."
     },
     "taskGroups": {
       "INIT": "Initiation",
