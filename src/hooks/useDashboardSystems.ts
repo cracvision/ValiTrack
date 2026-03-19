@@ -40,11 +40,15 @@ function computeReviewStatus(system: SystemProfile): { status: ReviewStatusType;
 
 function getCountdownLabel(status: ReviewStatusType, daysUntilDue: number): string {
   if (status === 'no_review') return '';
-  if (status === 'overdue') return `Overdue by ${Math.abs(daysUntilDue)} days`;
-  if (status === 'approaching') return `Due in ${daysUntilDue} days`;
+  if (status === 'overdue') {
+    const absDays = Math.abs(daysUntilDue);
+    return `Overdue by ${absDays} ${absDays === 1 ? 'day' : 'days'}`;
+  }
+  if (status === 'approaching') return `Due in ${daysUntilDue} ${daysUntilDue === 1 ? 'day' : 'days'}`;
   if (status === 'compliant') {
     const months = Math.floor(daysUntilDue / 30);
-    return months > 0 ? `${months} months away` : `${daysUntilDue} days away`;
+    if (months > 0) return `${months} ${months === 1 ? 'month' : 'months'} away`;
+    return `${daysUntilDue} ${daysUntilDue === 1 ? 'day' : 'days'} away`;
   }
   return '';
 }
