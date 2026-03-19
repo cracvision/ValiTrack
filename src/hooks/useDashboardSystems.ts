@@ -153,12 +153,7 @@ export function useDashboardSystems() {
           } else if (cs === 'approved') {
             reviewStatus = daysUntilDue >= 0 ? 'compliant' : 'overdue';
           } else {
-            // Backwards compat for old states
-            if (cs === 'in_preparation' as any || cs === 'under_review' as any) {
-              reviewStatus = cs === 'under_review' ? 'pending_approval' : 'in_progress';
-            } else {
-              reviewStatus = dateStatus;
-            }
+            reviewStatus = dateStatus;
           }
         } else {
           reviewStatus = dateStatus;
