@@ -8,7 +8,6 @@ export function useReviewTransitions(reviewCaseId: string | undefined) {
     queryFn: async (): Promise<ReviewCaseTransition[]> => {
       if (!reviewCaseId) return [];
 
-      // Fetch transitions
       const { data, error } = await supabase
         .from('review_case_transitions')
         .select('*')
@@ -18,18 +17,16 @@ export function useReviewTransitions(reviewCaseId: string | undefined) {
       if (error) throw error;
       if (!data || data.length === 0) return [];
 
-      // Batch-fetch user names
+      // Use SECURITY DEFINER RPC to resolve names (works for all roles)
       const userIds = [...new Set(data.map((t: any) => t.transitioned_by).filter(Boolean))];
       let userMap: Record<string, string> = {};
 
       if (userIds.length > 0) {
         const { data: users } = await supabase
-          .from('app_users')
-          .select('id, full_name')
-          .in('id', userIds);
+          .rpc('resolve_user_names', { user_ids: userIds });
 
         if (users) {
-          userMap = Object.fromEntries(users.map((u: any) => [u.id, u.full_name]));
+          userMap = Object.fromEntries(users.map((u: { id: string; full_name: string }) => [u.id, u.full_name]));
         }
       }
 
