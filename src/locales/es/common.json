@@ -328,6 +328,7 @@
       "blockedPending": "Todas las firmas de los revisores deben completarse primero",
       "blockedObjections": "Las objeciones deben ser atendidas antes de avanzar"
     }
+  },
   "pages": {
     "reviewCases": {
       "title": "Casos de Revisión",
