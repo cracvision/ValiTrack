@@ -170,7 +170,9 @@ export function useDashboardSystems() {
           actualReviewStatus: activeCase?.status as CaseStatus | undefined,
           daysUntilDue,
           countdownLabel: getCountdownLabel(reviewStatus, daysUntilDue),
-          userRelationship: isSuperUser ? ['super_user'] : getUserRelationships(s, userId),
+          userRelationship: isSuperUser
+            ? ['super_user', ...getUserRelationships(s, userId)]
+            : getUserRelationships(s, userId),
           activeReviewCaseId: activeCase?.id,
           activeReviewCaseStatus: activeCase?.status as CaseStatus | undefined,
         };
