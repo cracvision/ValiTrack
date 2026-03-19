@@ -120,6 +120,24 @@ export default function ReviewCaseDetail() {
         <ReviewActionButtons reviewCaseId={reviewCase.id} currentStatus={reviewCase.status} />
       </div>
 
+      {/* Rejection alert banner */}
+      {reviewCase.status === 'rejected' && (() => {
+        const rejectionTransition = transitions.find(t => t.to_status === 'rejected');
+        const rejectorName = rejectionTransition?.transitioned_by_name || 'System';
+        const reason = rejectionTransition?.reason || '';
+        return (
+          <Alert variant="destructive" className="bg-destructive/10 border-destructive/30">
+            <AlertTriangle className="h-4 w-4" />
+            <AlertTitle>
+              {rejectorName} {t('reviews.detail.rejectedThis')}{reason ? `: '${reason}'` : ''}
+            </AlertTitle>
+            <AlertDescription className="text-destructive/80">
+              {t('reviews.detail.returnToDraft')}
+            </AlertDescription>
+          </Alert>
+        );
+      })()}
+
       {/* Workflow stepper */}
       <ReviewWorkflowStepper currentStatus={reviewCase.status} />
 
