@@ -125,7 +125,7 @@ function NextActionBar({ system }: { system: DashboardSystem }) {
       <div className={cn('flex items-center gap-2 rounded px-3 py-2 mt-2', config.bg)}>
         <Icon className={cn('h-4 w-4 shrink-0', config.text)} strokeWidth={1.75} />
         <span className={cn('text-xs', config.text)}>
-          {t(config.msgKey, msgParams)}
+          {String(t(config.msgKey, msgParams))}
         </span>
       </div>
     );
