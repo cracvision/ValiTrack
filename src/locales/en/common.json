@@ -306,8 +306,28 @@
       "DOC": "Documentation",
       "AI_EVAL": "AI Evaluation",
       "APPR": "Approval"
+    },
+    "signoffs": {
+      "title": "Review Sign-offs",
+      "description": "All reviewers must complete their review before this case can advance.",
+      "yourSignoff": "Your sign-off is required",
+      "commentsLabel": "Comments",
+      "commentsOptional": "Comments (optional)",
+      "commentsPlaceholder": "Add any comments about your review...",
+      "objectionCommentsPlaceholder": "Describe your objections and what needs to be corrected...",
+      "objectionCommentsRequired": "You must provide details about your objections",
+      "noObjectionsButton": "No objections",
+      "raiseObjectionsButton": "Raise objections",
+      "approved": "Reviewed — No objections",
+      "objected": "Reviewed — Objections noted",
+      "pending": "Pending",
+      "progress": "{{completed}} of {{total}} reviews completed",
+      "allApproved": "All reviews completed — no objections",
+      "objectionsRaised": "Objections have been raised",
+      "objectionsDescription": "One or more reviewers have raised objections. The System Owner must address the comments and return this review to draft for corrections.",
+      "blockedPending": "All reviewer sign-offs must be completed first",
+      "blockedObjections": "Objections must be addressed before advancing"
     }
-  },
   "pages": {
     "reviewCases": {
       "title": "Review Cases",
