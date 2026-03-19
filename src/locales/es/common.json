@@ -103,9 +103,14 @@
       "compliant": "Próxima revisión: {{date}} — {{timeaway}}",
       "approaching": "Planificar e iniciar revisión — dentro de {{days}} días",
       "overdue": "Iniciar revisión periódica de inmediato",
-      "in_progress": "{{task}} — vence en {{days}} días",
-      "pending_approval": "Esperando aprobación de QA",
-      "no_review": "Sin historial de revisión periódica. Programar primera revisión."
+      "no_review": "Sin historial de revisión periódica. Programar primera revisión.",
+      "phase": {
+        "draft": "Revisión iniciada — avanzar a preparación",
+        "in_preparation": "Revisión en preparación — {{days}} días hasta vencimiento",
+        "in_progress": "Recopilación de evidencia en curso — {{days}} días hasta vencimiento",
+        "under_review": "Esperando aprobación de QA",
+        "rejected": "Revisión rechazada — se requieren correcciones"
+      }
     },
     "phases": {
       "draft": "Borrador",

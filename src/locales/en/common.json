@@ -103,9 +103,14 @@
       "compliant": "Next review due {{date}} — {{timeaway}}",
       "approaching": "Plan and initiate review — within {{days}} days",
       "overdue": "Initiate periodic review immediately",
-      "in_progress": "{{task}} — due in {{days}} days",
-      "pending_approval": "Awaiting QA approval",
-      "no_review": "No periodic review history. Schedule first review."
+      "no_review": "No periodic review history. Schedule first review.",
+      "phase": {
+        "draft": "Review initiated — advance to preparation",
+        "in_preparation": "Review in preparation — {{days}} days until due",
+        "in_progress": "Evidence gathering underway — {{days}} days until due",
+        "under_review": "Awaiting QA approval",
+        "rejected": "Review rejected — revisions needed"
+      }
     },
     "phases": {
       "draft": "Draft",

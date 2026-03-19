@@ -39,9 +39,58 @@ interface SystemCardProps {
 
 function NextActionBar({ system }: { system: DashboardSystem }) {
   const { t } = useTranslation();
-  const { reviewStatus, daysUntilDue, next_review_date } = system;
+  const { reviewStatus, actualReviewStatus, daysUntilDue, next_review_date } = system;
   const date = new Date(next_review_date).toLocaleDateString();
 
+  // If there's an active review case, use phase-specific messages
+  if (actualReviewStatus && !['approved'].includes(actualReviewStatus)) {
+    const phaseConfigs: Record<string, { icon: typeof Clock; bg: string; text: string; msgKey: string }> = {
+      draft: {
+        icon: Info,
+        bg: 'bg-muted/50',
+        text: 'text-muted-foreground',
+        msgKey: 'dashboard.nextAction.phase.draft',
+      },
+      in_preparation: {
+        icon: Clock,
+        bg: 'bg-blue-50',
+        text: 'text-blue-800',
+        msgKey: 'dashboard.nextAction.phase.in_preparation',
+      },
+      in_progress: {
+        icon: Clock,
+        bg: 'bg-blue-50',
+        text: 'text-blue-800',
+        msgKey: 'dashboard.nextAction.phase.in_progress',
+      },
+      under_review: {
+        icon: Clock,
+        bg: 'bg-amber-50',
+        text: 'text-amber-800',
+        msgKey: 'dashboard.nextAction.phase.under_review',
+      },
+      rejected: {
+        icon: AlertTriangle,
+        bg: 'bg-red-50',
+        text: 'text-red-800',
+        msgKey: 'dashboard.nextAction.phase.rejected',
+      },
+    };
+
+    const config = phaseConfigs[actualReviewStatus] ?? phaseConfigs.draft;
+    const Icon = config.icon;
+
+    return (
+      <div className={cn('flex items-center gap-2 rounded px-3 py-2 mt-2', config.bg)}>
+        <Icon className={cn('h-4 w-4 shrink-0', config.text)} strokeWidth={1.75} />
+        <span className={cn('text-xs', config.text)}>
+          {t(config.msgKey, { days: daysUntilDue, date })}
+        </span>
+      </div>
+    );
+  }
+
+  // Fallback: no active case or approved — use date-based status
   const configs: Record<string, { icon: typeof Clock; bg: string; text: string; msg: string }> = {
     compliant: {
       icon: Clock,
@@ -67,18 +116,6 @@ function NextActionBar({ system }: { system: DashboardSystem }) {
       text: 'text-muted-foreground',
       msg: t('dashboard.nextAction.no_review'),
     },
-    in_progress: {
-      icon: Clock,
-      bg: 'bg-blue-50',
-      text: 'text-blue-800',
-      msg: t('dashboard.nextAction.pending_approval'),
-    },
-    pending_approval: {
-      icon: Clock,
-      bg: 'bg-blue-50',
-      text: 'text-blue-800',
-      msg: t('dashboard.nextAction.pending_approval'),
-    },
   };
 
   const config = configs[reviewStatus] ?? configs.no_review;
@@ -95,7 +132,7 @@ function NextActionBar({ system }: { system: DashboardSystem }) {
 export function SystemCard({ system }: SystemCardProps) {
   const navigate = useNavigate();
   const isOverdue = system.reviewStatus === 'overdue';
-  const showStepper = system.activeReviewCaseStatus && !['approved', 'rejected'].includes(system.activeReviewCaseStatus);
+  const showStepper = system.actualReviewStatus && !['approved', 'rejected'].includes(system.actualReviewStatus);
 
   return (
     <div
@@ -140,8 +177,8 @@ export function SystemCard({ system }: SystemCardProps) {
       </div>
 
       {/* Phase stepper - only for in_progress/pending_approval */}
-      {showStepper && system.activeReviewCaseStatus && (
-        <ReviewPhaseStepper currentPhase={system.activeReviewCaseStatus as any} />
+      {showStepper && system.actualReviewStatus && (
+        <ReviewPhaseStepper currentPhase={system.actualReviewStatus as any} />
       )}
 
       {/* Next action bar */}
