@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { ChevronRight, Clock, CalendarDays, AlertTriangle, Info } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
 import { cn } from '@/lib/utils';
-import { ReviewStatusIndicator } from './ReviewStatusIndicator';
+import { ReviewStatusIndicator, useLocalizedCountdown } from './ReviewStatusIndicator';
 import { ReviewPhaseStepper } from './ReviewPhaseStepper';
 import { SystemAuditFeed } from './SystemAuditFeed';
 import { GXP_SHORT_LABELS, ENVIRONMENT_SHORT_LABELS, GAMP_SHORT_LABELS } from '@/lib/gxpClassifications';
