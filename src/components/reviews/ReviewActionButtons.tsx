@@ -19,7 +19,7 @@ interface ReviewActionButtonsProps {
   hasObjections?: boolean;
 }
 
-export function ReviewActionButtons({ reviewCaseId, currentStatus }: ReviewActionButtonsProps) {
+export function ReviewActionButtons({ reviewCaseId, currentStatus, canAdvanceSignoff, hasObjections }: ReviewActionButtonsProps) {
   const { t } = useTranslation();
   const { roles } = useAuth();
   const transitionMutation = useReviewCaseTransition();
