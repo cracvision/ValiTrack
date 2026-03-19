@@ -13,6 +13,7 @@ export type ReviewStatusType =
 
 export interface DashboardSystem extends SystemProfile {
   reviewStatus: ReviewStatusType;
+  actualReviewStatus?: CaseStatus;
   daysUntilDue: number;
   countdownLabel: string;
   userRelationship: string[];
