@@ -15,7 +15,7 @@ export function ReviewWorkflowStepper({ currentStatus }: ReviewWorkflowStepperPr
 
   // When rejected, current step goes back to draft visually
   const effectiveStatus = isRejected ? 'draft' : currentStatus;
-  const currentIndex = STEPS.indexOf(effectiveStatus);
+  const currentIndex = effectiveStatus === 'approved' ? STEPS.length : STEPS.indexOf(effectiveStatus);
 
   return (
     <div className="py-4">
