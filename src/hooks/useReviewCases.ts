@@ -32,6 +32,14 @@ export function useReviewCases(filters?: { status?: ReviewStatus; systemId?: str
       }
 
       const { data, error } = await query;
+
+      // 🔍 DEBUG: Review cases query diagnosis
+      console.group('🔍 [DEBUG] useReviewCases — query results');
+      console.log('Rows returned:', data?.length ?? 0);
+      console.log('Error:', error);
+      console.log('Raw data:', data);
+      console.groupEnd();
+
       if (error) throw error;
 
       return (data || []).map((row: any) => ({
