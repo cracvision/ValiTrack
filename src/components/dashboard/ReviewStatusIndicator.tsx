@@ -54,10 +54,30 @@ const statusConfig: Record<ReviewStatusType, {
   },
 };
 
-export function ReviewStatusIndicator({ status, countdownLabel }: ReviewStatusIndicatorProps) {
+function useLocalizedCountdown(status: ReviewStatusType, daysUntilDue: number): string {
+  const { t } = useTranslation();
+  if (status === 'no_review') return '';
+  if (status === 'overdue') {
+    return t('dashboard.countdown.overdueByDays', { count: Math.abs(daysUntilDue) });
+  }
+  if (status === 'approaching') {
+    return t('dashboard.countdown.dueInDays', { count: daysUntilDue });
+  }
+  if (status === 'compliant') {
+    const months = Math.floor(daysUntilDue / 30);
+    if (months > 0) return t('dashboard.countdown.monthsAway', { count: months });
+    return t('dashboard.countdown.daysAway', { count: daysUntilDue });
+  }
+  return '';
+}
+
+export { useLocalizedCountdown };
+
+export function ReviewStatusIndicator({ status, daysUntilDue }: ReviewStatusIndicatorProps) {
   const { t } = useTranslation();
   const config = statusConfig[status];
   const Icon = config.icon;
+  const localizedCountdown = useLocalizedCountdown(status, daysUntilDue);
 
   return (
     <div
@@ -70,8 +90,8 @@ export function ReviewStatusIndicator({ status, countdownLabel }: ReviewStatusIn
         {t(`dashboard.reviewStatus.${status}`)}
       </span>
       <span className="flex-1" />
-      {countdownLabel && (
-        <span className={cn('text-xs', config.countdownClass)}>{countdownLabel}</span>
+      {localizedCountdown && (
+        <span className={cn('text-xs', config.countdownClass)}>{localizedCountdown}</span>
       )}
     </div>
   );
