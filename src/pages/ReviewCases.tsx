@@ -92,6 +92,7 @@ export default function ReviewCases() {
                 <TableHead>{t('reviews.table.level')}</TableHead>
                 <TableHead>{t('reviews.table.status')}</TableHead>
                 <TableHead>{t('reviews.table.dueDate')}</TableHead>
+                <TableHead>{t('reviews.table.initiatedBy')}</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
