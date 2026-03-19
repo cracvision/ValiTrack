@@ -132,7 +132,7 @@ function NextActionBar({ system }: { system: DashboardSystem }) {
 export function SystemCard({ system }: SystemCardProps) {
   const navigate = useNavigate();
   const isOverdue = system.reviewStatus === 'overdue';
-  const showStepper = system.activeReviewCaseStatus && !['approved', 'rejected'].includes(system.activeReviewCaseStatus);
+  const showStepper = system.actualReviewStatus && !['approved', 'rejected'].includes(system.actualReviewStatus);
 
   return (
     <div
