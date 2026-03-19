@@ -6,9 +6,11 @@ import { supabase } from '@/integrations/supabase/client';
 import { useReviewCase } from '@/hooks/useReviewCase';
 import { useReviewTransitions } from '@/hooks/useReviewTransitions';
 import { useResolveUserNames } from '@/hooks/useResolveUserNames';
+import { useReviewSignoffs } from '@/hooks/useReviewSignoffs';
 import { ReviewStatusBadge } from '@/components/reviews/ReviewStatusBadge';
 import { ReviewWorkflowStepper } from '@/components/reviews/ReviewWorkflowStepper';
 import { ReviewActionButtons } from '@/components/reviews/ReviewActionButtons';
+import { ReviewSignoffPanel } from '@/components/reviews/ReviewSignoffPanel';
 import { TransitionHistory } from '@/components/reviews/TransitionHistory';
 import { REVIEW_LEVEL_CONFIG, CONCLUSION_CONFIG } from '@/lib/reviewWorkflow';
 import { GXP_SHORT_LABELS, GAMP_SHORT_LABELS } from '@/lib/gxpClassifications';
@@ -31,6 +33,15 @@ export default function ReviewCaseDetail() {
       ? [reviewCase.system_owner_id, reviewCase.system_admin_id, reviewCase.qa_id, reviewCase.business_owner_id, reviewCase.it_manager_id, reviewCase.initiated_by]
       : []
   );
+
+  const isSignoffPhase = reviewCase?.status === 'plan_review' || reviewCase?.status === 'execution_review';
+
+  const signoffData = useReviewSignoffs({
+    reviewCaseId: reviewCase?.id,
+    phase: reviewCase?.status || '',
+    systemOwnerId: reviewCase?.system_owner_id,
+    initiatedBy: reviewCase?.initiated_by,
+  });
 
   const { data: templateCount = 0 } = useQuery({
     queryKey: ['template-count', reviewCase?.review_level],
@@ -125,7 +136,12 @@ export default function ReviewCaseDetail() {
             )}
           </div>
         </div>
-        <ReviewActionButtons reviewCaseId={reviewCase.id} currentStatus={reviewCase.status} />
+        <ReviewActionButtons
+          reviewCaseId={reviewCase.id}
+          currentStatus={reviewCase.status}
+          canAdvanceSignoff={isSignoffPhase ? signoffData.canAdvance : undefined}
+          hasObjections={isSignoffPhase ? signoffData.hasObjections : undefined}
+        />
       </div>
 
       {/* Rejection alert banner */}
@@ -145,6 +161,17 @@ export default function ReviewCaseDetail() {
           </Alert>
         );
       })()}
+
+      {/* Objection alert banner (amber) */}
+      {isSignoffPhase && signoffData.hasObjections && (
+        <Alert className="bg-amber-50 border-amber-200">
+          <AlertTriangle className="h-4 w-4 text-amber-700" />
+          <AlertTitle className="text-amber-800">{t('reviews.signoffs.objectionsRaised')}</AlertTitle>
+          <AlertDescription className="text-amber-700">
+            {t('reviews.signoffs.objectionsDescription')}
+          </AlertDescription>
+        </Alert>
+      )}
 
       {/* Plan approval banner */}
       {reviewCase.status === 'plan_approval' && (
@@ -238,6 +265,21 @@ export default function ReviewCaseDetail() {
           </dl>
         </div>
       </div>
+
+      {/* Sign-off panel — only in plan_review or execution_review */}
+      {isSignoffPhase && (
+        <ReviewSignoffPanel
+          signoffs={signoffData.signoffs}
+          isLoading={signoffData.isLoading}
+          canSignOff={signoffData.canSignOff}
+          mySignoff={signoffData.mySignoff}
+          completedCount={signoffData.completedCount}
+          totalCount={signoffData.totalCount}
+          hasObjections={signoffData.hasObjections}
+          onSubmitDecision={async (args) => { await signoffData.submitDecision.mutateAsync(args); }}
+          isPending={signoffData.submitDecision.isPending}
+        />
+      )}
 
       {/* Tasks placeholder */}
       <div className="border rounded-lg p-4 space-y-3">
