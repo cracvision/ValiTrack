@@ -119,13 +119,9 @@ export function useDashboardSystems() {
         updated_at: row.updated_at,
       }));
 
-      // Super users see all systems; others see only assigned systems
-      const filtered = isSuperUser
-        ? allSystems
-        : allSystems.filter((s) => getUserRelationships(s, userId).length > 0);
-
+      // RLS already filters systems by role assignment — no client-side auth filter needed
       // Fetch latest review case per system
-      const systemIds = filtered.map(s => s.id);
+      const systemIds = allSystems.map(s => s.id);
       let reviewCaseMap: Record<string, { id: string; status: string }> = {};
 
       if (systemIds.length > 0) {
@@ -146,7 +142,7 @@ export function useDashboardSystems() {
         }
       }
 
-      const dashboardSystems: DashboardSystem[] = filtered.map((s) => {
+      const dashboardSystems: DashboardSystem[] = allSystems.map((s) => {
         const activeCase = reviewCaseMap[s.id];
         const { status: dateStatus, daysUntilDue } = computeReviewStatus(s);
 
@@ -174,7 +170,9 @@ export function useDashboardSystems() {
           actualReviewStatus: activeCase?.status as CaseStatus | undefined,
           daysUntilDue,
           countdownLabel: getCountdownLabel(reviewStatus, daysUntilDue),
-          userRelationship: isSuperUser ? ['super_user'] : getUserRelationships(s, userId),
+          userRelationship: isSuperUser
+            ? ['super_user', ...getUserRelationships(s, userId)]
+            : getUserRelationships(s, userId),
           activeReviewCaseId: activeCase?.id,
           activeReviewCaseStatus: activeCase?.status as CaseStatus | undefined,
         };
