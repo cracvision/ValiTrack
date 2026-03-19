@@ -105,11 +105,15 @@
       "overdue": "Iniciar revisión periódica de inmediato",
       "no_review": "Sin historial de revisión periódica. Programar primera revisión.",
       "phase": {
-        "draft": "Revisión iniciada — avanzar a preparación",
+        "draft": "Revisión creada — enviar plan a revisión",
+        "plan_review": "Plan en revisión — esperando comentarios",
+        "plan_approval": "Plan enviado — esperando aprobación de QA",
+        "approved_for_execution": "Plan aprobado — listo para iniciar ejecución",
+        "in_progress": "Ejecución en progreso — {{days}} días hasta vencimiento",
+        "execution_review": "Ejecución completada — esperando aprobación final",
+        "rejected": "Revisión rechazada — se requieren correcciones",
         "in_preparation": "Revisión en preparación — {{days}} días hasta vencimiento",
-        "in_progress": "Recopilación de evidencia en curso — {{days}} días hasta vencimiento",
-        "under_review": "Esperando aprobación de QA",
-        "rejected": "Revisión rechazada — se requieren correcciones"
+        "under_review": "Esperando aprobación de QA"
       }
     },
     "phases": {
@@ -156,11 +160,22 @@
     "emptyNoCreate": "Actualmente no estás asignado a ninguna revisión periódica. Las revisiones aparecerán aquí cuando seas incluido en un flujo de revisión.",
     "status": {
       "draft": "Borrador",
-      "in_preparation": "En preparación",
+      "plan_review": "Revisión del plan",
+      "plan_approval": "Aprobación del plan",
+      "approved_for_execution": "Aprobado para ejecución",
       "in_progress": "En progreso",
-      "under_review": "Bajo revisión",
+      "execution_review": "Revisión de ejecución",
       "approved": "Aprobado",
-      "rejected": "Rechazado"
+      "rejected": "Rechazado",
+      "in_preparation": "En preparación",
+      "under_review": "Bajo revisión"
+    },
+    "phases": {
+      "planning": "Planificación",
+      "planApproval": "Aprobación del plan",
+      "execution": "Ejecución",
+      "finalReview": "Revisión final",
+      "closure": "Aprobado"
     },
     "level": {
       "1": "Nivel 1",
@@ -206,18 +221,25 @@
       "sodError": "El System Owner y QA no pueden ser la misma persona. Actualiza las asignaciones de roles del perfil de sistema antes de crear una revisión."
     },
     "actions": {
-      "startPreparation": "Iniciar preparación",
-      "beginReview": "Comenzar revisión",
-      "returnToDraft": "Volver a borrador",
-      "returnToPreparation": "Volver a preparación",
-      "submitForApproval": "Enviar para aprobación",
-      "approve": "Aprobar",
+      "submitForReview": "Enviar a revisión",
+      "submitForApproval": "Enviar a aprobación",
+      "returnToDraft": "Devolver a borrador",
+      "approvePlan": "Aprobar plan",
+      "returnForReview": "Devolver a revisión",
+      "startExecution": "Iniciar ejecución",
+      "submitForFinalReview": "Enviar a revisión final",
+      "stepBack": "Retroceder",
+      "approveReview": "Aprobar revisión",
       "reject": "Rechazar",
+      "returnForCorrections": "Devolver para correcciones",
+      "restartReview": "Reiniciar revisión",
+      "returnToExecution": "Volver a ejecución",
       "transitionSuccess": "Estado actualizado",
       "rejectTitle": "Rechazar Revisión",
       "rejectDesc": "Proporciona una razón para rechazar esta revisión. Es obligatorio.",
+      "reasonRequiredDesc": "Proporciona una razón para esta acción. Es obligatorio.",
       "reason": "Razón",
-      "reasonPlaceholder": "Explica por qué se rechaza esta revisión...",
+      "reasonPlaceholder": "Explica la razón de esta acción...",
       "confirmReject": "Rechazar",
       "approveTitle": "Aprobar Revisión",
       "approveDesc": "Selecciona una conclusión para esta revisión periódica.",
@@ -225,7 +247,17 @@
       "selectConclusion": "Seleccionar conclusión...",
       "conclusionNotes": "Notas (opcional)",
       "conclusionNotesPlaceholder": "Notas adicionales sobre la conclusión...",
-      "confirmApprove": "Aprobar"
+      "confirmApprove": "Aprobar",
+      "startPreparation": "Iniciar preparación",
+      "beginReview": "Comenzar revisión",
+      "returnToPreparation": "Volver a preparación",
+      "approve": "Aprobar"
+    },
+    "banners": {
+      "planApprovalTitle": "Esperando aprobación de QA",
+      "planApproval": "Este plan de revisión está esperando la aprobación de QA. El plan debe ser aprobado antes de que pueda comenzar la ejecución.",
+      "approvedForExecutionTitle": "Plan aprobado",
+      "approvedForExecution": "Plan aprobado. Listo para comenzar la ejecución. Inicie la ejecución para generar y asignar las tareas de revisión."
     },
     "detail": {
       "backToList": "Casos de revisión",
@@ -258,6 +290,9 @@
       "statusHistory": "Historial de Estado",
       "tasksTitle": "Tareas de Revisión",
       "tasksPlaceholder": "Las tareas se generarán automáticamente cuando esta revisión avance al estado En Preparación.",
+      "tasksBeforeApproval": "Las tareas se generarán automáticamente cuando el plan de revisión sea aprobado para ejecución.",
+      "tasksApprovedWaiting": "Plan aprobado. Las tareas se generarán cuando comience la ejecución.",
+      "tasksFutureUpdate": "La generación de tareas estará disponible en una actualización futura.",
       "tasksPreview": "Esta revisión {{level}} generará aproximadamente {{count}} tareas en {{groups}} áreas de revisión.",
       "rejectedThis": "rechazó esta revisión",
       "returnToDraft": "Regrese a borrador para realizar correcciones."

@@ -1,7 +1,7 @@
 import { useTranslation } from 'react-i18next';
 import { useParams, useNavigate } from 'react-router-dom';
 import { useQuery } from '@tanstack/react-query';
-import { ArrowLeft, AlertTriangle, Info } from 'lucide-react';
+import { ArrowLeft, AlertTriangle, Info, ShieldCheck } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { useReviewCase } from '@/hooks/useReviewCase';
 import { useReviewTransitions } from '@/hooks/useReviewTransitions';
@@ -26,14 +26,12 @@ export default function ReviewCaseDetail() {
   const { data: reviewCase, isLoading } = useReviewCase(id);
   const { data: transitions = [] } = useReviewTransitions(id);
 
-  // Resolve user names for role assignments
   const { data: userNames = {} } = useResolveUserNames(
     reviewCase
       ? [reviewCase.system_owner_id, reviewCase.system_admin_id, reviewCase.qa_id, reviewCase.business_owner_id, reviewCase.it_manager_id, reviewCase.initiated_by]
       : []
   );
 
-  // Count task templates for this review level
   const { data: templateCount = 0 } = useQuery({
     queryKey: ['template-count', reviewCase?.review_level],
     queryFn: async () => {
@@ -50,7 +48,6 @@ export default function ReviewCaseDetail() {
     enabled: !!reviewCase,
   });
 
-  // Count task groups
   const { data: groupCount = 0 } = useQuery({
     queryKey: ['template-groups', reviewCase?.review_level],
     queryFn: async () => {
@@ -91,8 +88,19 @@ export default function ReviewCaseDetail() {
   const levelConfig = REVIEW_LEVEL_CONFIG[reviewCase.review_level as ReviewLevel];
   const conclusionConfig = reviewCase.conclusion ? CONCLUSION_CONFIG[reviewCase.conclusion as ReviewConclusion] : null;
   const snapshot = reviewCase.frozen_system_snapshot as Record<string, any>;
-
   const resolveName = (id: string | undefined) => (id ? userNames[id] || '—' : '—');
+
+  // Task placeholder message based on current status
+  const getTaskMessage = () => {
+    const s = reviewCase.status;
+    if (s === 'draft' || s === 'plan_review' || s === 'plan_approval') {
+      return t('reviews.detail.tasksBeforeApproval');
+    }
+    if (s === 'approved_for_execution') {
+      return t('reviews.detail.tasksApprovedWaiting');
+    }
+    return t('reviews.detail.tasksFutureUpdate');
+  };
 
   return (
     <div className="space-y-6">
@@ -137,6 +145,28 @@ export default function ReviewCaseDetail() {
           </Alert>
         );
       })()}
+
+      {/* Plan approval banner */}
+      {reviewCase.status === 'plan_approval' && (
+        <Alert className="bg-blue-50 border-blue-200">
+          <ShieldCheck className="h-4 w-4 text-blue-700" />
+          <AlertTitle className="text-blue-800">{t('reviews.banners.planApprovalTitle')}</AlertTitle>
+          <AlertDescription className="text-blue-700">
+            {t('reviews.banners.planApproval')}
+          </AlertDescription>
+        </Alert>
+      )}
+
+      {/* Approved for execution banner */}
+      {reviewCase.status === 'approved_for_execution' && (
+        <Alert className="bg-teal-50 border-teal-200">
+          <ShieldCheck className="h-4 w-4 text-teal-700" />
+          <AlertTitle className="text-teal-800">{t('reviews.banners.approvedForExecutionTitle')}</AlertTitle>
+          <AlertDescription className="text-teal-700">
+            {t('reviews.banners.approvedForExecution')}
+          </AlertDescription>
+        </Alert>
+      )}
 
       {/* Workflow stepper */}
       <ReviewWorkflowStepper currentStatus={reviewCase.status} />
@@ -215,7 +245,7 @@ export default function ReviewCaseDetail() {
         <div className="flex items-start gap-2 bg-muted/50 rounded p-3">
           <Info className="h-4 w-4 text-muted-foreground shrink-0 mt-0.5" />
           <div className="text-xs text-muted-foreground space-y-1">
-            <p>{t('reviews.detail.tasksPlaceholder')}</p>
+            <p>{getTaskMessage()}</p>
             <p className="font-medium">
               {t('reviews.detail.tasksPreview', {
                 level: levelConfig?.label,

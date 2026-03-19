@@ -105,11 +105,15 @@
       "overdue": "Initiate periodic review immediately",
       "no_review": "No periodic review history. Schedule first review.",
       "phase": {
-        "draft": "Review initiated — advance to preparation",
+        "draft": "Review created — submit plan for review",
+        "plan_review": "Plan under review — awaiting feedback",
+        "plan_approval": "Plan submitted — awaiting QA approval",
+        "approved_for_execution": "Plan approved — ready to start execution",
+        "in_progress": "Execution in progress — {{days}} days until due",
+        "execution_review": "Execution complete — awaiting final approval",
+        "rejected": "Review rejected — revisions needed",
         "in_preparation": "Review in preparation — {{days}} days until due",
-        "in_progress": "Evidence gathering underway — {{days}} days until due",
-        "under_review": "Awaiting QA approval",
-        "rejected": "Review rejected — revisions needed"
+        "under_review": "Awaiting QA approval"
       }
     },
     "phases": {
@@ -156,11 +160,22 @@
     "emptyNoCreate": "You are not currently assigned to any periodic review. Reviews will appear here when you are included in a review workflow.",
     "status": {
       "draft": "Draft",
-      "in_preparation": "In preparation",
+      "plan_review": "Plan review",
+      "plan_approval": "Plan approval",
+      "approved_for_execution": "Approved for execution",
       "in_progress": "In progress",
-      "under_review": "Under review",
+      "execution_review": "Execution review",
       "approved": "Approved",
-      "rejected": "Rejected"
+      "rejected": "Rejected",
+      "in_preparation": "In preparation",
+      "under_review": "Under review"
+    },
+    "phases": {
+      "planning": "Planning",
+      "planApproval": "Plan approval",
+      "execution": "Execution",
+      "finalReview": "Final review",
+      "closure": "Approved"
     },
     "level": {
       "1": "Level 1",
@@ -206,18 +221,25 @@
       "sodError": "System Owner and QA cannot be the same person. Update the system profile role assignments before creating a review."
     },
     "actions": {
-      "startPreparation": "Start preparation",
-      "beginReview": "Begin review",
-      "returnToDraft": "Return to draft",
-      "returnToPreparation": "Return to preparation",
+      "submitForReview": "Submit for review",
       "submitForApproval": "Submit for approval",
-      "approve": "Approve",
+      "returnToDraft": "Return to draft",
+      "approvePlan": "Approve plan",
+      "returnForReview": "Return for review",
+      "startExecution": "Start execution",
+      "submitForFinalReview": "Submit for final review",
+      "stepBack": "Step back",
+      "approveReview": "Approve review",
       "reject": "Reject",
+      "returnForCorrections": "Return for corrections",
+      "restartReview": "Restart review",
+      "returnToExecution": "Return to execution",
       "transitionSuccess": "Status updated",
       "rejectTitle": "Reject Review",
       "rejectDesc": "Provide a reason for rejecting this review. This is mandatory.",
+      "reasonRequiredDesc": "Provide a reason for this action. This is mandatory.",
       "reason": "Reason",
-      "reasonPlaceholder": "Explain why this review is being rejected...",
+      "reasonPlaceholder": "Explain the reason for this action...",
       "confirmReject": "Reject",
       "approveTitle": "Approve Review",
       "approveDesc": "Select a conclusion for this periodic review.",
@@ -225,7 +247,17 @@
       "selectConclusion": "Select conclusion...",
       "conclusionNotes": "Notes (optional)",
       "conclusionNotesPlaceholder": "Additional notes about the conclusion...",
-      "confirmApprove": "Approve"
+      "confirmApprove": "Approve",
+      "startPreparation": "Start preparation",
+      "beginReview": "Begin review",
+      "returnToPreparation": "Return to preparation",
+      "approve": "Approve"
+    },
+    "banners": {
+      "planApprovalTitle": "Awaiting QA Approval",
+      "planApproval": "This review plan is awaiting QA approval. The plan must be approved before execution can begin.",
+      "approvedForExecutionTitle": "Plan Approved",
+      "approvedForExecution": "Plan approved. Ready to begin execution. Start execution to generate and assign review tasks."
     },
     "detail": {
       "backToList": "Review cases",
@@ -258,6 +290,9 @@
       "statusHistory": "Status History",
       "tasksTitle": "Review Tasks",
       "tasksPlaceholder": "Tasks will be auto-generated when this review advances to In Preparation status.",
+      "tasksBeforeApproval": "Tasks will be auto-generated when this review plan is approved for execution.",
+      "tasksApprovedWaiting": "Plan approved. Tasks will be generated when execution starts.",
+      "tasksFutureUpdate": "Task generation will be available in a future update.",
       "tasksPreview": "This {{level}} review will generate approximately {{count}} tasks across {{groups}} review areas.",
       "rejectedThis": "rejected this review",
       "returnToDraft": "Return to draft to make corrections."

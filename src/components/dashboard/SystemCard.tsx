@@ -1,6 +1,6 @@
 import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
-import { ChevronRight, Clock, CalendarDays, AlertTriangle, Info } from 'lucide-react';
+import { ChevronRight, Clock, CalendarDays, AlertTriangle, Info, ShieldCheck } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
 import { cn } from '@/lib/utils';
 import { ReviewStatusIndicator, useLocalizedCountdown } from './ReviewStatusIndicator';
@@ -43,7 +43,7 @@ function NextActionBar({ system }: { system: DashboardSystem }) {
   const date = new Date(next_review_date).toLocaleDateString();
   const localizedCountdown = useLocalizedCountdown(reviewStatus, daysUntilDue);
 
-  // If there's an active review case, use phase-specific messages
+  // Active review case — phase-specific messages
   if (actualReviewStatus && !['approved'].includes(actualReviewStatus)) {
     const phaseConfigs: Record<string, { icon: typeof Clock; bg: string; text: string; msgKey: string }> = {
       draft: {
@@ -52,29 +52,54 @@ function NextActionBar({ system }: { system: DashboardSystem }) {
         text: 'text-muted-foreground',
         msgKey: 'dashboard.nextAction.phase.draft',
       },
-      in_preparation: {
+      plan_review: {
         icon: Clock,
         bg: 'bg-blue-50',
         text: 'text-blue-800',
-        msgKey: 'dashboard.nextAction.phase.in_preparation',
+        msgKey: 'dashboard.nextAction.phase.plan_review',
+      },
+      plan_approval: {
+        icon: ShieldCheck,
+        bg: 'bg-purple-50',
+        text: 'text-purple-800',
+        msgKey: 'dashboard.nextAction.phase.plan_approval',
+      },
+      approved_for_execution: {
+        icon: ShieldCheck,
+        bg: 'bg-teal-50',
+        text: 'text-teal-800',
+        msgKey: 'dashboard.nextAction.phase.approved_for_execution',
       },
       in_progress: {
         icon: Clock,
-        bg: 'bg-blue-50',
-        text: 'text-blue-800',
-        msgKey: 'dashboard.nextAction.phase.in_progress',
-      },
-      under_review: {
-        icon: Clock,
         bg: 'bg-amber-50',
         text: 'text-amber-800',
-        msgKey: 'dashboard.nextAction.phase.under_review',
+        msgKey: 'dashboard.nextAction.phase.in_progress',
+      },
+      execution_review: {
+        icon: Clock,
+        bg: 'bg-orange-50',
+        text: 'text-orange-800',
+        msgKey: 'dashboard.nextAction.phase.execution_review',
       },
       rejected: {
         icon: AlertTriangle,
         bg: 'bg-red-50',
         text: 'text-red-800',
         msgKey: 'dashboard.nextAction.phase.rejected',
+      },
+      // Backwards compat for old states
+      in_preparation: {
+        icon: Clock,
+        bg: 'bg-blue-50',
+        text: 'text-blue-800',
+        msgKey: 'dashboard.nextAction.phase.plan_review',
+      },
+      under_review: {
+        icon: Clock,
+        bg: 'bg-amber-50',
+        text: 'text-amber-800',
+        msgKey: 'dashboard.nextAction.phase.execution_review',
       },
     };
 
@@ -91,7 +116,7 @@ function NextActionBar({ system }: { system: DashboardSystem }) {
     );
   }
 
-  // Fallback: no active case or approved — use date-based status
+  // Fallback: no active case or approved
   const configs: Record<string, { icon: typeof Clock; bg: string; text: string; msg: string }> = {
     compliant: {
       icon: Clock,
@@ -176,9 +201,9 @@ export function SystemCard({ system }: SystemCardProps) {
         />
       </div>
 
-      {/* Phase stepper - only for in_progress/pending_approval */}
+      {/* Phase stepper */}
       {showStepper && system.actualReviewStatus && (
-        <ReviewPhaseStepper currentPhase={system.actualReviewStatus as any} />
+        <ReviewPhaseStepper currentPhase={system.actualReviewStatus} />
       )}
 
       {/* Next action bar */}

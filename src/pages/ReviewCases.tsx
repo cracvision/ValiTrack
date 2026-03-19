@@ -11,10 +11,13 @@ import { Button } from '@/components/ui/button';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { Badge } from '@/components/ui/badge';
-import { REVIEW_LEVEL_CONFIG } from '@/lib/reviewWorkflow';
+import { REVIEW_LEVEL_CONFIG, REVIEW_STATUS_CONFIG } from '@/lib/reviewWorkflow';
 import type { ReviewStatus, ReviewLevel } from '@/types';
 
-const STATUSES: ReviewStatus[] = ['draft', 'in_preparation', 'in_progress', 'under_review', 'approved', 'rejected'];
+const STATUSES: ReviewStatus[] = [
+  'draft', 'plan_review', 'plan_approval', 'approved_for_execution',
+  'in_progress', 'execution_review', 'approved', 'rejected',
+];
 
 export default function ReviewCases() {
   const { t } = useTranslation();
@@ -27,7 +30,6 @@ export default function ReviewCases() {
   const filters = statusFilter !== 'all' ? { status: statusFilter as ReviewStatus } : undefined;
   const { data: reviewCases = [], isLoading } = useReviewCases(filters);
 
-  // Collect unique initiated_by IDs for name resolution
   const initiatorIds = useMemo(
     () => [...new Set(reviewCases.map(rc => rc.initiated_by).filter(Boolean))],
     [reviewCases]
@@ -53,14 +55,19 @@ export default function ReviewCases() {
       {/* Filters */}
       <div className="flex gap-3">
         <Select value={statusFilter} onValueChange={setStatusFilter}>
-          <SelectTrigger className="w-48">
+          <SelectTrigger className="w-56">
             <SelectValue />
           </SelectTrigger>
           <SelectContent>
             <SelectItem value="all">{t('reviews.filters.allStatuses')}</SelectItem>
-            {STATUSES.map(s => (
-              <SelectItem key={s} value={s}>{t(`reviews.status.${s}`)}</SelectItem>
-            ))}
+            {STATUSES.map(s => {
+              const config = REVIEW_STATUS_CONFIG[s];
+              return (
+                <SelectItem key={s} value={s}>
+                  {t(config?.labelKey ?? `reviews.status.${s}`, { defaultValue: config?.label ?? s })}
+                </SelectItem>
+              );
+            })}
           </SelectContent>
         </Select>
       </div>

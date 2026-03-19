@@ -5,27 +5,116 @@ export interface TransitionRule {
   requiredRoles: string[];
   requiresReason?: boolean;
   requiresConclusion?: boolean;
+  label: string;
+  labelKey: string;
 }
 
 const TRANSITION_MAP: Record<ReviewStatus, TransitionRule[]> = {
   draft: [
-    { to: 'in_preparation', requiredRoles: ['system_owner', 'super_user'] },
+    {
+      to: 'plan_review',
+      requiredRoles: ['system_owner', 'super_user'],
+      label: 'Submit for review',
+      labelKey: 'reviews.actions.submitForReview',
+    },
   ],
-  in_preparation: [
-    { to: 'in_progress', requiredRoles: ['system_owner', 'super_user'] },
-    { to: 'draft', requiredRoles: ['system_owner', 'super_user'] },
+
+  plan_review: [
+    {
+      to: 'plan_approval',
+      requiredRoles: ['system_owner', 'super_user'],
+      label: 'Submit for approval',
+      labelKey: 'reviews.actions.submitForApproval',
+    },
+    {
+      to: 'draft',
+      requiredRoles: ['system_owner', 'super_user'],
+      label: 'Return to draft',
+      labelKey: 'reviews.actions.returnToDraft',
+      requiresReason: true,
+    },
   ],
+
+  plan_approval: [
+    {
+      to: 'approved_for_execution',
+      requiredRoles: ['quality_assurance', 'super_user'],
+      label: 'Approve plan',
+      labelKey: 'reviews.actions.approvePlan',
+    },
+    {
+      to: 'plan_review',
+      requiredRoles: ['quality_assurance', 'super_user'],
+      label: 'Return for review',
+      labelKey: 'reviews.actions.returnForReview',
+      requiresReason: true,
+    },
+  ],
+
+  approved_for_execution: [
+    {
+      to: 'in_progress',
+      requiredRoles: ['system_owner', 'super_user'],
+      label: 'Start execution',
+      labelKey: 'reviews.actions.startExecution',
+    },
+  ],
+
   in_progress: [
-    { to: 'under_review', requiredRoles: ['system_owner', 'super_user'] },
-    { to: 'in_preparation', requiredRoles: ['system_owner', 'super_user'] },
+    {
+      to: 'execution_review',
+      requiredRoles: ['system_owner', 'super_user'],
+      label: 'Submit for final review',
+      labelKey: 'reviews.actions.submitForFinalReview',
+    },
+    {
+      to: 'approved_for_execution',
+      requiredRoles: ['system_owner', 'super_user'],
+      label: 'Step back',
+      labelKey: 'reviews.actions.stepBack',
+      requiresReason: true,
+    },
   ],
-  under_review: [
-    { to: 'approved', requiredRoles: ['quality_assurance', 'super_user'], requiresConclusion: true },
-    { to: 'rejected', requiredRoles: ['quality_assurance', 'super_user'], requiresReason: true },
+
+  execution_review: [
+    {
+      to: 'approved',
+      requiredRoles: ['quality_assurance', 'super_user'],
+      label: 'Approve review',
+      labelKey: 'reviews.actions.approveReview',
+      requiresConclusion: true,
+    },
+    {
+      to: 'rejected',
+      requiredRoles: ['quality_assurance', 'super_user'],
+      label: 'Reject',
+      labelKey: 'reviews.actions.reject',
+      requiresReason: true,
+    },
+    {
+      to: 'in_progress',
+      requiredRoles: ['quality_assurance', 'super_user'],
+      label: 'Return for corrections',
+      labelKey: 'reviews.actions.returnForCorrections',
+      requiresReason: true,
+    },
   ],
+
   approved: [],
+
   rejected: [
-    { to: 'draft', requiredRoles: ['system_owner', 'super_user'] },
+    {
+      to: 'draft',
+      requiredRoles: ['system_owner', 'super_user'],
+      label: 'Restart review',
+      labelKey: 'reviews.actions.restartReview',
+    },
+    {
+      to: 'in_progress',
+      requiredRoles: ['system_owner', 'super_user'],
+      label: 'Return to execution',
+      labelKey: 'reviews.actions.returnToExecution',
+    },
   ],
 };
 
@@ -52,20 +141,40 @@ export function calculateReviewLevel(riskLevel: string, gampCategory: string): R
     if (riskLevel === 'Medium') return '2';
     return '1';
   }
-  // GAMP Cat 3 and Cat 1
   if (riskLevel === 'High') return '2';
   return '1';
 }
 
-// Status display configuration
-export const REVIEW_STATUS_CONFIG: Record<ReviewStatus, { label: string; className: string }> = {
-  draft: { label: 'Draft', className: 'bg-muted text-muted-foreground border-border' },
-  in_preparation: { label: 'In preparation', className: 'bg-blue-50 text-blue-700 border-blue-200' },
-  in_progress: { label: 'In progress', className: 'bg-teal-50 text-teal-700 border-teal-200' },
-  under_review: { label: 'Under review', className: 'bg-amber-50 text-amber-700 border-amber-200' },
-  approved: { label: 'Approved', className: 'bg-green-50 text-green-700 border-green-200' },
-  rejected: { label: 'Rejected', className: 'bg-red-50 text-red-700 border-red-200' },
+// Status display configuration — includes BOTH new and old states for historical display
+export const REVIEW_STATUS_CONFIG: Record<string, { label: string; labelKey: string; className: string }> = {
+  // === NEW STATES ===
+  draft: { label: 'Draft', labelKey: 'reviews.status.draft', className: 'bg-muted text-muted-foreground border-border' },
+  plan_review: { label: 'Plan review', labelKey: 'reviews.status.plan_review', className: 'bg-blue-50 text-blue-700 border-blue-200' },
+  plan_approval: { label: 'Plan approval', labelKey: 'reviews.status.plan_approval', className: 'bg-purple-50 text-purple-700 border-purple-200' },
+  approved_for_execution: { label: 'Approved for execution', labelKey: 'reviews.status.approved_for_execution', className: 'bg-teal-50 text-teal-700 border-teal-200' },
+  in_progress: { label: 'In progress', labelKey: 'reviews.status.in_progress', className: 'bg-amber-50 text-amber-700 border-amber-200' },
+  execution_review: { label: 'Execution review', labelKey: 'reviews.status.execution_review', className: 'bg-orange-50 text-orange-700 border-orange-200' },
+  approved: { label: 'Approved', labelKey: 'reviews.status.approved', className: 'bg-green-50 text-green-700 border-green-200' },
+  rejected: { label: 'Rejected', labelKey: 'reviews.status.rejected', className: 'bg-red-50 text-red-700 border-red-200' },
+  // === OLD STATES (historical transition display only) ===
+  in_preparation: { label: 'In preparation', labelKey: 'reviews.status.in_preparation', className: 'bg-blue-50 text-blue-700 border-blue-200' },
+  under_review: { label: 'Under review', labelKey: 'reviews.status.under_review', className: 'bg-amber-50 text-amber-700 border-amber-200' },
 };
+
+// Stepper phase groupings (5 visual phases for 8 states)
+export interface StepperPhase {
+  key: string;
+  labelKey: string;
+  states: string[];
+}
+
+export const STEPPER_PHASES: StepperPhase[] = [
+  { key: 'planning', labelKey: 'reviews.phases.planning', states: ['draft', 'plan_review'] },
+  { key: 'plan_approval', labelKey: 'reviews.phases.planApproval', states: ['plan_approval'] },
+  { key: 'execution', labelKey: 'reviews.phases.execution', states: ['approved_for_execution', 'in_progress'] },
+  { key: 'final_review', labelKey: 'reviews.phases.finalReview', states: ['execution_review'] },
+  { key: 'closure', labelKey: 'reviews.phases.closure', states: ['approved'] },
+];
 
 // Review level display
 export const REVIEW_LEVEL_CONFIG: Record<ReviewLevel, { label: string; description: string }> = {
@@ -79,16 +188,4 @@ export const CONCLUSION_CONFIG: Record<ReviewConclusion, { label: string; classN
   remains_validated: { label: 'Remains validated', className: 'bg-green-50 text-green-700' },
   requires_remediation: { label: 'Requires remediation', className: 'bg-amber-50 text-amber-700' },
   requires_revalidation: { label: 'Requires revalidation', className: 'bg-red-50 text-red-700' },
-};
-
-// Transition button labels (i18n keys)
-export const TRANSITION_BUTTON_KEYS: Record<string, string> = {
-  'draft->in_preparation': 'reviews.actions.startPreparation',
-  'in_preparation->in_progress': 'reviews.actions.beginReview',
-  'in_preparation->draft': 'reviews.actions.returnToDraft',
-  'in_progress->under_review': 'reviews.actions.submitForApproval',
-  'in_progress->in_preparation': 'reviews.actions.returnToPreparation',
-  'under_review->approved': 'reviews.actions.approve',
-  'under_review->rejected': 'reviews.actions.reject',
-  'rejected->draft': 'reviews.actions.returnToDraft',
 };

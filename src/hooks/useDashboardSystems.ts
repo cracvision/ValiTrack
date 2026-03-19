@@ -91,7 +91,6 @@ export function useDashboardSystems() {
       if (error) throw error;
       if (!data) return [];
 
-      // Map rows to SystemProfile, then filter by role assignment
       const allSystems: SystemProfile[] = data.map((row: any) => ({
         id: row.id,
         name: row.name,
@@ -119,22 +118,18 @@ export function useDashboardSystems() {
         updated_at: row.updated_at,
       }));
 
-      // RLS already filters systems by role assignment — no client-side auth filter needed
-      // Fetch latest review case per system
       const systemIds = allSystems.map(s => s.id);
       let reviewCaseMap: Record<string, { id: string; status: string }> = {};
 
       if (systemIds.length > 0) {
-        const { data: cases, error: casesError } = await supabase
+        const { data: cases } = await supabase
           .from('review_cases')
           .select('id, system_id, status, business_owner_id, system_owner_id, qa_id, initiated_by')
           .eq('is_deleted', false)
           .in('system_id', systemIds)
           .order('created_at', { ascending: false });
 
-
         if (cases) {
-          // Keep only the latest case per system
           for (const c of cases as any[]) {
             if (!reviewCaseMap[c.system_id]) {
               reviewCaseMap[c.system_id] = { id: c.id, status: c.status };
@@ -151,12 +146,11 @@ export function useDashboardSystems() {
 
         if (activeCase) {
           const cs = activeCase.status as CaseStatus;
-          if (cs === 'draft' || cs === 'in_preparation' || cs === 'in_progress' || cs === 'rejected') {
+          if (['draft', 'plan_review', 'plan_approval', 'approved_for_execution', 'in_progress', 'rejected'].includes(cs)) {
             reviewStatus = 'in_progress';
-          } else if (cs === 'under_review') {
+          } else if (cs === 'execution_review') {
             reviewStatus = 'pending_approval';
           } else if (cs === 'approved') {
-            // Approved + future next_review → compliant; otherwise fallback
             reviewStatus = daysUntilDue >= 0 ? 'compliant' : 'overdue';
           } else {
             reviewStatus = dateStatus;
@@ -179,7 +173,6 @@ export function useDashboardSystems() {
         };
       });
 
-      // Sort: overdue first, then approaching, etc.
       dashboardSystems.sort((a, b) => {
         const orderDiff = STATUS_ORDER[a.reviewStatus] - STATUS_ORDER[b.reviewStatus];
         if (orderDiff !== 0) return orderDiff;

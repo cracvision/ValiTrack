@@ -1,7 +1,7 @@
 import { useTranslation } from 'react-i18next';
 import { ReviewStatusBadge } from './ReviewStatusBadge';
 import { getRelativeTime } from '@/lib/relativeTime';
-import type { ReviewCaseTransition, ReviewStatus } from '@/types';
+import type { ReviewCaseTransition } from '@/types';
 
 interface TransitionHistoryProps {
   transitions: ReviewCaseTransition[];
@@ -25,11 +25,11 @@ export function TransitionHistory({ transitions }: TransitionHistoryProps) {
                 </span>
                 {tr.from_status && (
                   <>
-                    <ReviewStatusBadge status={tr.from_status as ReviewStatus} />
+                    <ReviewStatusBadge status={tr.from_status} />
                     <span className="text-muted-foreground text-xs">→</span>
                   </>
                 )}
-                <ReviewStatusBadge status={tr.to_status as ReviewStatus} />
+                <ReviewStatusBadge status={tr.to_status} />
               </div>
               <span className="text-xs text-muted-foreground">
                 {getRelativeTime(tr.created_at)}

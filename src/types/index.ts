@@ -6,7 +6,7 @@ export type GxPClassification = 'GMP' | 'GLP' | 'GCP' | 'GDP' | 'GVP' | 'NON_GXP
 export type RiskLevel = 'High' | 'Medium' | 'Low';
 export type SystemStatus = 'Active' | 'Retired' | 'Under Validation';
 
-export type ReviewStatus = 'draft' | 'in_preparation' | 'in_progress' | 'under_review' | 'approved' | 'rejected';
+export type ReviewStatus = 'draft' | 'plan_review' | 'plan_approval' | 'approved_for_execution' | 'in_progress' | 'execution_review' | 'approved' | 'rejected';
 export type ReviewLevel = '1' | '2' | '3';
 export type ReviewConclusion = 'remains_validated' | 'requires_remediation' | 'requires_revalidation';
 export type TaskGroup = 'INIT' | 'ITSM' | 'QMS' | 'SEC' | 'INFRA' | 'DOC' | 'AI_EVAL' | 'APPR';
