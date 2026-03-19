@@ -107,10 +107,16 @@
       "phase": {
         "draft": "Revisión creada — enviar plan a revisión",
         "plan_review": "Plan en revisión — esperando comentarios",
+        "plan_review_pending": "Plan en revisión — {{completed}}/{{total}} firmas",
+        "plan_review_objections": "Revisión del plan — objeciones presentadas, se requieren correcciones",
+        "plan_review_ready": "Revisiones completadas — listo para enviar a aprobación",
         "plan_approval": "Plan enviado — esperando aprobación de QA",
         "approved_for_execution": "Plan aprobado — listo para iniciar ejecución",
         "in_progress": "Ejecución en progreso — {{days}} días hasta vencimiento",
         "execution_review": "Ejecución completada — esperando aprobación final",
+        "execution_review_pending": "Revisión de ejecución — {{completed}}/{{total}} firmas",
+        "execution_review_objections": "Revisión de ejecución — objeciones presentadas, se requieren correcciones",
+        "execution_review_ready": "Revisiones completadas — listo para aprobación final",
         "rejected": "Revisión rechazada — se requieren correcciones",
         "in_preparation": "Revisión en preparación — {{days}} días hasta vencimiento",
         "under_review": "Esperando aprobación de QA"
