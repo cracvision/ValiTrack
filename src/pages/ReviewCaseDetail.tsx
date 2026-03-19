@@ -13,6 +13,7 @@ import { TransitionHistory } from '@/components/reviews/TransitionHistory';
 import { REVIEW_LEVEL_CONFIG, CONCLUSION_CONFIG } from '@/lib/reviewWorkflow';
 import { GXP_SHORT_LABELS, GAMP_SHORT_LABELS } from '@/lib/gxpClassifications';
 import { Badge } from '@/components/ui/badge';
+import { Alert, AlertTitle, AlertDescription } from '@/components/ui/alert';
 import { Button } from '@/components/ui/button';
 import { Skeleton } from '@/components/ui/skeleton';
 import type { ReviewLevel, ReviewConclusion, GxPClassification, GampCategory } from '@/types';
