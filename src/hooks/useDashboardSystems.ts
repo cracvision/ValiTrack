@@ -19,6 +19,7 @@ export interface DashboardSystem extends SystemProfile {
   userRelationship: string[];
   activeReviewCaseId?: string;
   activeReviewCaseStatus?: CaseStatus;
+  signoffSummary?: { total_required: number; total_completed: number; has_objections: boolean };
 }
 
 function computeReviewStatus(system: SystemProfile): { status: ReviewStatusType; daysUntilDue: number } {
