@@ -87,6 +87,13 @@ export function useReviewCaseTransition() {
 
       if (updateError) throw updateError;
 
+      // Build reason for the transition record
+      let transitionReason: string | null = input.reason || null;
+      if (input.toStatus === 'approved' && (input.conclusion || input.conclusionNotes)) {
+        const conclusionLabel = input.conclusion?.replace(/_/g, ' ').replace(/\b\w/g, c => c.toUpperCase()) || '';
+        transitionReason = `Conclusion: ${conclusionLabel}.${input.conclusionNotes ? ' ' + input.conclusionNotes : ''}`;
+      }
+
       // Insert transition record
       const { error: transError } = await supabase
         .from('review_case_transitions')
@@ -94,7 +101,7 @@ export function useReviewCaseTransition() {
           review_case_id: input.reviewCaseId,
           from_status: input.fromStatus,
           to_status: input.toStatus,
-          reason: input.reason || null,
+          reason: transitionReason,
           transitioned_by: user.id,
         } as any);
 
