@@ -1,7 +1,7 @@
 import { useTranslation } from 'react-i18next';
 import { useParams, useNavigate } from 'react-router-dom';
 import { useQuery } from '@tanstack/react-query';
-import { ArrowLeft, Info } from 'lucide-react';
+import { ArrowLeft, AlertTriangle, Info } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { useReviewCase } from '@/hooks/useReviewCase';
 import { useReviewTransitions } from '@/hooks/useReviewTransitions';
@@ -13,6 +13,7 @@ import { TransitionHistory } from '@/components/reviews/TransitionHistory';
 import { REVIEW_LEVEL_CONFIG, CONCLUSION_CONFIG } from '@/lib/reviewWorkflow';
 import { GXP_SHORT_LABELS, GAMP_SHORT_LABELS } from '@/lib/gxpClassifications';
 import { Badge } from '@/components/ui/badge';
+import { Alert, AlertTitle, AlertDescription } from '@/components/ui/alert';
 import { Button } from '@/components/ui/button';
 import { Skeleton } from '@/components/ui/skeleton';
 import type { ReviewLevel, ReviewConclusion, GxPClassification, GampCategory } from '@/types';
@@ -118,6 +119,24 @@ export default function ReviewCaseDetail() {
         </div>
         <ReviewActionButtons reviewCaseId={reviewCase.id} currentStatus={reviewCase.status} />
       </div>
+
+      {/* Rejection alert banner */}
+      {reviewCase.status === 'rejected' && (() => {
+        const rejectionTransition = transitions.find(t => t.to_status === 'rejected');
+        const rejectorName = rejectionTransition?.transitioned_by_name || 'System';
+        const reason = rejectionTransition?.reason || '';
+        return (
+          <Alert variant="destructive" className="bg-destructive/10 border-destructive/30">
+            <AlertTriangle className="h-4 w-4" />
+            <AlertTitle>
+              {rejectorName} {t('reviews.detail.rejectedThis')}{reason ? `: '${reason}'` : ''}
+            </AlertTitle>
+            <AlertDescription className="text-destructive/80">
+              {t('reviews.detail.returnToDraft')}
+            </AlertDescription>
+          </Alert>
+        );
+      })()}
 
       {/* Workflow stepper */}
       <ReviewWorkflowStepper currentStatus={reviewCase.status} />
