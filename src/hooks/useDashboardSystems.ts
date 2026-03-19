@@ -142,7 +142,7 @@ export function useDashboardSystems() {
         }
       }
 
-      const dashboardSystems: DashboardSystem[] = filtered.map((s) => {
+      const dashboardSystems: DashboardSystem[] = allSystems.map((s) => {
         const activeCase = reviewCaseMap[s.id];
         const { status: dateStatus, daysUntilDue } = computeReviewStatus(s);
 
