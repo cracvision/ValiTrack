@@ -7,9 +7,10 @@ import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { useAuth } from '@/hooks/useAuth';
 import { useReviewCaseTransition } from '@/hooks/useReviewCase';
-import { getValidTransitions, TRANSITION_BUTTON_KEYS, CONCLUSION_CONFIG } from '@/lib/reviewWorkflow';
+import { getValidTransitions, CONCLUSION_CONFIG } from '@/lib/reviewWorkflow';
 import { toast } from '@/hooks/use-toast';
 import type { ReviewStatus, ReviewConclusion } from '@/types';
+import type { TransitionRule } from '@/lib/reviewWorkflow';
 
 interface ReviewActionButtonsProps {
   reviewCaseId: string;
@@ -21,21 +22,24 @@ export function ReviewActionButtons({ reviewCaseId, currentStatus }: ReviewActio
   const { roles } = useAuth();
   const transitionMutation = useReviewCaseTransition();
 
-  const [rejectDialogOpen, setRejectDialogOpen] = useState(false);
+  const [reasonDialogOpen, setReasonDialogOpen] = useState(false);
   const [approveDialogOpen, setApproveDialogOpen] = useState(false);
+  const [pendingRule, setPendingRule] = useState<TransitionRule | null>(null);
   const [reason, setReason] = useState('');
   const [conclusion, setConclusion] = useState<ReviewConclusion | ''>('');
   const [conclusionNotes, setConclusionNotes] = useState('');
 
   const validTransitions = getValidTransitions(currentStatus, roles);
 
-  const handleTransition = async (toStatus: ReviewStatus) => {
-    if (toStatus === 'rejected') {
-      setRejectDialogOpen(true);
+  const handleTransition = async (rule: TransitionRule) => {
+    if (rule.requiresConclusion) {
+      setPendingRule(rule);
+      setApproveDialogOpen(true);
       return;
     }
-    if (toStatus === 'approved') {
-      setApproveDialogOpen(true);
+    if (rule.requiresReason) {
+      setPendingRule(rule);
+      setReasonDialogOpen(true);
       return;
     }
 
@@ -43,7 +47,7 @@ export function ReviewActionButtons({ reviewCaseId, currentStatus }: ReviewActio
       await transitionMutation.mutateAsync({
         reviewCaseId,
         fromStatus: currentStatus,
-        toStatus,
+        toStatus: rule.to,
       });
       toast({ title: t('reviews.actions.transitionSuccess') });
     } catch (err: any) {
@@ -51,18 +55,19 @@ export function ReviewActionButtons({ reviewCaseId, currentStatus }: ReviewActio
     }
   };
 
-  const handleReject = async () => {
-    if (!reason.trim()) return;
+  const handleReasonSubmit = async () => {
+    if (!reason.trim() || !pendingRule) return;
     try {
       await transitionMutation.mutateAsync({
         reviewCaseId,
         fromStatus: currentStatus,
-        toStatus: 'rejected',
+        toStatus: pendingRule.to,
         reason: reason.trim(),
       });
       toast({ title: t('reviews.actions.transitionSuccess') });
-      setRejectDialogOpen(false);
+      setReasonDialogOpen(false);
       setReason('');
+      setPendingRule(null);
     } catch (err: any) {
       toast({ title: t('common.error'), description: err.message, variant: 'destructive' });
     }
@@ -82,6 +87,7 @@ export function ReviewActionButtons({ reviewCaseId, currentStatus }: ReviewActio
       setApproveDialogOpen(false);
       setConclusion('');
       setConclusionNotes('');
+      setPendingRule(null);
     } catch (err: any) {
       toast({ title: t('common.error'), description: err.message, variant: 'destructive' });
     }
@@ -89,34 +95,48 @@ export function ReviewActionButtons({ reviewCaseId, currentStatus }: ReviewActio
 
   if (validTransitions.length === 0) return null;
 
+  const getButtonVariant = (rule: TransitionRule) => {
+    if (rule.to === 'rejected') return 'destructive' as const;
+    if (rule.to === 'approved') return 'default' as const;
+    if (rule.requiresReason) return 'outline' as const;
+    return 'default' as const;
+  };
+
+  // Determine dialog title based on the pending transition
+  const getReasonDialogTitle = () => {
+    if (!pendingRule) return '';
+    if (pendingRule.to === 'rejected') return t('reviews.actions.rejectTitle');
+    return t(pendingRule.labelKey);
+  };
+
+  const getReasonDialogDesc = () => {
+    if (!pendingRule) return '';
+    if (pendingRule.to === 'rejected') return t('reviews.actions.rejectDesc');
+    return t('reviews.actions.reasonRequiredDesc');
+  };
+
   return (
     <>
       <div className="flex gap-2">
-        {validTransitions.map(rule => {
-          const key = `${currentStatus}->${rule.to}`;
-          const labelKey = TRANSITION_BUTTON_KEYS[key] || `reviews.actions.${rule.to}`;
-          const isDestructive = rule.to === 'rejected';
-
-          return (
-            <Button
-              key={rule.to}
-              variant={isDestructive ? 'destructive' : rule.to === 'approved' ? 'default' : 'outline'}
-              size="sm"
-              onClick={() => handleTransition(rule.to)}
-              disabled={transitionMutation.isPending}
-            >
-              {t(labelKey)}
-            </Button>
-          );
-        })}
+        {validTransitions.map(rule => (
+          <Button
+            key={rule.to}
+            variant={getButtonVariant(rule)}
+            size="sm"
+            onClick={() => handleTransition(rule)}
+            disabled={transitionMutation.isPending}
+          >
+            {t(rule.labelKey, { defaultValue: rule.label })}
+          </Button>
+        ))}
       </div>
 
-      {/* Reject dialog */}
-      <Dialog open={rejectDialogOpen} onOpenChange={setRejectDialogOpen}>
+      {/* Reason dialog — reused for rejections AND return/step-back transitions */}
+      <Dialog open={reasonDialogOpen} onOpenChange={setReasonDialogOpen}>
         <DialogContent className="sm:max-w-md">
           <DialogHeader>
-            <DialogTitle>{t('reviews.actions.rejectTitle')}</DialogTitle>
-            <DialogDescription>{t('reviews.actions.rejectDesc')}</DialogDescription>
+            <DialogTitle>{getReasonDialogTitle()}</DialogTitle>
+            <DialogDescription>{getReasonDialogDesc()}</DialogDescription>
           </DialogHeader>
           <div className="space-y-4">
             <div className="space-y-2">
@@ -129,15 +149,15 @@ export function ReviewActionButtons({ reviewCaseId, currentStatus }: ReviewActio
               />
             </div>
             <div className="flex justify-end gap-2">
-              <Button variant="outline" onClick={() => setRejectDialogOpen(false)}>
+              <Button variant="outline" onClick={() => { setReasonDialogOpen(false); setReason(''); setPendingRule(null); }}>
                 {t('userForm.cancel')}
               </Button>
               <Button
-                variant="destructive"
-                onClick={handleReject}
+                variant={pendingRule?.to === 'rejected' ? 'destructive' : 'default'}
+                onClick={handleReasonSubmit}
                 disabled={!reason.trim() || transitionMutation.isPending}
               >
-                {t('reviews.actions.confirmReject')}
+                {pendingRule ? t(pendingRule.labelKey, { defaultValue: pendingRule.label }) : t('reviews.actions.confirmReject')}
               </Button>
             </div>
           </div>
@@ -177,7 +197,7 @@ export function ReviewActionButtons({ reviewCaseId, currentStatus }: ReviewActio
               />
             </div>
             <div className="flex justify-end gap-2">
-              <Button variant="outline" onClick={() => setApproveDialogOpen(false)}>
+              <Button variant="outline" onClick={() => { setApproveDialogOpen(false); setConclusion(''); setConclusionNotes(''); setPendingRule(null); }}>
                 {t('userForm.cancel')}
               </Button>
               <Button
