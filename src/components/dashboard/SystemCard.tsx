@@ -41,6 +41,7 @@ function NextActionBar({ system }: { system: DashboardSystem }) {
   const { t } = useTranslation();
   const { reviewStatus, actualReviewStatus, daysUntilDue, next_review_date } = system;
   const date = new Date(next_review_date).toLocaleDateString();
+  const localizedCountdown = useLocalizedCountdown(reviewStatus, daysUntilDue);
 
   // If there's an active review case, use phase-specific messages
   if (actualReviewStatus && !['approved'].includes(actualReviewStatus)) {

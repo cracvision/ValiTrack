@@ -5,7 +5,6 @@ import type { ReviewStatusType } from '@/hooks/useDashboardSystems';
 
 interface ReviewStatusIndicatorProps {
   status: ReviewStatusType;
-  countdownLabel: string;
   daysUntilDue: number;
 }
 
