@@ -15,6 +15,8 @@ import type { TransitionRule } from '@/lib/reviewWorkflow';
 interface ReviewActionButtonsProps {
   reviewCaseId: string;
   currentStatus: ReviewStatus;
+  canAdvanceSignoff?: boolean;
+  hasObjections?: boolean;
 }
 
 export function ReviewActionButtons({ reviewCaseId, currentStatus }: ReviewActionButtonsProps) {
