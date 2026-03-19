@@ -1,9 +1,10 @@
-import { useState } from 'react';
+import { useState, useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
 import { Plus, ClipboardCheck } from 'lucide-react';
 import { useAuth } from '@/hooks/useAuth';
 import { useReviewCases } from '@/hooks/useReviewCases';
+import { useResolveUserNames } from '@/hooks/useResolveUserNames';
 import { CreateReviewDialog } from '@/components/reviews/CreateReviewDialog';
 import { ReviewStatusBadge } from '@/components/reviews/ReviewStatusBadge';
 import { Button } from '@/components/ui/button';
@@ -25,6 +26,13 @@ export default function ReviewCases() {
 
   const filters = statusFilter !== 'all' ? { status: statusFilter as ReviewStatus } : undefined;
   const { data: reviewCases = [], isLoading } = useReviewCases(filters);
+
+  // Collect unique initiated_by IDs for name resolution
+  const initiatorIds = useMemo(
+    () => [...new Set(reviewCases.map(rc => rc.initiated_by).filter(Boolean))],
+    [reviewCases]
+  );
+  const { data: userNames = {} } = useResolveUserNames(initiatorIds);
 
   return (
     <div className="space-y-4">
@@ -84,6 +92,7 @@ export default function ReviewCases() {
                 <TableHead>{t('reviews.table.level')}</TableHead>
                 <TableHead>{t('reviews.table.status')}</TableHead>
                 <TableHead>{t('reviews.table.dueDate')}</TableHead>
+                <TableHead>{t('reviews.table.initiatedBy')}</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
@@ -116,6 +125,9 @@ export default function ReviewCases() {
                     </TableCell>
                     <TableCell className={isOverdue ? 'text-destructive text-sm font-medium' : 'text-sm'}>
                       {rc.due_date}
+                    </TableCell>
+                    <TableCell className="text-sm">
+                      {userNames[rc.initiated_by] || '—'}
                     </TableCell>
                   </TableRow>
                 );

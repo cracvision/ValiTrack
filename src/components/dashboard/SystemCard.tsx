@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { ChevronRight, Clock, CalendarDays, AlertTriangle, Info } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
 import { cn } from '@/lib/utils';
-import { ReviewStatusIndicator } from './ReviewStatusIndicator';
+import { ReviewStatusIndicator, useLocalizedCountdown } from './ReviewStatusIndicator';
 import { ReviewPhaseStepper } from './ReviewPhaseStepper';
 import { SystemAuditFeed } from './SystemAuditFeed';
 import { GXP_SHORT_LABELS, ENVIRONMENT_SHORT_LABELS, GAMP_SHORT_LABELS } from '@/lib/gxpClassifications';
@@ -41,6 +41,7 @@ function NextActionBar({ system }: { system: DashboardSystem }) {
   const { t } = useTranslation();
   const { reviewStatus, actualReviewStatus, daysUntilDue, next_review_date } = system;
   const date = new Date(next_review_date).toLocaleDateString();
+  const localizedCountdown = useLocalizedCountdown(reviewStatus, daysUntilDue);
 
   // If there's an active review case, use phase-specific messages
   if (actualReviewStatus && !['approved'].includes(actualReviewStatus)) {
@@ -96,7 +97,7 @@ function NextActionBar({ system }: { system: DashboardSystem }) {
       icon: Clock,
       bg: 'bg-muted/50',
       text: 'text-muted-foreground',
-      msg: t('dashboard.nextAction.compliant', { date, timeaway: system.countdownLabel }),
+      msg: t('dashboard.nextAction.compliant', { date, timeaway: localizedCountdown }),
     },
     approaching: {
       icon: CalendarDays,
@@ -171,7 +172,6 @@ export function SystemCard({ system }: SystemCardProps) {
       <div className="border-t border-b border-border py-1">
         <ReviewStatusIndicator
           status={system.reviewStatus}
-          countdownLabel={system.countdownLabel}
           daysUntilDue={system.daysUntilDue}
         />
       </div>
