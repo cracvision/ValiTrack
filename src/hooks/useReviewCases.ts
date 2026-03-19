@@ -32,6 +32,14 @@ export function useReviewCases(filters?: { status?: ReviewStatus; systemId?: str
       }
 
       const { data, error } = await query;
+
+      // 🔍 DEBUG: Review cases query diagnosis
+      console.group('🔍 [DEBUG] useReviewCases — query results');
+      console.log('Rows returned:', data?.length ?? 0);
+      console.log('Error:', error);
+      console.log('Raw data:', data);
+      console.groupEnd();
+
       if (error) throw error;
 
       return (data || []).map((row: any) => ({
@@ -91,7 +99,7 @@ export function useCreateReviewCase() {
           system_owner_id: input.system.system_owner_id,
           system_admin_id: input.system.system_admin_id,
           qa_id: input.system.qa_id,
-          business_owner_id: input.system.owner_id,
+          business_owner_id: input.system.business_owner_id || input.system.owner_id,
           it_manager_id: input.system.it_manager_id || null,
           created_by: user.id,
         } as any)
