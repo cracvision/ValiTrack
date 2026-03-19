@@ -27,6 +27,13 @@ export default function ReviewCases() {
   const filters = statusFilter !== 'all' ? { status: statusFilter as ReviewStatus } : undefined;
   const { data: reviewCases = [], isLoading } = useReviewCases(filters);
 
+  // Collect unique initiated_by IDs for name resolution
+  const initiatorIds = useMemo(
+    () => [...new Set(reviewCases.map(rc => rc.initiated_by).filter(Boolean))],
+    [reviewCases]
+  );
+  const { data: userNames = {} } = useResolveUserNames(initiatorIds);
+
   return (
     <div className="space-y-4">
       {/* Header */}
