@@ -107,10 +107,16 @@
       "phase": {
         "draft": "Review created — submit plan for review",
         "plan_review": "Plan under review — awaiting feedback",
+        "plan_review_pending": "Plan under review — {{completed}}/{{total}} sign-offs",
+        "plan_review_objections": "Plan review — objections raised, corrections needed",
+        "plan_review_ready": "All reviews complete — ready to submit for approval",
         "plan_approval": "Plan submitted — awaiting QA approval",
         "approved_for_execution": "Plan approved — ready to start execution",
         "in_progress": "Execution in progress — {{days}} days until due",
         "execution_review": "Execution complete — awaiting final approval",
+        "execution_review_pending": "Execution review — {{completed}}/{{total}} sign-offs",
+        "execution_review_objections": "Execution review — objections raised, corrections needed",
+        "execution_review_ready": "All reviews complete — ready for final approval",
         "rejected": "Review rejected — revisions needed",
         "in_preparation": "Review in preparation — {{days}} days until due",
         "under_review": "Awaiting QA approval"
@@ -306,6 +312,27 @@
       "DOC": "Documentation",
       "AI_EVAL": "AI Evaluation",
       "APPR": "Approval"
+    },
+    "signoffs": {
+      "title": "Review Sign-offs",
+      "description": "All reviewers must complete their review before this case can advance.",
+      "yourSignoff": "Your sign-off is required",
+      "commentsLabel": "Comments",
+      "commentsOptional": "Comments (optional)",
+      "commentsPlaceholder": "Add any comments about your review...",
+      "objectionCommentsPlaceholder": "Describe your objections and what needs to be corrected...",
+      "objectionCommentsRequired": "You must provide details about your objections",
+      "noObjectionsButton": "No objections",
+      "raiseObjectionsButton": "Raise objections",
+      "approved": "Reviewed — No objections",
+      "objected": "Reviewed — Objections noted",
+      "pending": "Pending",
+      "progress": "{{completed}} of {{total}} reviews completed",
+      "allApproved": "All reviews completed — no objections",
+      "objectionsRaised": "Objections have been raised",
+      "objectionsDescription": "One or more reviewers have raised objections. The System Owner must address the comments and return this review to draft for corrections.",
+      "blockedPending": "All reviewer sign-offs must be completed first",
+      "blockedObjections": "Objections must be addressed before advancing"
     }
   },
   "pages": {

@@ -15,9 +15,11 @@ import type { TransitionRule } from '@/lib/reviewWorkflow';
 interface ReviewActionButtonsProps {
   reviewCaseId: string;
   currentStatus: ReviewStatus;
+  canAdvanceSignoff?: boolean;
+  hasObjections?: boolean;
 }
 
-export function ReviewActionButtons({ reviewCaseId, currentStatus }: ReviewActionButtonsProps) {
+export function ReviewActionButtons({ reviewCaseId, currentStatus, canAdvanceSignoff, hasObjections }: ReviewActionButtonsProps) {
   const { t } = useTranslation();
   const { roles } = useAuth();
   const transitionMutation = useReviewCaseTransition();
@@ -118,17 +120,33 @@ export function ReviewActionButtons({ reviewCaseId, currentStatus }: ReviewActio
   return (
     <>
       <div className="flex gap-2">
-        {validTransitions.map(rule => (
-          <Button
-            key={rule.to}
-            variant={getButtonVariant(rule)}
-            size="sm"
-            onClick={() => handleTransition(rule)}
-            disabled={transitionMutation.isPending}
-          >
-            {t(rule.labelKey, { defaultValue: rule.label })}
-          </Button>
-        ))}
+        {validTransitions.map(rule => {
+          // Block forward transitions when signoffs are incomplete
+          const isForwardBlocked =
+            canAdvanceSignoff === false && (
+              (currentStatus === 'plan_review' && rule.to === 'plan_approval') ||
+              (currentStatus === 'execution_review' && (rule.to === 'approved' || rule.to === 'rejected'))
+            );
+
+          const tooltipText = isForwardBlocked
+            ? (hasObjections
+              ? t('reviews.signoffs.blockedObjections')
+              : t('reviews.signoffs.blockedPending'))
+            : undefined;
+
+          return (
+            <Button
+              key={rule.to}
+              variant={getButtonVariant(rule)}
+              size="sm"
+              onClick={() => handleTransition(rule)}
+              disabled={transitionMutation.isPending || isForwardBlocked}
+              title={tooltipText}
+            >
+              {t(rule.labelKey, { defaultValue: rule.label })}
+            </Button>
+          );
+        })}
       </div>
 
       {/* Reason dialog — reused for rejections AND return/step-back transitions */}

@@ -19,6 +19,7 @@ export interface DashboardSystem extends SystemProfile {
   userRelationship: string[];
   activeReviewCaseId?: string;
   activeReviewCaseStatus?: CaseStatus;
+  signoffSummary?: { total_required: number; total_completed: number; has_objections: boolean };
 }
 
 function computeReviewStatus(system: SystemProfile): { status: ReviewStatusType; daysUntilDue: number } {
@@ -138,6 +139,31 @@ export function useDashboardSystems() {
         }
       }
 
+      // Fetch signoff summaries in parallel for cases in plan_review/execution_review
+      const signoffPhases = ['plan_review', 'execution_review'];
+      const casesNeedingSignoffs = Object.entries(reviewCaseMap)
+        .filter(([, c]) => signoffPhases.includes(c.status))
+        .map(([systemId, c]) => ({ systemId, caseId: c.id, phase: c.status }));
+
+      const signoffMap: Record<string, { total_required: number; total_completed: number; has_objections: boolean }> = {};
+
+      if (casesNeedingSignoffs.length > 0) {
+        const results = await Promise.all(
+          casesNeedingSignoffs.map(async ({ systemId, caseId, phase }) => {
+            const { data } = await supabase.rpc('get_signoff_summary', {
+              p_review_case_id: caseId,
+              p_phase: phase,
+            });
+            return { systemId, summary: data?.[0] || null };
+          })
+        );
+        for (const { systemId, summary } of results) {
+          if (summary) {
+            signoffMap[systemId] = summary;
+          }
+        }
+      }
+
       const dashboardSystems: DashboardSystem[] = allSystems.map((s) => {
         const activeCase = reviewCaseMap[s.id];
         const { status: dateStatus, daysUntilDue } = computeReviewStatus(s);
@@ -170,6 +196,7 @@ export function useDashboardSystems() {
             : getUserRelationships(s, userId),
           activeReviewCaseId: activeCase?.id,
           activeReviewCaseStatus: activeCase?.status as CaseStatus | undefined,
+          signoffSummary: signoffMap[s.id],
         };
       });
 

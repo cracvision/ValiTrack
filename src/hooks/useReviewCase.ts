@@ -106,11 +106,58 @@ export function useReviewCaseTransition() {
         } as any);
 
       if (transError) throw transError;
+
+      // Create/reset signoffs when entering plan_review or execution_review
+      if (input.toStatus === 'plan_review' || input.toStatus === 'execution_review') {
+        // Fetch the review case to get role user IDs
+        const { data: rc } = await supabase
+          .from('review_cases')
+          .select('system_admin_id, qa_id')
+          .eq('id', input.reviewCaseId)
+          .single();
+
+        if (rc) {
+          // Reset existing signoffs for this phase to pending
+          await supabase
+            .from('review_signoffs')
+            .update({
+              status: 'pending',
+              completed_at: null,
+              comments: '',
+              updated_by: user.id,
+            } as any)
+            .eq('review_case_id', input.reviewCaseId)
+            .eq('phase', input.toStatus);
+
+          // Create signoff requests for SA and QA
+          const signoffRoles = [
+            { role: 'system_administrator', userId: rc.system_admin_id },
+            { role: 'quality_assurance', userId: rc.qa_id },
+          ];
+
+          for (const { role, userId: requestedUserId } of signoffRoles) {
+            if (requestedUserId && String(requestedUserId).trim() !== '') {
+              await supabase.from('review_signoffs').upsert({
+                review_case_id: input.reviewCaseId,
+                phase: input.toStatus,
+                requested_role: role,
+                requested_user_id: requestedUserId,
+                status: 'pending',
+                created_by: user.id,
+              } as any, {
+                onConflict: 'review_case_id,phase,requested_user_id',
+                ignoreDuplicates: true,
+              });
+            }
+          }
+        }
+      }
     },
     onSuccess: (_, input) => {
       queryClient.invalidateQueries({ queryKey: ['review-case', input.reviewCaseId] });
       queryClient.invalidateQueries({ queryKey: ['review-cases'] });
       queryClient.invalidateQueries({ queryKey: ['review-transitions', input.reviewCaseId] });
+      queryClient.invalidateQueries({ queryKey: ['review-signoffs', input.reviewCaseId] });
       queryClient.invalidateQueries({ queryKey: ['dashboard-systems'] });
     },
   });

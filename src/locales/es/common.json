@@ -107,10 +107,16 @@
       "phase": {
         "draft": "Revisión creada — enviar plan a revisión",
         "plan_review": "Plan en revisión — esperando comentarios",
+        "plan_review_pending": "Plan en revisión — {{completed}}/{{total}} firmas",
+        "plan_review_objections": "Revisión del plan — objeciones presentadas, se requieren correcciones",
+        "plan_review_ready": "Revisiones completadas — listo para enviar a aprobación",
         "plan_approval": "Plan enviado — esperando aprobación de QA",
         "approved_for_execution": "Plan aprobado — listo para iniciar ejecución",
         "in_progress": "Ejecución en progreso — {{days}} días hasta vencimiento",
         "execution_review": "Ejecución completada — esperando aprobación final",
+        "execution_review_pending": "Revisión de ejecución — {{completed}}/{{total}} firmas",
+        "execution_review_objections": "Revisión de ejecución — objeciones presentadas, se requieren correcciones",
+        "execution_review_ready": "Revisiones completadas — listo para aprobación final",
         "rejected": "Revisión rechazada — se requieren correcciones",
         "in_preparation": "Revisión en preparación — {{days}} días hasta vencimiento",
         "under_review": "Esperando aprobación de QA"
@@ -306,6 +312,27 @@
       "DOC": "Documentación",
       "AI_EVAL": "Evaluación IA",
       "APPR": "Aprobación"
+    },
+    "signoffs": {
+      "title": "Firmas de Revisión",
+      "description": "Todos los revisores deben completar su revisión antes de que este caso pueda avanzar.",
+      "yourSignoff": "Se requiere tu firma",
+      "commentsLabel": "Comentarios",
+      "commentsOptional": "Comentarios (opcional)",
+      "commentsPlaceholder": "Agrega comentarios sobre tu revisión...",
+      "objectionCommentsPlaceholder": "Describe tus objeciones y qué necesita ser corregido...",
+      "objectionCommentsRequired": "Debes proveer detalles sobre tus objeciones",
+      "noObjectionsButton": "Sin objeciones",
+      "raiseObjectionsButton": "Presentar objeciones",
+      "approved": "Revisado — Sin objeciones",
+      "objected": "Revisado — Objeciones registradas",
+      "pending": "Pendiente",
+      "progress": "{{completed}} de {{total}} revisiones completadas",
+      "allApproved": "Todas las revisiones completadas — sin objeciones",
+      "objectionsRaised": "Se han presentado objeciones",
+      "objectionsDescription": "Uno o más revisores han presentado objeciones. El System Owner debe atender los comentarios y devolver esta revisión a borrador para correcciones.",
+      "blockedPending": "Todas las firmas de los revisores deben completarse primero",
+      "blockedObjections": "Las objeciones deben ser atendidas antes de avanzar"
     }
   },
   "pages": {

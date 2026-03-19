@@ -161,6 +161,30 @@ export interface ActionItem {
   completed_date?: string;
 }
 
+export interface ReviewSignoff {
+  id: string;
+  review_case_id: string;
+  phase: 'plan_review' | 'execution_review';
+  requested_role: string;
+  requested_user_id: string;
+  status: 'pending' | 'approved' | 'objected';
+  comments: string;
+  completed_at: string | null;
+  created_at: string;
+  created_by: string;
+  updated_at: string;
+  updated_by: string | null;
+  is_deleted: boolean;
+  deleted_at: string | null;
+  deleted_by: string | null;
+}
+
+export interface SignoffSummary {
+  total_required: number;
+  total_completed: number;
+  has_objections: boolean;
+}
+
 export interface AuditLogEntry {
   id: string;
   user_id: string;

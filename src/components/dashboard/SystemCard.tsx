@@ -45,19 +45,26 @@ function NextActionBar({ system }: { system: DashboardSystem }) {
 
   // Active review case — phase-specific messages
   if (actualReviewStatus && !['approved'].includes(actualReviewStatus)) {
-    const phaseConfigs: Record<string, { icon: typeof Clock; bg: string; text: string; msgKey: string }> = {
+    const phaseConfigs: Record<string, { icon: typeof Clock; bg: string; text: string; msgKey: string; msgParams?: Record<string, any> }> = {
       draft: {
         icon: Info,
         bg: 'bg-muted/50',
         text: 'text-muted-foreground',
         msgKey: 'dashboard.nextAction.phase.draft',
       },
-      plan_review: {
-        icon: Clock,
-        bg: 'bg-blue-50',
-        text: 'text-blue-800',
-        msgKey: 'dashboard.nextAction.phase.plan_review',
-      },
+      plan_review: (() => {
+        const ss = system.signoffSummary;
+        if (ss && ss.has_objections) {
+          return { icon: AlertTriangle, bg: 'bg-amber-50', text: 'text-amber-800', msgKey: 'dashboard.nextAction.phase.plan_review_objections' };
+        }
+        if (ss && ss.total_completed === ss.total_required && ss.total_required > 0) {
+          return { icon: ShieldCheck, bg: 'bg-green-50', text: 'text-green-800', msgKey: 'dashboard.nextAction.phase.plan_review_ready' };
+        }
+        if (ss && ss.total_required > 0) {
+          return { icon: Clock, bg: 'bg-blue-50', text: 'text-blue-800', msgKey: 'dashboard.nextAction.phase.plan_review_pending', msgParams: { completed: ss.total_completed, total: ss.total_required } };
+        }
+        return { icon: Clock, bg: 'bg-blue-50', text: 'text-blue-800', msgKey: 'dashboard.nextAction.phase.plan_review' };
+      })(),
       plan_approval: {
         icon: ShieldCheck,
         bg: 'bg-purple-50',
@@ -76,12 +83,19 @@ function NextActionBar({ system }: { system: DashboardSystem }) {
         text: 'text-amber-800',
         msgKey: 'dashboard.nextAction.phase.in_progress',
       },
-      execution_review: {
-        icon: Clock,
-        bg: 'bg-orange-50',
-        text: 'text-orange-800',
-        msgKey: 'dashboard.nextAction.phase.execution_review',
-      },
+      execution_review: (() => {
+        const ss = system.signoffSummary;
+        if (ss && ss.has_objections) {
+          return { icon: AlertTriangle, bg: 'bg-amber-50', text: 'text-amber-800', msgKey: 'dashboard.nextAction.phase.execution_review_objections' };
+        }
+        if (ss && ss.total_completed === ss.total_required && ss.total_required > 0) {
+          return { icon: ShieldCheck, bg: 'bg-green-50', text: 'text-green-800', msgKey: 'dashboard.nextAction.phase.execution_review_ready' };
+        }
+        if (ss && ss.total_required > 0) {
+          return { icon: Clock, bg: 'bg-orange-50', text: 'text-orange-800', msgKey: 'dashboard.nextAction.phase.execution_review_pending', msgParams: { completed: ss.total_completed, total: ss.total_required } };
+        }
+        return { icon: Clock, bg: 'bg-orange-50', text: 'text-orange-800', msgKey: 'dashboard.nextAction.phase.execution_review' };
+      })(),
       rejected: {
         icon: AlertTriangle,
         bg: 'bg-red-50',
@@ -105,12 +119,13 @@ function NextActionBar({ system }: { system: DashboardSystem }) {
 
     const config = phaseConfigs[actualReviewStatus] ?? phaseConfigs.draft;
     const Icon = config.icon;
+    const msgParams = { days: daysUntilDue, date, ...(config as any).msgParams };
 
     return (
       <div className={cn('flex items-center gap-2 rounded px-3 py-2 mt-2', config.bg)}>
         <Icon className={cn('h-4 w-4 shrink-0', config.text)} strokeWidth={1.75} />
         <span className={cn('text-xs', config.text)}>
-          {t(config.msgKey, { days: daysUntilDue, date })}
+          {String(t(config.msgKey, msgParams))}
         </span>
       </div>
     );

@@ -270,6 +270,68 @@ export type Database = {
           },
         ]
       }
+      review_signoffs: {
+        Row: {
+          comments: string | null
+          completed_at: string | null
+          created_at: string
+          created_by: string
+          deleted_at: string | null
+          deleted_by: string | null
+          id: string
+          is_deleted: boolean
+          phase: string
+          requested_role: string
+          requested_user_id: string
+          review_case_id: string
+          status: string
+          updated_at: string | null
+          updated_by: string | null
+        }
+        Insert: {
+          comments?: string | null
+          completed_at?: string | null
+          created_at?: string
+          created_by?: string
+          deleted_at?: string | null
+          deleted_by?: string | null
+          id?: string
+          is_deleted?: boolean
+          phase: string
+          requested_role: string
+          requested_user_id: string
+          review_case_id: string
+          status?: string
+          updated_at?: string | null
+          updated_by?: string | null
+        }
+        Update: {
+          comments?: string | null
+          completed_at?: string | null
+          created_at?: string
+          created_by?: string
+          deleted_at?: string | null
+          deleted_by?: string | null
+          id?: string
+          is_deleted?: boolean
+          phase?: string
+          requested_role?: string
+          requested_user_id?: string
+          review_case_id?: string
+          status?: string
+          updated_at?: string | null
+          updated_by?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "review_signoffs_review_case_id_fkey"
+            columns: ["review_case_id"]
+            isOneToOne: false
+            referencedRelation: "review_cases"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       review_tasks: {
         Row: {
           approved_by_user: string | null
@@ -595,6 +657,14 @@ export type Database = {
           roles: string
           user_id: string
           username: string
+        }[]
+      }
+      get_signoff_summary: {
+        Args: { p_phase: string; p_review_case_id: string }
+        Returns: {
+          has_objections: boolean
+          total_completed: number
+          total_required: number
         }[]
       }
       get_user_roles: {
