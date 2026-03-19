@@ -119,6 +119,16 @@
       "under_review": "Revisión",
       "approved": "Aprobado"
     },
+    "countdown": {
+      "overdueByDays_one": "Vencido por {{count}} día",
+      "overdueByDays_other": "Vencido por {{count}} días",
+      "dueInDays_one": "Vence en {{count}} día",
+      "dueInDays_other": "Vence en {{count}} días",
+      "monthsAway_one": "{{count}} mes restante",
+      "monthsAway_other": "{{count}} meses restantes",
+      "daysAway_one": "{{count}} día restante",
+      "daysAway_other": "{{count}} días restantes"
+    },
     "auditFeed": {
       "noActivity": "Sin actividad reciente"
     },

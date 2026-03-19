@@ -119,6 +119,16 @@
       "under_review": "Review",
       "approved": "Approved"
     },
+    "countdown": {
+      "overdueByDays_one": "Overdue by {{count}} day",
+      "overdueByDays_other": "Overdue by {{count}} days",
+      "dueInDays_one": "Due in {{count}} day",
+      "dueInDays_other": "Due in {{count}} days",
+      "monthsAway_one": "{{count}} month away",
+      "monthsAway_other": "{{count}} months away",
+      "daysAway_one": "{{count}} day away",
+      "daysAway_other": "{{count}} days away"
+    },
     "auditFeed": {
       "noActivity": "No recent activity"
     },
