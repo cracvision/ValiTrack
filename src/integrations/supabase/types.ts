@@ -113,6 +113,121 @@ export type Database = {
         }
         Relationships: []
       }
+      profile_signoffs: {
+        Row: {
+          comments: string | null
+          completed_at: string | null
+          created_at: string
+          created_by: string
+          deleted_at: string | null
+          deleted_by: string | null
+          id: string
+          is_deleted: boolean
+          requested_role: string
+          requested_user_id: string
+          status: string
+          system_profile_id: string
+          updated_at: string
+          updated_by: string | null
+        }
+        Insert: {
+          comments?: string | null
+          completed_at?: string | null
+          created_at?: string
+          created_by: string
+          deleted_at?: string | null
+          deleted_by?: string | null
+          id?: string
+          is_deleted?: boolean
+          requested_role: string
+          requested_user_id: string
+          status?: string
+          system_profile_id: string
+          updated_at?: string
+          updated_by?: string | null
+        }
+        Update: {
+          comments?: string | null
+          completed_at?: string | null
+          created_at?: string
+          created_by?: string
+          deleted_at?: string | null
+          deleted_by?: string | null
+          id?: string
+          is_deleted?: boolean
+          requested_role?: string
+          requested_user_id?: string
+          status?: string
+          system_profile_id?: string
+          updated_at?: string
+          updated_by?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "profile_signoffs_system_profile_id_fkey"
+            columns: ["system_profile_id"]
+            isOneToOne: false
+            referencedRelation: "system_profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      profile_transitions: {
+        Row: {
+          created_at: string
+          created_by: string
+          deleted_at: string | null
+          deleted_by: string | null
+          from_status: string
+          id: string
+          is_deleted: boolean
+          reason: string | null
+          system_profile_id: string
+          to_status: string
+          transitioned_by: string
+          updated_at: string
+          updated_by: string | null
+        }
+        Insert: {
+          created_at?: string
+          created_by: string
+          deleted_at?: string | null
+          deleted_by?: string | null
+          from_status: string
+          id?: string
+          is_deleted?: boolean
+          reason?: string | null
+          system_profile_id: string
+          to_status: string
+          transitioned_by: string
+          updated_at?: string
+          updated_by?: string | null
+        }
+        Update: {
+          created_at?: string
+          created_by?: string
+          deleted_at?: string | null
+          deleted_by?: string | null
+          from_status?: string
+          id?: string
+          is_deleted?: boolean
+          reason?: string | null
+          system_profile_id?: string
+          to_status?: string
+          transitioned_by?: string
+          updated_at?: string
+          updated_by?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "profile_transitions_system_profile_id_fkey"
+            columns: ["system_profile_id"]
+            isOneToOne: false
+            referencedRelation: "system_profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       profiles: {
         Row: {
           created_at: string
@@ -427,6 +542,7 @@ export type Database = {
       }
       system_profiles: {
         Row: {
+          approval_status: string
           business_owner_id: string | null
           created_at: string
           created_by: string
@@ -458,6 +574,7 @@ export type Database = {
           vendor_name: string
         }
         Insert: {
+          approval_status?: string
           business_owner_id?: string | null
           created_at?: string
           created_by: string
@@ -489,6 +606,7 @@ export type Database = {
           vendor_name?: string
         }
         Update: {
+          approval_status?: string
           business_owner_id?: string | null
           created_at?: string
           created_by?: string
@@ -657,6 +775,14 @@ export type Database = {
           roles: string
           user_id: string
           username: string
+        }[]
+      }
+      get_profile_signoff_summary: {
+        Args: { p_system_profile_id: string }
+        Returns: {
+          has_objections: boolean
+          total_completed: number
+          total_required: number
         }[]
       }
       get_signoff_summary: {

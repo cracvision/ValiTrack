@@ -2,7 +2,7 @@ import { useState, useEffect, useCallback, useRef } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/hooks/useAuth';
 import { toast } from '@/hooks/use-toast';
-import type { SystemProfile } from '@/types';
+import type { SystemProfile, ProfileApprovalStatus } from '@/types';
 
 interface UseSystemProfilesReturn {
   systems: SystemProfile[];
@@ -10,6 +10,7 @@ interface UseSystemProfilesReturn {
   addSystem: (system: SystemProfile) => Promise<boolean>;
   updateSystem: (system: SystemProfile) => Promise<boolean>;
   deleteSystem: (id: string) => Promise<boolean>;
+  transitionApprovalStatus: (profileId: string, fromStatus: ProfileApprovalStatus, toStatus: ProfileApprovalStatus, reason?: string) => Promise<boolean>;
   refetch: () => void;
 }
 
@@ -37,6 +38,7 @@ function rowToSystemProfile(row: any): SystemProfile {
     validation_date: row.validation_date,
     review_period_months: row.review_period_months,
     next_review_date: row.next_review_date,
+    approval_status: row.approval_status ?? 'draft',
     created_at: row.created_at,
     updated_at: row.updated_at,
   };
@@ -108,6 +110,7 @@ export function useSystemProfiles(): UseSystemProfilesReturn {
         validation_date: system.validation_date,
         review_period_months: system.review_period_months,
         next_review_date: system.next_review_date,
+        approval_status: 'draft',
         created_by: user.id,
       });
       if (error) throw error;
@@ -187,5 +190,125 @@ export function useSystemProfiles(): UseSystemProfilesReturn {
     }
   }, [user, fetchSystems]);
 
-  return { systems, loading, addSystem, updateSystem, deleteSystem, refetch: fetchSystems };
+  const transitionApprovalStatus = useCallback(async (
+    profileId: string,
+    fromStatus: ProfileApprovalStatus,
+    toStatus: ProfileApprovalStatus,
+    reason?: string
+  ): Promise<boolean> => {
+    if (!user) return false;
+    try {
+      // 1. Update approval_status
+      const { error: updateError } = await supabase
+        .from('system_profiles')
+        .update({
+          approval_status: toStatus,
+          updated_by: user.id,
+        } as any)
+        .eq('id', profileId);
+      if (updateError) throw updateError;
+
+      // 2. Insert transition record
+      const { error: transError } = await supabase
+        .from('profile_transitions')
+        .insert({
+          system_profile_id: profileId,
+          from_status: fromStatus,
+          to_status: toStatus,
+          reason: reason ?? '',
+          transitioned_by: user.id,
+          created_by: user.id,
+        } as any);
+      if (transError) throw transError;
+
+      // 3. Audit log for the transition
+      const auditActionMap: Record<string, string> = {
+        'in_review': 'PROFILE_SUBMITTED_FOR_REVIEW',
+        'approved': 'PROFILE_APPROVED',
+      };
+      let auditAction = auditActionMap[toStatus];
+      if (toStatus === 'draft' && fromStatus === 'in_review') {
+        auditAction = 'PROFILE_RETURNED_TO_DRAFT';
+      } else if (toStatus === 'draft' && fromStatus === 'approved') {
+        auditAction = 'PROFILE_REVISED';
+      }
+      if (auditAction) {
+        await supabase.from('audit_log').insert({
+          user_id: user.id,
+          action: auditAction,
+          resource_type: 'system_profile',
+          resource_id: profileId,
+          details: { from_status: fromStatus, to_status: toStatus, reason: reason ?? '' },
+        } as any);
+      }
+
+      // 4. If transitioning to 'in_review': create sign-off requests
+      if (toStatus === 'in_review') {
+        // First reset any existing signoffs to pending
+        await supabase
+          .from('profile_signoffs')
+          .update({
+            status: 'pending',
+            completed_at: null,
+            comments: '',
+            updated_by: user.id,
+          } as any)
+          .eq('system_profile_id', profileId)
+          .eq('is_deleted', false);
+
+        // Get the profile to read role assignments
+        const profile = systems.find(s => s.id === profileId);
+        if (profile) {
+          const signoffRoles = [
+            { role: 'system_administrator', userId: profile.system_admin_id },
+            { role: 'quality_assurance', userId: profile.qa_id },
+            { role: 'business_owner', userId: profile.business_owner_id },
+            { role: 'it_manager', userId: profile.it_manager_id },
+          ];
+
+          const validSignoffs = signoffRoles.filter(s => s.userId && s.userId.trim() !== '');
+
+          for (const { role, userId: requestedUserId } of validSignoffs) {
+            await supabase.from('profile_signoffs').upsert({
+              system_profile_id: profileId,
+              requested_role: role,
+              requested_user_id: requestedUserId,
+              status: 'pending',
+              created_by: user.id,
+            } as any, {
+              onConflict: 'system_profile_id,requested_user_id',
+              ignoreDuplicates: true,
+            });
+          }
+        }
+      }
+
+      // 5. If transitioning to 'draft' from 'in_review': reset all signoffs
+      if (toStatus === 'draft' && fromStatus === 'in_review') {
+        await supabase
+          .from('profile_signoffs')
+          .update({
+            status: 'pending',
+            completed_at: null,
+            comments: '',
+            updated_by: user.id,
+          } as any)
+          .eq('system_profile_id', profileId)
+          .eq('is_deleted', false);
+      }
+
+      await fetchSystems();
+      return true;
+    } catch (err: any) {
+      console.error('Failed to transition approval status:', err);
+      toastRef.current({
+        title: 'Error updating status',
+        description: err.message ?? 'Could not update the approval status.',
+        variant: 'destructive',
+      });
+      return false;
+    }
+  }, [user, fetchSystems, systems]);
+
+  return { systems, loading, addSystem, updateSystem, deleteSystem, transitionApprovalStatus, refetch: fetchSystems };
 }

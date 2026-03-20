@@ -53,7 +53,7 @@ const gampColor: Record<string, string> = {
 
 export default function SystemProfiles() {
   const { roles } = useAuth();
-  const { systems, loading, addSystem, updateSystem, deleteSystem } = useSystemProfiles();
+  const { systems, loading, addSystem, updateSystem, deleteSystem, transitionApprovalStatus } = useSystemProfiles();
   const canEdit = roles.includes('system_owner') || roles.includes('super_user');
   const [formOpen, setFormOpen] = useState(false);
   const [editingSystem, setEditingSystem] = useState<SystemProfile | null>(null);
@@ -84,6 +84,7 @@ export default function SystemProfiles() {
   };
 
   const handleEdit = (system: SystemProfile) => {
+    if (system.approval_status !== 'draft') return;
     setEditingSystem(system);
     setFormOpen(true);
   };
@@ -271,6 +272,15 @@ export default function SystemProfiles() {
         onEdit={(system) => {
           setViewingSystem(null);
           handleEdit(system);
+        }}
+        onTransition={async (profileId, fromStatus, toStatus, reason) => {
+          const success = await transitionApprovalStatus(profileId, fromStatus, toStatus, reason);
+          if (success) {
+            // Re-fetch the updated system for the detail dialog
+            const updated = systems.find(s => s.id === profileId);
+            if (updated) setViewingSystem(null);
+          }
+          return success;
         }}
       />
 

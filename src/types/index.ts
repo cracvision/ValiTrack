@@ -5,6 +5,7 @@ export type GampCategory = '1' | '3' | '4' | '5';
 export type GxPClassification = 'GMP' | 'GLP' | 'GCP' | 'GDP' | 'GVP' | 'NON_GXP_CRITICAL' | 'NON_GXP_STANDARD';
 export type RiskLevel = 'High' | 'Medium' | 'Low';
 export type SystemStatus = 'Active' | 'Retired' | 'Under Validation';
+export type ProfileApprovalStatus = 'draft' | 'in_review' | 'approved';
 
 export type ReviewStatus = 'draft' | 'plan_review' | 'plan_approval' | 'approved_for_execution' | 'in_progress' | 'execution_review' | 'approved' | 'rejected';
 export type ReviewLevel = '1' | '2' | '3';
@@ -44,8 +45,34 @@ export interface SystemProfile {
   validation_date: string;
   review_period_months: number;
   next_review_date: string;
+  approval_status: ProfileApprovalStatus;
   created_at: string;
   updated_at: string;
+}
+
+export interface ProfileSignoff {
+  id: string;
+  system_profile_id: string;
+  requested_role: string;
+  requested_user_id: string;
+  status: 'pending' | 'approved' | 'objected';
+  comments: string;
+  completed_at: string | null;
+  created_at: string;
+  created_by: string;
+  updated_at: string;
+  updated_by: string | null;
+  is_deleted: boolean;
+}
+
+export interface ProfileTransition {
+  id: string;
+  system_profile_id: string;
+  from_status: string;
+  to_status: string;
+  reason: string;
+  transitioned_by: string;
+  created_at: string;
 }
 
 export interface ReviewCase {

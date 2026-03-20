@@ -496,5 +496,54 @@
   "common": {
     "error": "Error",
     "loading": "Loading..."
+  },
+  "systemProfiles": {
+    "approval": {
+      "status": {
+        "draft": "Draft",
+        "inReview": "In Review",
+        "approved": "Approved"
+      },
+      "actions": {
+        "submitForReview": "Submit for review",
+        "approve": "Approve profile",
+        "returnToDraft": "Return to draft",
+        "revise": "Revise profile"
+      },
+      "signoffs": {
+        "title": "Profile Review Sign-offs",
+        "description": "All assigned reviewers must complete their review before this profile can be approved.",
+        "yourSignoff": "Your sign-off is required",
+        "commentsLabel": "Comments",
+        "commentsOptional": "Comments (optional)",
+        "commentsPlaceholder": "Add any comments about your review...",
+        "objectionCommentsPlaceholder": "Describe your objections and what needs to be corrected...",
+        "objectionCommentsRequired": "You must provide details about your objections",
+        "noObjectionsButton": "No objections",
+        "raiseObjectionsButton": "Raise objections",
+        "approved": "Reviewed — No objections",
+        "objected": "Reviewed — Objections noted",
+        "pending": "Pending",
+        "progress": "{{completed}} of {{total}} reviews completed",
+        "allApproved": "All reviews completed — no objections",
+        "objectionsRaised": "Objections have been raised",
+        "objectionsDescription": "One or more reviewers have raised objections. The System Owner must address the comments and return this profile to draft for corrections.",
+        "blockedPending": "All reviewer sign-offs must be completed first",
+        "blockedObjections": "Objections must be addressed before approving",
+        "missingReviewers": "All required reviewers (SA, QA, Business Owner) must be assigned before submitting for review."
+      },
+      "banners": {
+        "inReviewReadonly": "This profile is currently under review. Return it to Draft to make changes.",
+        "approvedReadonly": "This profile is approved. To make changes, use 'Revise profile' to return it to Draft.",
+        "pendingApproval": "Profile pending approval",
+        "underReview": "Profile under review",
+        "onlyApprovedAvailable": "Only systems with approved profiles are available.",
+        "systemsPendingApproval": "{{count}} system(s) are pending approval."
+      },
+      "transitions": {
+        "title": "Approval History",
+        "returnReason": "Reason"
+      }
+    }
   }
 }
