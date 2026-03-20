@@ -108,15 +108,19 @@ export const GAMP_SHORT_LABELS: Record<GampCategory, string> = {
 export function suggestReviewLevel(riskLevel: RiskLevel, gampCategory: GampCategory): string | null {
   if (!riskLevel || !gampCategory) return null;
 
-  if (gampCategory === '5') {
-    return riskLevel === 'Low' ? '2' : '3';
-  }
-  if (gampCategory === '4') {
-    if (riskLevel === 'High') return '3';
-    if (riskLevel === 'Medium') return '2';
-    return '1';
-  }
-  // Cat 3 and Cat 1
-  if (riskLevel === 'High') return '2';
-  return '1';
+  // GAMP 5 Review Depth Matrix (Risk × GAMP Category)
+  // Source: GAMP 5 (2nd Ed.) + Periodic Review Template Research
+  const REVIEW_LEVEL_MATRIX: Record<string, string> = {
+    // Category 1 — Infrastructure Software: ALWAYS Level 1
+    'Low_1': '1', 'Medium_1': '1', 'High_1': '1',
+    // Category 3 — Non-Configured COTS
+    'Low_3': '1', 'Medium_3': '2', 'High_3': '2',
+    // Category 4 — Configured Product
+    'Low_4': '2', 'Medium_4': '2', 'High_4': '3',
+    // Category 5 — Custom/Bespoke
+    'Low_5': '2', 'Medium_5': '3', 'High_5': '3',
+  };
+
+  const key = `${riskLevel}_${gampCategory}`;
+  return REVIEW_LEVEL_MATRIX[key] ?? null;
 }
