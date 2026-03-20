@@ -5,6 +5,7 @@ export type GampCategory = '1' | '3' | '4' | '5';
 export type GxPClassification = 'GMP' | 'GLP' | 'GCP' | 'GDP' | 'GVP' | 'NON_GXP_CRITICAL' | 'NON_GXP_STANDARD';
 export type RiskLevel = 'High' | 'Medium' | 'Low';
 export type SystemStatus = 'Active' | 'Retired' | 'Under Validation';
+export type ProfileApprovalStatus = 'draft' | 'in_review' | 'approved';
 
 export type ReviewStatus = 'draft' | 'plan_review' | 'plan_approval' | 'approved_for_execution' | 'in_progress' | 'execution_review' | 'approved' | 'rejected';
 export type ReviewLevel = '1' | '2' | '3';
