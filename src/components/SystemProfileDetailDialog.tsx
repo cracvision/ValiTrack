@@ -102,8 +102,56 @@ export function SystemProfileDetailDialog({ system, open, onOpenChange, onEdit, 
     enabled: !!system?.id,
   });
 
-  const transitionUserIds = transitions.map(t => t.transitioned_by).filter(Boolean);
-  const { data: transitionNames = {} } = useResolveUserNames(transitionUserIds);
+  // Fetch completed signoffs for history timeline
+  const { data: completedSignoffs = [] } = useQuery({
+    queryKey: ['profile-signoffs-history', system?.id],
+    queryFn: async (): Promise<ProfileSignoff[]> => {
+      if (!system?.id) return [];
+      const { data, error } = await supabase
+        .from('profile_signoffs')
+        .select('*')
+        .eq('system_profile_id', system.id)
+        .eq('is_deleted', false)
+        .neq('status', 'pending')
+        .order('completed_at', { ascending: false });
+      if (error) throw error;
+      return (data || []) as unknown as ProfileSignoff[];
+    },
+    enabled: !!system?.id,
+  });
+
+  // Resolve all user names for history (transition users + signoff users)
+  const allHistoryUserIds = [
+    ...transitions.map(t => t.transitioned_by),
+    ...completedSignoffs.map(s => s.requested_user_id),
+  ].filter(Boolean);
+  const { data: historyNames = {} } = useResolveUserNames(allHistoryUserIds);
+
+  // Merge transitions + signoffs into unified timeline
+  type TimelineEntry =
+    | { type: 'transition'; timestamp: string; data: ProfileTransition }
+    | { type: 'signoff'; timestamp: string; data: ProfileSignoff };
+
+  const timelineEntries: TimelineEntry[] = [
+    ...transitions.map(tr => ({
+      type: 'transition' as const,
+      timestamp: tr.created_at,
+      data: tr,
+    })),
+    ...completedSignoffs.map(s => ({
+      type: 'signoff' as const,
+      timestamp: s.completed_at || s.created_at,
+      data: s,
+    })),
+  ].sort((a, b) => new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime());
+
+  const ROLE_LABEL_KEYS: Record<string, string> = {
+    system_administrator: 'users.roles.system_administrator',
+    quality_assurance: 'users.roles.quality_assurance',
+    business_owner: 'users.roles.business_owner',
+    it_manager: 'users.roles.it_manager',
+    system_owner: 'users.roles.system_owner',
+  };
 
   if (!system) return null;
 
