@@ -84,6 +84,7 @@ export default function SystemProfiles() {
   };
 
   const handleEdit = (system: SystemProfile) => {
+    if (system.approval_status !== 'draft') return;
     setEditingSystem(system);
     setFormOpen(true);
   };
