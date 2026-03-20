@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { Plus, Pencil, Trash2, Server } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
@@ -16,11 +17,13 @@ import {
 import { Skeleton } from '@/components/ui/skeleton';
 import { SystemProfileForm } from '@/components/SystemProfileForm';
 import { SystemProfileDetailDialog } from '@/components/SystemProfileDetailDialog';
+import { ProfileApprovalBadge } from '@/components/profiles/ProfileApprovalBadge';
 import { useSystemProfiles } from '@/hooks/useSystemProfiles';
 import { toast } from '@/hooks/use-toast';
 import { useAuth } from '@/hooks/useAuth';
 import { GXP_SHORT_LABELS, ENVIRONMENT_SHORT_LABELS, GAMP_SHORT_LABELS, SYSTEM_ENVIRONMENT_OPTIONS } from '@/lib/gxpClassifications';
-import type { SystemProfile, GxPClassification, SystemEnvironment, GampCategory } from '@/types';
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
+import type { SystemProfile, GxPClassification, SystemEnvironment, GampCategory, ProfileApprovalStatus } from '@/types';
 
 const classificationColor: Record<string, string> = {
   GMP: 'bg-destructive/10 text-destructive',
@@ -52,6 +55,7 @@ const gampColor: Record<string, string> = {
 };
 
 export default function SystemProfiles() {
+  const { t } = useTranslation();
   const { roles } = useAuth();
   const { systems, loading, addSystem, updateSystem, deleteSystem, transitionApprovalStatus } = useSystemProfiles();
   const canEdit = roles.includes('system_owner') || roles.includes('super_user');
@@ -60,11 +64,13 @@ export default function SystemProfiles() {
   const [deleteId, setDeleteId] = useState<string | null>(null);
   const [filterEnvironment, setFilterEnvironment] = useState<string>('all');
   const [filterStatus, setFilterStatus] = useState<string>('all');
+  const [filterApproval, setFilterApproval] = useState<string>('all');
   const [viewingSystem, setViewingSystem] = useState<SystemProfile | null>(null);
 
   const filtered = systems.filter((s) => {
     if (filterEnvironment !== 'all' && s.system_environment !== filterEnvironment) return false;
     if (filterStatus !== 'all' && s.status !== filterStatus) return false;
+    if (filterApproval !== 'all' && s.approval_status !== filterApproval) return false;
     return true;
   });
 
@@ -189,6 +195,17 @@ export default function SystemProfiles() {
                     ))}
                   </SelectContent>
                 </Select>
+                <Select value={filterApproval} onValueChange={setFilterApproval}>
+                  <SelectTrigger className="w-[150px] h-8 text-xs">
+                    <SelectValue placeholder="Approval" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="all">{t('systemProfiles.approval.filters.allApproval', { defaultValue: 'All Approval' })}</SelectItem>
+                    <SelectItem value="draft">{t('systemProfiles.approval.status.draft')}</SelectItem>
+                    <SelectItem value="in_review">{t('systemProfiles.approval.status.inReview')}</SelectItem>
+                    <SelectItem value="approved">{t('systemProfiles.approval.status.approved')}</SelectItem>
+                  </SelectContent>
+                </Select>
               </div>
             </div>
           </CardHeader>
@@ -202,6 +219,7 @@ export default function SystemProfiles() {
                   <TableHead>GAMP</TableHead>
                   <TableHead>Risk</TableHead>
                   <TableHead>Status</TableHead>
+                  <TableHead>Approval</TableHead>
                   <TableHead>Next Review</TableHead>
                   {canEdit && <TableHead className="w-[80px]">Actions</TableHead>}
                 </TableRow>
@@ -241,6 +259,9 @@ export default function SystemProfiles() {
                       </Badge>
                     </TableCell>
                     <TableCell>
+                      <ProfileApprovalBadge status={system.approval_status as ProfileApprovalStatus} />
+                    </TableCell>
+                    <TableCell>
                       <span className="text-sm text-foreground">
                         {new Date(system.next_review_date).toLocaleDateString()}
                       </span>
@@ -248,9 +269,30 @@ export default function SystemProfiles() {
                     {canEdit && (
                       <TableCell>
                         <div className="flex gap-1">
-                          <Button variant="ghost" size="icon" className="h-7 w-7" onClick={(e) => { e.stopPropagation(); handleEdit(system); }}>
-                            <Pencil className="h-3.5 w-3.5" />
-                          </Button>
+                          <TooltipProvider>
+                            <Tooltip>
+                              <TooltipTrigger asChild>
+                                <span>
+                                  <Button
+                                    variant="ghost"
+                                    size="icon"
+                                    className="h-7 w-7"
+                                    disabled={system.approval_status !== 'draft'}
+                                    onClick={(e) => { e.stopPropagation(); handleEdit(system); }}
+                                  >
+                                    <Pencil className="h-3.5 w-3.5" />
+                                  </Button>
+                                </span>
+                              </TooltipTrigger>
+                              {system.approval_status !== 'draft' && (
+                                <TooltipContent>
+                                  {system.approval_status === 'in_review'
+                                    ? t('systemProfiles.approval.banners.inReviewReadonly', { defaultValue: 'This profile is under review' })
+                                    : t('systemProfiles.approval.banners.approvedReadonly', { defaultValue: 'Return this profile to Draft to edit' })}
+                                </TooltipContent>
+                              )}
+                            </Tooltip>
+                          </TooltipProvider>
                           <Button variant="ghost" size="icon" className="h-7 w-7 text-destructive hover:text-destructive" onClick={(e) => { e.stopPropagation(); setDeleteId(system.id); }}>
                             <Trash2 className="h-3.5 w-3.5" />
                           </Button>
