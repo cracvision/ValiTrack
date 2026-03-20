@@ -70,6 +70,7 @@ export default function SystemProfiles() {
   const filtered = systems.filter((s) => {
     if (filterEnvironment !== 'all' && s.system_environment !== filterEnvironment) return false;
     if (filterStatus !== 'all' && s.status !== filterStatus) return false;
+    if (filterApproval !== 'all' && s.approval_status !== filterApproval) return false;
     return true;
   });
 
