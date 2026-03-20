@@ -45,8 +45,34 @@ export interface SystemProfile {
   validation_date: string;
   review_period_months: number;
   next_review_date: string;
+  approval_status: ProfileApprovalStatus;
   created_at: string;
   updated_at: string;
+}
+
+export interface ProfileSignoff {
+  id: string;
+  system_profile_id: string;
+  requested_role: string;
+  requested_user_id: string;
+  status: 'pending' | 'approved' | 'objected';
+  comments: string;
+  completed_at: string | null;
+  created_at: string;
+  created_by: string;
+  updated_at: string;
+  updated_by: string | null;
+  is_deleted: boolean;
+}
+
+export interface ProfileTransition {
+  id: string;
+  system_profile_id: string;
+  from_status: string;
+  to_status: string;
+  reason: string;
+  transitioned_by: string;
+  created_at: string;
 }
 
 export interface ReviewCase {
