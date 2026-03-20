@@ -219,6 +219,7 @@ export default function SystemProfiles() {
                   <TableHead>GAMP</TableHead>
                   <TableHead>Risk</TableHead>
                   <TableHead>Status</TableHead>
+                  <TableHead>Approval</TableHead>
                   <TableHead>Next Review</TableHead>
                   {canEdit && <TableHead className="w-[80px]">Actions</TableHead>}
                 </TableRow>
