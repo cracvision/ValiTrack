@@ -355,7 +355,7 @@ export function SystemProfileDetailDialog({ system, open, onOpenChange, onEdit, 
           <Separator />
 
           {/* Approval History */}
-          {transitions.length > 0 && (
+          {timelineEntries.length > 0 && (
             <>
               <Collapsible open={historyOpen} onOpenChange={setHistoryOpen}>
                 <CollapsibleTrigger className="flex items-center gap-1 text-sm font-semibold text-foreground cursor-pointer hover:text-foreground/80">
@@ -363,26 +363,58 @@ export function SystemProfileDetailDialog({ system, open, onOpenChange, onEdit, 
                   {t('systemProfiles.approval.transitions.title')}
                 </CollapsibleTrigger>
                 <CollapsibleContent className="mt-2 space-y-2">
-                  {transitions.map(tr => (
-                    <div key={tr.id} className="flex items-start gap-3 text-xs border rounded-md p-2 bg-muted/20">
-                      <div className="min-w-0 flex-1">
-                        <div className="flex items-center gap-1.5 flex-wrap">
-                          <span className="font-medium text-foreground">{transitionNames[tr.transitioned_by] || '—'}</span>
-                          <span className="text-muted-foreground">
-                            {transitionStatusLabel(tr.from_status)} → {transitionStatusLabel(tr.to_status)}
-                          </span>
+                  {timelineEntries.map(entry => {
+                    if (entry.type === 'transition') {
+                      const tr = entry.data;
+                      return (
+                        <div key={`tr-${tr.id}`} className="flex items-start gap-3 text-xs border rounded-md p-2 bg-muted/20">
+                          <div className="min-w-0 flex-1">
+                            <div className="flex items-center gap-1.5 flex-wrap">
+                              <span className="font-medium text-foreground">{historyNames[tr.transitioned_by] || '—'}</span>
+                              <span className="text-muted-foreground">
+                                {transitionStatusLabel(tr.from_status)} → {transitionStatusLabel(tr.to_status)}
+                              </span>
+                            </div>
+                            {tr.reason && (
+                              <p className="text-muted-foreground mt-0.5 italic">
+                                {t('systemProfiles.approval.transitions.returnReason')}: {tr.reason}
+                              </p>
+                            )}
+                            <p className="text-muted-foreground/70 mt-0.5">
+                              {new Date(tr.created_at).toLocaleString()}
+                            </p>
+                          </div>
                         </div>
-                        {tr.reason && (
-                          <p className="text-muted-foreground mt-0.5 italic">
-                            {t('systemProfiles.approval.transitions.returnReason')}: {tr.reason}
-                          </p>
-                        )}
-                        <p className="text-muted-foreground/70 mt-0.5">
-                          {new Date(tr.created_at).toLocaleString()}
-                        </p>
-                      </div>
-                    </div>
-                  ))}
+                      );
+                    } else {
+                      const s = entry.data;
+                      const isApproved = s.status === 'approved';
+                      const roleKey = ROLE_LABEL_KEYS[s.requested_role] || s.requested_role;
+                      return (
+                        <div key={`so-${s.id}`} className="flex items-start gap-3 text-xs border rounded-md p-2 bg-muted/20">
+                          <div className="min-w-0 flex-1">
+                            <div className="flex items-center gap-1.5 flex-wrap">
+                              <span className="font-medium text-foreground">{historyNames[s.requested_user_id] || '—'}</span>
+                              <span className="text-muted-foreground">({t(roleKey)})</span>
+                              <span className={isApproved ? 'text-green-700' : 'text-destructive'}>
+                                {isApproved
+                                  ? t('systemProfiles.approval.signoffs.approved')
+                                  : t('systemProfiles.approval.signoffs.objected')}
+                              </span>
+                            </div>
+                            {s.comments && (
+                              <p className="text-muted-foreground mt-0.5 italic">
+                                "{s.comments}"
+                              </p>
+                            )}
+                            <p className="text-muted-foreground/70 mt-0.5">
+                              {s.completed_at ? new Date(s.completed_at).toLocaleString() : new Date(s.created_at).toLocaleString()}
+                            </p>
+                          </div>
+                        </div>
+                      );
+                    }
+                  })}
                 </CollapsibleContent>
               </Collapsible>
               <Separator />
