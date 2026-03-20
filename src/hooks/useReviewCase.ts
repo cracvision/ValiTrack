@@ -153,6 +153,67 @@ export function useReviewCaseTransition() {
           }
         }
       }
+
+      // Block 2: Task generation (approved_for_execution) — independent of Block 1
+      if (input.toStatus === 'approved_for_execution') {
+        // 1. Idempotency guard: verify no tasks already exist
+        const { count: existingTaskCount } = await supabase
+          .from('review_tasks')
+          .select('id', { count: 'exact', head: true })
+          .eq('review_case_id', input.reviewCaseId)
+          .eq('is_deleted', false);
+
+        if (existingTaskCount === 0) {
+          // 2. Fetch active templates
+          const { data: templates, error: templatesError } = await supabase
+            .from('task_templates')
+            .select('*')
+            .eq('is_active', true)
+            .eq('is_deleted', false)
+            .order('sort_order', { ascending: true });
+
+          if (templatesError) throw templatesError;
+
+          // 3. Fetch full review case for role IDs
+          const { data: reviewCaseData, error: caseError } = await supabase
+            .from('review_cases')
+            .select('*')
+            .eq('id', input.reviewCaseId)
+            .single();
+
+          if (caseError) throw caseError;
+
+          // 4. Build payloads using utility (handles role fallbacks + due date calc)
+          const taskPayloads = buildTaskPayloads(
+            templates as any[],
+            reviewCaseData as any,
+            user.id
+          );
+
+          // 5. Batch insert
+          if (taskPayloads.length > 0) {
+            const { error: insertError } = await supabase
+              .from('review_tasks')
+              .insert(taskPayloads as any[]);
+
+            if (insertError) throw insertError;
+          }
+
+          // 6. Audit log
+          await supabase.from('audit_log').insert({
+            user_id: user.id,
+            action: 'TASKS_GENERATED',
+            resource_type: 'review_tasks',
+            resource_id: input.reviewCaseId,
+            details: {
+              review_case_id: input.reviewCaseId,
+              tasks_generated: taskPayloads.length,
+              review_level: reviewCaseData.review_level,
+              triggered_by_transition: 'plan_approval → approved_for_execution',
+            },
+          });
+        }
+      }
     },
     onSuccess: (_, input) => {
       queryClient.invalidateQueries({ queryKey: ['review-case', input.reviewCaseId] });
