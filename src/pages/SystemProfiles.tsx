@@ -195,6 +195,17 @@ export default function SystemProfiles() {
                     ))}
                   </SelectContent>
                 </Select>
+                <Select value={filterApproval} onValueChange={setFilterApproval}>
+                  <SelectTrigger className="w-[150px] h-8 text-xs">
+                    <SelectValue placeholder="Approval" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="all">{t('systemProfiles.approval.filters.allApproval', { defaultValue: 'All Approval' })}</SelectItem>
+                    <SelectItem value="draft">{t('systemProfiles.approval.status.draft')}</SelectItem>
+                    <SelectItem value="in_review">{t('systemProfiles.approval.status.inReview')}</SelectItem>
+                    <SelectItem value="approved">{t('systemProfiles.approval.status.approved')}</SelectItem>
+                  </SelectContent>
+                </Select>
               </div>
             </div>
           </CardHeader>
