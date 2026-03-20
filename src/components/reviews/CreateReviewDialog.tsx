@@ -15,8 +15,10 @@ import { Label } from '@/components/ui/label';
 import { Input } from '@/components/ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Badge } from '@/components/ui/badge';
+import { Alert, AlertDescription } from '@/components/ui/alert';
 import { toast } from '@/hooks/use-toast';
 import { useResolveUserNames } from '@/hooks/useResolveUserNames';
+import { Info } from 'lucide-react';
 import type { SystemProfile, GxPClassification, GampCategory } from '@/types';
 
 interface CreateReviewDialogProps {
@@ -56,10 +58,13 @@ export function CreateReviewDialog({ open, onOpenChange }: CreateReviewDialogPro
     enabled: open && !!user,
   });
 
-  // Filter systems: SO sees only their systems, SU sees all
+  // Filter to approved profiles only, then apply role-based visibility
+  const approvedSystems = systems.filter(s => s.approval_status === 'approved');
+  const pendingCount = systems.length - approvedSystems.length;
+
   const availableSystems = isSuperUser
-    ? systems
-    : systems.filter(s => s.system_owner_id === user?.id);
+    ? approvedSystems
+    : approvedSystems.filter(s => s.system_owner_id === user?.id);
 
   const selectedSystem = availableSystems.find(s => s.id === selectedSystemId);
 
@@ -159,6 +164,25 @@ export function CreateReviewDialog({ open, onOpenChange }: CreateReviewDialogPro
                 </SelectContent>
               </Select>
             </div>
+
+            {pendingCount > 0 && (
+              <Alert variant="default" className="border-accent bg-accent/30">
+                <Info className="h-4 w-4 text-accent-foreground" />
+                <AlertDescription className="text-sm text-accent-foreground">
+                  {t('systemProfiles.approval.banners.onlyApprovedAvailable')}{' '}
+                  {t('systemProfiles.approval.banners.systemsPendingApproval', { count: pendingCount })}
+                </AlertDescription>
+              </Alert>
+            )}
+
+            {availableSystems.length === 0 && (
+              <Alert variant="default">
+                <Info className="h-4 w-4" />
+                <AlertDescription className="text-sm text-muted-foreground">
+                  {t('systemProfiles.approval.banners.onlyApprovedAvailable')}
+                </AlertDescription>
+              </Alert>
+            )}
 
             {selectedSystem && (
               <div className="bg-muted/50 rounded-lg p-4 space-y-2 text-sm">
