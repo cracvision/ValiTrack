@@ -273,6 +273,15 @@ export default function SystemProfiles() {
           setViewingSystem(null);
           handleEdit(system);
         }}
+        onTransition={async (profileId, fromStatus, toStatus, reason) => {
+          const success = await transitionApprovalStatus(profileId, fromStatus, toStatus, reason);
+          if (success) {
+            // Re-fetch the updated system for the detail dialog
+            const updated = systems.find(s => s.id === profileId);
+            if (updated) setViewingSystem(null);
+          }
+          return success;
+        }}
       />
 
       <SystemProfileForm
