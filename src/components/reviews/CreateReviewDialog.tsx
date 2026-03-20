@@ -58,10 +58,13 @@ export function CreateReviewDialog({ open, onOpenChange }: CreateReviewDialogPro
     enabled: open && !!user,
   });
 
-  // Filter systems: SO sees only their systems, SU sees all
+  // Filter to approved profiles only, then apply role-based visibility
+  const approvedSystems = systems.filter(s => s.approval_status === 'approved');
+  const pendingCount = systems.length - approvedSystems.length;
+
   const availableSystems = isSuperUser
-    ? systems
-    : systems.filter(s => s.system_owner_id === user?.id);
+    ? approvedSystems
+    : approvedSystems.filter(s => s.system_owner_id === user?.id);
 
   const selectedSystem = availableSystems.find(s => s.id === selectedSystemId);
 
