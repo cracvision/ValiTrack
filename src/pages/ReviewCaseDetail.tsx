@@ -2,6 +2,7 @@ import { useTranslation } from 'react-i18next';
 import { useParams, useNavigate } from 'react-router-dom';
 import { useQuery } from '@tanstack/react-query';
 import { ArrowLeft, AlertTriangle, Info, ShieldCheck } from 'lucide-react';
+import { ReviewTasksPanel } from '@/components/reviews/ReviewTasksPanel';
 import { supabase } from '@/integrations/supabase/client';
 import { useReviewCase } from '@/hooks/useReviewCase';
 import { useReviewTransitions } from '@/hooks/useReviewTransitions';
@@ -281,23 +282,30 @@ export default function ReviewCaseDetail() {
         />
       )}
 
-      {/* Tasks placeholder */}
-      <div className="border rounded-lg p-4 space-y-3">
-        <h3 className="text-sm font-semibold text-foreground">{t('reviews.detail.tasksTitle')}</h3>
-        <div className="flex items-start gap-2 bg-muted/50 rounded p-3">
-          <Info className="h-4 w-4 text-muted-foreground shrink-0 mt-0.5" />
-          <div className="text-xs text-muted-foreground space-y-1">
-            <p>{getTaskMessage()}</p>
-            <p className="font-medium">
-              {t('reviews.detail.tasksPreview', {
-                level: levelConfig?.label,
-                count: templateCount,
-                groups: groupCount,
-              })}
-            </p>
+      {/* Tasks — conditional: placeholder before approval, real panel after */}
+      {(['draft', 'plan_review', 'plan_approval'] as const).includes(reviewCase.status as any) ? (
+        <div className="border rounded-lg p-4 space-y-3">
+          <h3 className="text-sm font-semibold text-foreground">{t('reviews.detail.tasksTitle')}</h3>
+          <div className="flex items-start gap-2 bg-muted/50 rounded p-3">
+            <Info className="h-4 w-4 text-muted-foreground shrink-0 mt-0.5" />
+            <div className="text-xs text-muted-foreground space-y-1">
+              <p>{getTaskMessage()}</p>
+              <p className="font-medium">
+                {t('reviews.detail.tasksPreview', {
+                  level: levelConfig?.label,
+                  count: templateCount,
+                  groups: groupCount,
+                })}
+              </p>
+            </div>
           </div>
         </div>
-      </div>
+      ) : (
+        <ReviewTasksPanel
+          reviewCaseId={reviewCase.id}
+          reviewLevel={reviewCase.review_level as any}
+        />
+      )}
 
       {/* Transition history */}
       <TransitionHistory transitions={transitions} />

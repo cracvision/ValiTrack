@@ -333,6 +333,36 @@
       "objectionsDescription": "Uno o más revisores han presentado objeciones. El System Owner debe atender los comentarios y devolver esta revisión a borrador para correcciones.",
       "blockedPending": "Todas las firmas de los revisores deben completarse primero",
       "blockedObjections": "Las objeciones deben ser atendidas antes de avanzar"
+    },
+    "tasks": {
+      "title": "Tareas de Revisión",
+      "generatingTasks": "Generando tareas...",
+      "taskCount": "{{count}} tareas — Nivel {{level}}",
+      "noTasksYet": "Las tareas se generarán automáticamente cuando el plan de revisión sea aprobado para ejecución.",
+      "tasksFailed": "Error en la generación de tareas. Contacta a tu administrador.",
+      "progressOverall": "{{completed}} / {{total}} completadas",
+      "completed": "completadas",
+      "status": {
+        "pending": "Pendiente",
+        "in_progress": "En progreso",
+        "completed": "Completada",
+        "blocked": "Bloqueada",
+        "skipped": "Omitida"
+      },
+      "groups": {
+        "INIT": "Iniciación",
+        "ITSM": "Gestión de Incidentes y Cambios",
+        "QMS": "Gestión de Calidad",
+        "SEC": "Seguridad y Control de Acceso",
+        "INFRA": "Infraestructura y Respaldo",
+        "DOC": "Documentación",
+        "AI_EVAL": "Evaluación de IA",
+        "APPR": "Aprobaciones"
+      },
+      "executionType": {
+        "manual": "Manual",
+        "ai_assisted": "Asistida por IA"
+      }
     }
   },
   "pages": {

@@ -333,6 +333,36 @@
       "objectionsDescription": "One or more reviewers have raised objections. The System Owner must address the comments and return this review to draft for corrections.",
       "blockedPending": "All reviewer sign-offs must be completed first",
       "blockedObjections": "Objections must be addressed before advancing"
+    },
+    "tasks": {
+      "title": "Review Tasks",
+      "generatingTasks": "Generating tasks...",
+      "taskCount": "{{count}} tasks — Level {{level}}",
+      "noTasksYet": "Tasks will be auto-generated when the review plan is approved for execution.",
+      "tasksFailed": "Task generation failed. Contact your administrator.",
+      "progressOverall": "{{completed}} / {{total}} completed",
+      "completed": "completed",
+      "status": {
+        "pending": "Pending",
+        "in_progress": "In progress",
+        "completed": "Completed",
+        "blocked": "Blocked",
+        "skipped": "Skipped"
+      },
+      "groups": {
+        "INIT": "Initiation",
+        "ITSM": "Incident & Change Management",
+        "QMS": "Quality Management",
+        "SEC": "Security & Access Control",
+        "INFRA": "Infrastructure & Backup",
+        "DOC": "Documentation",
+        "AI_EVAL": "AI Evaluation",
+        "APPR": "Approvals"
+      },
+      "executionType": {
+        "manual": "Manual",
+        "ai_assisted": "AI-assisted"
+      }
     }
   },
   "pages": {
