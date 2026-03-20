@@ -15,8 +15,10 @@ import { Label } from '@/components/ui/label';
 import { Input } from '@/components/ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Badge } from '@/components/ui/badge';
+import { Alert, AlertDescription } from '@/components/ui/alert';
 import { toast } from '@/hooks/use-toast';
 import { useResolveUserNames } from '@/hooks/useResolveUserNames';
+import { Info } from 'lucide-react';
 import type { SystemProfile, GxPClassification, GampCategory } from '@/types';
 
 interface CreateReviewDialogProps {
