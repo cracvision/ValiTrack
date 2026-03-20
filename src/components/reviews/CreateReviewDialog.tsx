@@ -166,9 +166,9 @@ export function CreateReviewDialog({ open, onOpenChange }: CreateReviewDialogPro
             </div>
 
             {pendingCount > 0 && (
-              <Alert variant="default" className="border-blue-200 bg-blue-50/50">
-                <Info className="h-4 w-4 text-blue-600" />
-                <AlertDescription className="text-sm text-blue-700">
+              <Alert variant="default" className="border-accent bg-accent/30">
+                <Info className="h-4 w-4 text-accent-foreground" />
+                <AlertDescription className="text-sm text-accent-foreground">
                   {t('systemProfiles.approval.banners.onlyApprovedAvailable')}{' '}
                   {t('systemProfiles.approval.banners.systemsPendingApproval', { count: pendingCount })}
                 </AlertDescription>
