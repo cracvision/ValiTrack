@@ -395,7 +395,7 @@ export function SystemProfileDetailDialog({ system, open, onOpenChange, onEdit, 
                           <div className="min-w-0 flex-1">
                             <div className="flex items-center gap-1.5 flex-wrap">
                               <span className="font-medium text-foreground">{historyNames[s.requested_user_id] || '—'}</span>
-                              <span className="text-muted-foreground">({t(roleKey)})</span>
+                              <span className="text-muted-foreground">({roleLabel})</span>
                               <span className={isApproved ? 'text-green-700' : 'text-destructive'}>
                                 {isApproved
                                   ? t('systemProfiles.approval.signoffs.approved')
