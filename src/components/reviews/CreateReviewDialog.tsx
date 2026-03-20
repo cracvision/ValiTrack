@@ -165,6 +165,25 @@ export function CreateReviewDialog({ open, onOpenChange }: CreateReviewDialogPro
               </Select>
             </div>
 
+            {pendingCount > 0 && (
+              <Alert variant="default" className="border-blue-200 bg-blue-50/50">
+                <Info className="h-4 w-4 text-blue-600" />
+                <AlertDescription className="text-sm text-blue-700">
+                  {t('systemProfiles.approval.banners.onlyApprovedAvailable')}{' '}
+                  {t('systemProfiles.approval.banners.systemsPendingApproval', { count: pendingCount })}
+                </AlertDescription>
+              </Alert>
+            )}
+
+            {availableSystems.length === 0 && (
+              <Alert variant="default">
+                <Info className="h-4 w-4" />
+                <AlertDescription className="text-sm text-muted-foreground">
+                  {t('systemProfiles.approval.banners.onlyApprovedAvailable')}
+                </AlertDescription>
+              </Alert>
+            )}
+
             {selectedSystem && (
               <div className="bg-muted/50 rounded-lg p-4 space-y-2 text-sm">
                 <div className="flex items-center gap-2">
