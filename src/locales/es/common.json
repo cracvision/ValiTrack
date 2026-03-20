@@ -496,5 +496,54 @@
   "common": {
     "error": "Error",
     "loading": "Cargando..."
+  },
+  "systemProfiles": {
+    "approval": {
+      "status": {
+        "draft": "Borrador",
+        "inReview": "En Revisión",
+        "approved": "Aprobado"
+      },
+      "actions": {
+        "submitForReview": "Enviar a revisión",
+        "approve": "Aprobar perfil",
+        "returnToDraft": "Devolver a borrador",
+        "revise": "Revisar perfil"
+      },
+      "signoffs": {
+        "title": "Firmas de Revisión del Perfil",
+        "description": "Todos los revisores asignados deben completar su revisión antes de que este perfil pueda ser aprobado.",
+        "yourSignoff": "Se requiere tu firma",
+        "commentsLabel": "Comentarios",
+        "commentsOptional": "Comentarios (opcional)",
+        "commentsPlaceholder": "Agrega comentarios sobre tu revisión...",
+        "objectionCommentsPlaceholder": "Describe tus objeciones y qué necesita ser corregido...",
+        "objectionCommentsRequired": "Debes proveer detalles sobre tus objeciones",
+        "noObjectionsButton": "Sin objeciones",
+        "raiseObjectionsButton": "Presentar objeciones",
+        "approved": "Revisado — Sin objeciones",
+        "objected": "Revisado — Objeciones registradas",
+        "pending": "Pendiente",
+        "progress": "{{completed}} de {{total}} revisiones completadas",
+        "allApproved": "Todas las revisiones completadas — sin objeciones",
+        "objectionsRaised": "Se han presentado objeciones",
+        "objectionsDescription": "Uno o más revisores han presentado objeciones. El System Owner debe atender los comentarios y devolver este perfil a borrador para correcciones.",
+        "blockedPending": "Todas las firmas de revisión deben completarse primero",
+        "blockedObjections": "Las objeciones deben resolverse antes de aprobar",
+        "missingReviewers": "Todos los revisores requeridos (SA, QA, Business Owner) deben estar asignados antes de enviar a revisión."
+      },
+      "banners": {
+        "inReviewReadonly": "Este perfil está actualmente en revisión. Devuélvelo a Borrador para hacer cambios.",
+        "approvedReadonly": "Este perfil está aprobado. Para hacer cambios, usa 'Revisar perfil' para devolverlo a Borrador.",
+        "pendingApproval": "Perfil pendiente de aprobación",
+        "underReview": "Perfil en revisión",
+        "onlyApprovedAvailable": "Solo sistemas con perfiles aprobados están disponibles.",
+        "systemsPendingApproval": "{{count}} sistema(s) están pendientes de aprobación."
+      },
+      "transitions": {
+        "title": "Historial de Aprobación",
+        "returnReason": "Razón"
+      }
+    }
   }
 }
