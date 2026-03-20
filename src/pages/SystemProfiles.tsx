@@ -259,6 +259,9 @@ export default function SystemProfiles() {
                       </Badge>
                     </TableCell>
                     <TableCell>
+                      <ProfileApprovalBadge status={system.approval_status as ProfileApprovalStatus} />
+                    </TableCell>
+                    <TableCell>
                       <span className="text-sm text-foreground">
                         {new Date(system.next_review_date).toLocaleDateString()}
                       </span>
@@ -266,9 +269,30 @@ export default function SystemProfiles() {
                     {canEdit && (
                       <TableCell>
                         <div className="flex gap-1">
-                          <Button variant="ghost" size="icon" className="h-7 w-7" onClick={(e) => { e.stopPropagation(); handleEdit(system); }}>
-                            <Pencil className="h-3.5 w-3.5" />
-                          </Button>
+                          <TooltipProvider>
+                            <Tooltip>
+                              <TooltipTrigger asChild>
+                                <span>
+                                  <Button
+                                    variant="ghost"
+                                    size="icon"
+                                    className="h-7 w-7"
+                                    disabled={system.approval_status !== 'draft'}
+                                    onClick={(e) => { e.stopPropagation(); handleEdit(system); }}
+                                  >
+                                    <Pencil className="h-3.5 w-3.5" />
+                                  </Button>
+                                </span>
+                              </TooltipTrigger>
+                              {system.approval_status !== 'draft' && (
+                                <TooltipContent>
+                                  {system.approval_status === 'in_review'
+                                    ? t('systemProfiles.approval.banners.inReviewReadonly', { defaultValue: 'This profile is under review' })
+                                    : t('systemProfiles.approval.banners.approvedReadonly', { defaultValue: 'Return this profile to Draft to edit' })}
+                                </TooltipContent>
+                              )}
+                            </Tooltip>
+                          </TooltipProvider>
                           <Button variant="ghost" size="icon" className="h-7 w-7 text-destructive hover:text-destructive" onClick={(e) => { e.stopPropagation(); setDeleteId(system.id); }}>
                             <Trash2 className="h-3.5 w-3.5" />
                           </Button>
