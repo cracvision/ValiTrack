@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import type { Database } from '@/integrations/supabase/types';
 
@@ -11,39 +11,21 @@ export interface RoleUser {
 }
 
 export function useRoleUsers(role: AppRole) {
-  const [users, setUsers] = useState<RoleUser[]>([]);
-  const [loading, setLoading] = useState(true);
-
-  useEffect(() => {
-    async function fetchUsers() {
-      setLoading(true);
+  const { data: users = [], isLoading: loading } = useQuery<RoleUser[]>({
+    queryKey: ['role-users', role],
+    queryFn: async () => {
       const { data, error } = await supabase
-        .from('user_roles')
-        .select('user_id')
-        .eq('role', role);
+        .rpc('get_users_by_role', { p_role: role });
 
-      if (error || !data?.length) {
-        setUsers([]);
-        setLoading(false);
-        return;
+      if (error) {
+        console.error(`[useRoleUsers] Failed to fetch users for role "${role}":`, error.message);
+        return [];
       }
 
-      const userIds = data.map((r) => r.user_id);
-      const { data: appUsers, error: usersError } = await supabase
-        .from('app_users')
-        .select('id, full_name, username')
-        .in('id', userIds);
-
-      if (usersError || !appUsers) {
-        setUsers([]);
-      } else {
-        setUsers(appUsers);
-      }
-      setLoading(false);
-    }
-
-    fetchUsers();
-  }, [role]);
+      return (data || []) as RoleUser[];
+    },
+    staleTime: 5 * 60 * 1000,
+  });
 
   return { users, loading };
 }
