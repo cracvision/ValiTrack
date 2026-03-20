@@ -24,7 +24,7 @@ import {
 import { useAuth } from '@/hooks/useAuth';
 import { supabase } from '@/integrations/supabase/client';
 import { useQuery } from '@tanstack/react-query';
-import type { SystemProfile, GxPClassification, SystemEnvironment, GampCategory, RiskLevel, ProfileApprovalStatus, ProfileTransition } from '@/types';
+import type { SystemProfile, GxPClassification, SystemEnvironment, GampCategory, RiskLevel, ProfileApprovalStatus, ProfileTransition, ProfileSignoff } from '@/types';
 
 interface Props {
   system: SystemProfile | null;
