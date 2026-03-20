@@ -145,12 +145,12 @@ export function SystemProfileDetailDialog({ system, open, onOpenChange, onEdit, 
     })),
   ].sort((a, b) => new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime());
 
-  const ROLE_LABEL_KEYS: Record<string, string> = {
-    system_administrator: 'users.roles.system_administrator',
-    quality_assurance: 'users.roles.quality_assurance',
-    business_owner: 'users.roles.business_owner',
-    it_manager: 'users.roles.it_manager',
-    system_owner: 'users.roles.system_owner',
+  const ROLE_DISPLAY_LABELS: Record<string, string> = {
+    system_administrator: 'System Administrator',
+    quality_assurance: 'Quality Assurance',
+    business_owner: 'Business Owner',
+    it_manager: 'IT Manager',
+    system_owner: 'System Owner',
   };
 
   if (!system) return null;
@@ -389,13 +389,13 @@ export function SystemProfileDetailDialog({ system, open, onOpenChange, onEdit, 
                     } else {
                       const s = entry.data;
                       const isApproved = s.status === 'approved';
-                      const roleKey = ROLE_LABEL_KEYS[s.requested_role] || s.requested_role;
+                      const roleLabel = ROLE_DISPLAY_LABELS[s.requested_role] || s.requested_role;
                       return (
                         <div key={`so-${s.id}`} className="flex items-start gap-3 text-xs border rounded-md p-2 bg-muted/20">
                           <div className="min-w-0 flex-1">
                             <div className="flex items-center gap-1.5 flex-wrap">
                               <span className="font-medium text-foreground">{historyNames[s.requested_user_id] || '—'}</span>
-                              <span className="text-muted-foreground">({t(roleKey)})</span>
+                              <span className="text-muted-foreground">({roleLabel})</span>
                               <span className={isApproved ? 'text-green-700' : 'text-destructive'}>
                                 {isApproved
                                   ? t('systemProfiles.approval.signoffs.approved')
