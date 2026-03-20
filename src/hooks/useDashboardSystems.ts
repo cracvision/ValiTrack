@@ -115,6 +115,7 @@ export function useDashboardSystems() {
         validation_date: row.validation_date,
         review_period_months: row.review_period_months,
         next_review_date: row.next_review_date,
+        approval_status: row.approval_status ?? 'draft',
         created_at: row.created_at,
         updated_at: row.updated_at,
       }));

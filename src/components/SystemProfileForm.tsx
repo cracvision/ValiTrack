@@ -278,6 +278,7 @@ export function SystemProfileForm({ open, onOpenChange, onSubmit, editingSystem 
       validation_date: values.validation_date,
       review_period_months: values.review_period_months,
       next_review_date: calculateNextReviewDate(values.validation_date, values.review_period_months),
+      approval_status: editingSystem?.approval_status ?? 'draft',
       created_at: editingSystem?.created_at ?? now,
       updated_at: now,
     };
