@@ -145,12 +145,12 @@ export function SystemProfileDetailDialog({ system, open, onOpenChange, onEdit, 
     })),
   ].sort((a, b) => new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime());
 
-  const ROLE_LABEL_KEYS: Record<string, string> = {
-    system_administrator: 'users.roles.system_administrator',
-    quality_assurance: 'users.roles.quality_assurance',
-    business_owner: 'users.roles.business_owner',
-    it_manager: 'users.roles.it_manager',
-    system_owner: 'users.roles.system_owner',
+  const ROLE_DISPLAY_LABELS: Record<string, string> = {
+    system_administrator: 'System Administrator',
+    quality_assurance: 'Quality Assurance',
+    business_owner: 'Business Owner',
+    it_manager: 'IT Manager',
+    system_owner: 'System Owner',
   };
 
   if (!system) return null;
