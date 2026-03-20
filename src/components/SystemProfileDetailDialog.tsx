@@ -389,7 +389,7 @@ export function SystemProfileDetailDialog({ system, open, onOpenChange, onEdit, 
                     } else {
                       const s = entry.data;
                       const isApproved = s.status === 'approved';
-                      const roleKey = ROLE_LABEL_KEYS[s.requested_role] || s.requested_role;
+                      const roleLabel = ROLE_DISPLAY_LABELS[s.requested_role] || s.requested_role;
                       return (
                         <div key={`so-${s.id}`} className="flex items-start gap-3 text-xs border rounded-md p-2 bg-muted/20">
                           <div className="min-w-0 flex-1">
