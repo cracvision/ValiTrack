@@ -540,6 +540,9 @@
         "onlyApprovedAvailable": "Solo sistemas con perfiles aprobados están disponibles.",
         "systemsPendingApproval": "{{count}} sistema(s) están pendientes de aprobación."
       },
+      "filters": {
+        "allApproval": "Toda Aprobación"
+      },
       "transitions": {
         "title": "Historial de Aprobación",
         "returnReason": "Razón"
