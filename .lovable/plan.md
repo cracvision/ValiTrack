@@ -1,43 +1,25 @@
 
-## Iteration 3B-1: Workflow Expansion (6 → 8 States) — IMPLEMENTED
 
-### New workflow
-`draft → plan_review → plan_approval → approved_for_execution → in_progress → execution_review → approved / rejected`
+## Fix: `suggestReviewLevel()` incorrect results for 3 combinations
 
-### Changes made
-1. **Database**: CHECK constraint updated, existing data migrated (`in_preparation` → `plan_review`, `under_review` → `execution_review`)
-2. **Types**: `ReviewStatus` updated with 8 states
-3. **Workflow engine**: Full rewrite with `labelKey` on each transition rule, 5-phase stepper config
-4. **Stepper**: 5 grouped phases (Planning, Plan Approval, Execution, Final Review, Approved)
-5. **Action buttons**: Reusable reason dialog for all `requiresReason` transitions
-6. **Status badge & transition history**: Accept `string` for backwards compat with old states
-7. **Detail page**: Plan approval + approved_for_execution banners, updated task messages
-8. **Review list**: 8-state filter dropdown
-9. **Dashboard**: Updated status mapping, phase-specific next action messages
-10. **i18n**: All keys in EN + ES with real Spanish translations
+### Problem
+The function groups GAMP Cat 1 and Cat 3 together, causing 3 wrong results:
+- Any Risk + Cat 1 → should always be Level 1 (Cat 1 was returning Level 2 for High)
+- Medium + Cat 3 → should be Level 2 (was returning Level 1)
+- Low + Cat 4 → should be Level 2 (was returning Level 1)
 
----
+### Change
+**File: `src/lib/gxpClassifications.ts`** — Replace the `suggestReviewLevel` function body (lines ~99-113) with a lookup table mapping all 12 Risk×GAMP combinations explicitly. No other files or functions touched.
 
-## Iteration 3B-1 Addendum: Reviewer Sign-Off Mechanism — IMPLEMENTED
+```typescript
+const REVIEW_LEVEL_MATRIX: Record<string, string> = {
+  'Low_1': '1', 'Medium_1': '1', 'High_1': '1',
+  'Low_3': '1', 'Medium_3': '2', 'High_3': '2',
+  'Low_4': '2', 'Medium_4': '2', 'High_4': '3',
+  'Low_5': '2', 'Medium_5': '3', 'High_5': '3',
+};
+return REVIEW_LEVEL_MATRIX[`${riskLevel}_${gampCategory}`] ?? null;
+```
 
-### Summary
-Mandatory SA + QA sign-off gate for `plan_review` and `execution_review` states. Reviewers choose "No objections" or "Raise objections" (with mandatory comments). Forward advancement blocked until all approved with no objections.
+Single file, single function. No UI, DB, or other logic changes.
 
-### Changes made
-1. **Database**: `review_signoffs` table with RLS (SELECT/UPDATE/INSERT), `get_signoff_summary` RPC, audit_log INSERT policy
-2. **Types**: `ReviewSignoff` and `SignoffSummary` interfaces added
-3. **Hook**: `useReviewSignoffs.ts` — queries signoffs, derives canAdvance/hasObjections, submitDecision mutation with audit_log entry
-4. **Component**: `ReviewSignoffPanel.tsx` — progress bar, per-reviewer status cards, decision form with mandatory comments for objections
-5. **Transition logic**: `useReviewCase.ts` — creates/resets signoff records on transition to plan_review or execution_review
-6. **Detail page**: `ReviewCaseDetail.tsx` — signoff panel between role assignments and tasks, amber objection banner, passes canAdvanceSignoff/hasObjections to action buttons
-7. **Action buttons**: `ReviewActionButtons.tsx` — blocks forward transitions (plan_review→plan_approval, execution_review→approved/rejected) when signoffs incomplete
-8. **Dashboard**: `useDashboardSystems.ts` — parallel `Promise.all` for signoff summaries, `SystemCard.tsx` — signoff-aware next action messages
-9. **i18n**: All signoff + next action keys in EN + ES
-
-### Security & compliance
-- canSignOff excludes system_owner_id AND initiated_by
-- execution_review blocks both "Approve" and "Reject" (not just Approve) when signoffs incomplete
-- Return/step-back transitions NEVER blocked
-- Audit log entries for SIGNOFF_APPROVED and SIGNOFF_OBJECTED
-- Signoffs reset to pending on re-entry to review phases
-- Null check before creating signoffs for unassigned roles
