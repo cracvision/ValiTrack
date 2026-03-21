@@ -38,7 +38,7 @@ const NOTE_TYPE_STYLES: Record<string, { bg: string; icon: React.ReactNode }> = 
   },
 };
 
-export function TaskWorkLog({ notes, isLoading, taskStatus, onAddNote, isAdding }: TaskWorkLogProps) {
+export function TaskWorkLog({ notes, isLoading, taskStatus, onAddNote, isAdding, canAddNotes = true }: TaskWorkLogProps) {
   const { t } = useTranslation();
   const [noteContent, setNoteContent] = useState('');
 
@@ -48,7 +48,7 @@ export function TaskWorkLog({ notes, isLoading, taskStatus, onAddNote, isAdding 
     setNoteContent('');
   };
 
-  const showNoteForm = taskStatus === 'in_progress';
+  const showNoteForm = canAddNotes && taskStatus === 'in_progress';
 
   return (
     <div className="space-y-3">
