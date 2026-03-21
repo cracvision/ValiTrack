@@ -1,69 +1,70 @@
+## ValiTrack — Iteration 3C: Task Execution & Evidence Upload
 
+### Phase 1 — COMPLETED ✅
 
-## Phase 2 — Evidence Upload + SHA-256 + Completion Validation
+**Database Migration:**
+- Added `completed_by`, `reopened_at`, `reopened_by`, `reopened_reason` columns to `review_tasks`
+- Updated status CHECK constraint to only allow `pending`, `in_progress`, `completed`
+- Created `task_work_notes` table with full audit trail, soft delete, RLS (SELECT for case participants, INSERT for assignee/SO/super_user, UPDATE for super_user only)
+- Updated RLS on `review_tasks` to allow SO to update tasks
+- Added reassignment columns: `reassigned_at`, `reassigned_by`, `reassigned_from`, `reassignment_reason`
+- Added `reassignment` to `task_work_notes` note_type CHECK constraint
 
-### What exists (Phase 1 — done)
-- `task_work_notes` table + RLS ✅
-- `useTaskExecution.ts` with start/complete/reopen + reassign ✅
-- `useTaskWorkNotes.ts` ✅
-- `TaskDetailPanel.tsx`, `TaskActionButtons.tsx`, `TaskWorkLog.tsx`, `TaskReassignDialog.tsx` ✅
-- `EVIDENCE_GROUPS` constant already defined in TaskDetailPanel ✅
-- i18n keys for `tasks.evidence.*` and `tasks.validation.*` already added ✅
+**Types (`src/types/index.ts`):**
+- Updated `TaskStatus` to remove `blocked`/`skipped`
+- Added `WorkNoteType`, `TaskWorkNote`, `TaskEvidenceFile` types
+- Updated `ReviewTask` interface with new columns
 
-### What needs to be built
+**Hooks:**
+- `useTaskExecution.ts` — Start/complete/reopen/reassign with auto work notes + audit log
+- `useTaskWorkNotes.ts` — CRUD for immutable work notes with user name resolution
 
-**Step 1: Database Migration**
-- Create `task_evidence_files` table (id, task_id, file_name, file_size_bytes, mime_type, storage_path, sha256_hash, evidence_category with CHECK constraint for 25 categories, description, version, replaces_file_id, full audit + soft delete columns)
+**Components:**
+- `TaskDetailPanel.tsx` — Sheet slide-over with header, actions, evidence, work log, task details
+- `TaskActionButtons.tsx` — Start/Complete/Reopen with authorization + reopen reason dialog
+- `TaskWorkLog.tsx` — Note form + immutable note list with type-specific styling
+- `TaskReassignDialog.tsx` — Reassign task to same-role user with mandatory reason
+
+**ReviewTasksPanel:**
+- Task rows are now clickable → opens TaskDetailPanel
+- Completed tasks show green checkmark + muted styling + completed date
+- Removed blocked/skipped status styles
+- Passes `reviewCaseStatus` for action button gating
+
+**ReviewActionButtons:**
+- Blocks `in_progress → execution_review` transition until ALL tasks are completed
+
+**Authorization:**
+- Only assignee or super_user can start/complete tasks
+- Only SO or super_user can reopen tasks
+- Only SO or super_user can reassign tasks
+- Non-authorized users see read-only panel with info message
+
+**i18n:** All `tasks.*` keys added in both EN and ES
+
+---
+
+### Phase 2 — COMPLETED ✅
+
+**Database Migration:**
+- Created `task_evidence_files` table with SHA-256 hash, evidence category CHECK (25 categories), version tracking, full audit + soft delete
 - RLS: SELECT for review case participants, INSERT for assignee/SO/super_user, UPDATE for super_user only
-- Create `review-evidence` storage bucket (private, 50MB limit, restricted MIME types: PDF, PNG, JPEG, TIFF, XLSX, DOCX, CSV, TXT, ZIP)
-- Storage RLS: INSERT + SELECT for authenticated users on `review-evidence` bucket
-- Indexes on `task_id`
-- `updated_at` trigger
+- Created `review-evidence` private storage bucket (50MB limit, restricted MIME types)
+- Storage RLS: INSERT + SELECT for authenticated users
 
-**Step 2: Hook — `src/hooks/useTaskEvidenceFiles.ts`**
-- Fetch files for a task (sorted by `created_at` DESC) with user name resolution via `useResolveUserNames`
-- `uploadFile(file, category, description?)`:
-  1. Client-side SHA-256 via `crypto.subtle.digest()`
-  2. Upload to storage: path `{review_case_id}/{task_id}/{timestamp}_{filename}`
-  3. Insert metadata into `task_evidence_files`
-  4. Auto work note: `"Evidence uploaded: {filename} ({size}, SHA-256: {first16}...)"`
-  5. Audit log entry
-- `getDownloadUrl(storagePath)`: signed URL via `supabase.storage.createSignedUrl()`
-- `fileCount` for validation
+**Hooks:**
+- `useTaskEvidenceFiles.ts` — Fetch files, client-side SHA-256 via Web Crypto API, upload to storage, insert metadata, auto work note + audit log, signed download URLs
 
-**Step 3: Component — `src/components/tasks/TaskEvidenceSection.tsx`**
-- Upload zone: drag-and-drop + "Upload Evidence" button
-- Category dropdown with auto-suggestion based on task group/title keywords
-- Optional description field
-- File list: icon by MIME type, name, size (formatted), SHA-256 (first 16 chars + copy button), uploader name, timestamp, category badge, Preview + Download buttons
-- No delete buttons (files are immutable)
-- Only shown for evidence-gathering groups (INIT, ITSM, QMS, SEC, INFRA, DOC)
+**Components:**
+- `TaskEvidenceSection.tsx` — Drag-and-drop upload zone, category auto-suggestion by task group/title keywords, file list with MIME icon, SHA-256 (copy button), preview/download, no delete buttons (immutable)
 
-**Step 4: Update `TaskDetailPanel.tsx`**
-- Import and render `TaskEvidenceSection` between Action Buttons and Work Log
-- Only show for task groups in `EVIDENCE_GROUPS`
-- Pass `canUpload` (assignee or super_user) and `reviewCaseId` props
+**TaskDetailPanel Updates:**
+- Evidence section rendered between action buttons and work log for EVIDENCE_GROUPS (INIT, ITSM, QMS, SEC, INFRA, DOC)
+- Hidden for AI_EVAL and APPR task groups
 - Read-only mode hides upload zone
 
-**Step 5: Update `useTaskExecution.ts` — Completion Validation**
-- Before allowing `completeTask()`, validate:
-  - INIT/ITSM/QMS/SEC/INFRA/DOC: ≥1 evidence file AND ≥1 manual work note
-  - AI_EVAL: ≥1 manual work note (no evidence required)
-  - APPR: ≥1 manual work note (no evidence required)
-- If validation fails: show toast with the specific i18n error message, do NOT transition
-
-**Step 6: Evidence Category Auto-Suggestion**
-- Map task group + title keywords to default category (e.g., ITSM + "incident" → `incident_report`, SEC + "access" → `user_access_list`)
-- Fallback to `other` if no keyword match
-
-### Files summary
-| File | Action |
-|------|--------|
-| New migration | CREATE — `task_evidence_files` + storage bucket + RLS |
-| `src/hooks/useTaskEvidenceFiles.ts` | CREATE |
-| `src/components/tasks/TaskEvidenceSection.tsx` | CREATE |
-| `src/components/tasks/TaskDetailPanel.tsx` | MODIFY — add evidence section |
-| `src/hooks/useTaskExecution.ts` | MODIFY — add completion validation |
-
-No i18n changes needed — keys were already added in Phase 1.
-
+**Completion Validation:**
+- INIT/ITSM/QMS/SEC/INFRA/DOC: ≥1 evidence file AND ≥1 manual work note required
+- AI_EVAL: ≥1 manual work note required
+- APPR: ≥1 manual work note required
+- Validation blocks completion with specific i18n error message

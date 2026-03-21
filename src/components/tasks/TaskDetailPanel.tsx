@@ -19,9 +19,11 @@ import {
 import { useResolveUserNames } from '@/hooks/useResolveUserNames';
 import { useTaskExecution } from '@/hooks/useTaskExecution';
 import { useTaskWorkNotes } from '@/hooks/useTaskWorkNotes';
+import { useTaskEvidenceFiles } from '@/hooks/useTaskEvidenceFiles';
 import { TaskActionButtons } from '@/components/tasks/TaskActionButtons';
 import { TaskReassignDialog } from '@/components/tasks/TaskReassignDialog';
 import { TaskWorkLog } from '@/components/tasks/TaskWorkLog';
+import { TaskEvidenceSection } from '@/components/tasks/TaskEvidenceSection';
 import type { ReviewTask, TaskGroup } from '@/types';
 
 const STATUS_BADGE: Record<string, string> = {
@@ -68,19 +70,20 @@ export function TaskDetailPanel({ task, open, onClose, reviewCaseId, reviewCaseS
   });
 
   const workNotes = useTaskWorkNotes(task?.id);
+  const evidenceFiles = useTaskEvidenceFiles({ taskId: task?.id, reviewCaseId });
 
   if (!task) return null;
 
   const isOverdue = task.status !== 'completed' && new Date(task.due_date) < new Date();
   const assigneeName = userNames[task.assigned_to] || task.assigned_to_name || '—';
 
-  // Completion validation
+  // Completion validation with evidence check
   const getCompletionBlockedReason = (): string | null => {
     if (task.status !== 'in_progress') return null;
     const isEvidenceGroup = EVIDENCE_GROUPS.includes(task.task_group as TaskGroup);
 
     if (isEvidenceGroup) {
-      if (workNotes.noteCount < 1) {
+      if (evidenceFiles.fileCount < 1 || workNotes.noteCount < 1) {
         return t('tasks.validation.evidenceAndNoteRequired');
       }
     } else if (task.task_group === 'AI_EVAL') {
@@ -194,6 +197,20 @@ export function TaskDetailPanel({ task, open, onClose, reviewCaseId, reviewCaseS
             isReopening={execution.reopenTask.isPending}
             completionBlocked={completionBlocked}
           />
+        )}
+
+        {/* Evidence Files — only for evidence-gathering task groups */}
+        {EVIDENCE_GROUPS.includes(task.task_group as TaskGroup) && (
+          <>
+            <Separator className="my-4" />
+            <TaskEvidenceSection
+              taskId={task.id}
+              taskGroup={task.task_group}
+              taskTitle={task.title}
+              reviewCaseId={reviewCaseId}
+              canUpload={!execution.isReadOnly && (execution.canStart || execution.canComplete || task.status === 'in_progress') && (execution.canAddNotes)}
+            />
+          </>
         )}
 
         <Separator className="my-4" />
