@@ -3,6 +3,7 @@ import { AlertTriangle, User, Sparkles, Calendar } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
 import { Separator } from '@/components/ui/separator';
 import { toast } from '@/hooks/use-toast';
+import {
   Sheet,
   SheetContent,
   SheetHeader,
