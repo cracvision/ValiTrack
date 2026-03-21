@@ -304,6 +304,7 @@ export default function ReviewCaseDetail() {
         <ReviewTasksPanel
           reviewCaseId={reviewCase.id}
           reviewLevel={reviewCase.review_level as any}
+          reviewCaseStatus={reviewCase.status}
         />
       )}
 

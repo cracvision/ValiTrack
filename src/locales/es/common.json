@@ -344,10 +344,8 @@
       "completed": "completadas",
       "status": {
         "pending": "Pendiente",
-        "in_progress": "En progreso",
-        "completed": "Completada",
-        "blocked": "Bloqueada",
-        "skipped": "Omitida"
+        "in_progress": "En Progreso",
+        "completed": "Completada"
       },
       "groups": {
         "INIT": "Iniciación",
@@ -363,6 +361,96 @@
         "manual": "Manual",
         "ai_assisted": "Asistida por IA"
       }
+    }
+  },
+  "tasks": {
+    "detail": {
+      "title": "Detalles de la Tarea",
+      "assignedTo": "Asignado a",
+      "dueDate": "Fecha límite",
+      "overdue": "Vencida",
+      "executionType": "Tipo de ejecución",
+      "manual": "Manual",
+      "aiAssisted": "Asistida por IA",
+      "templateId": "ID de plantilla",
+      "reviewLevelMin": "Nivel de revisión mínimo",
+      "taskGroup": "Grupo de tarea",
+      "description": "Descripción"
+    },
+    "status": {
+      "pending": "Pendiente",
+      "in_progress": "En Progreso",
+      "completed": "Completada"
+    },
+    "actions": {
+      "startTask": "Iniciar tarea",
+      "completeTask": "Completar tarea",
+      "reopenTask": "Reabrir tarea",
+      "reopenReason": "Proporcione una razón para reabrir esta tarea. Esto es obligatorio.",
+      "notAuthorized": "Solo el usuario asignado, el System Owner o el Super User pueden realizar esta acción",
+      "reviewCaseNotInProgress": "El caso de revisión debe estar en estado 'En Progreso' para trabajar en las tareas"
+    },
+    "workLog": {
+      "title": "Registro de Trabajo",
+      "addNote": "Agregar nota",
+      "placeholder": "Documenta tu trabajo en esta tarea...",
+      "minLength": "Las notas de trabajo deben tener al menos 10 caracteres",
+      "emptyState": "Aún no hay notas de trabajo. Comienza a documentar tu trabajo.",
+      "noteTypes": {
+        "work_note": "Nota de trabajo",
+        "status_change": "Cambio de estado",
+        "evidence_upload": "Evidencia subida",
+        "reopen_reason": "Razón de reapertura"
+      }
+    },
+    "evidence": {
+      "title": "Archivos de Evidencia",
+      "upload": "Subir evidencia",
+      "dragDrop": "Arrastra archivos aquí, o haz clic para seleccionar",
+      "category": "Categoría de evidencia",
+      "description": "Descripción (opcional)",
+      "hash": "SHA-256",
+      "copyHash": "Copiar hash completo",
+      "hashCopied": "Hash copiado al portapapeles",
+      "preview": "Vista previa",
+      "download": "Descargar",
+      "version": "Versión",
+      "uploadedBy": "Subido por",
+      "emptyState": "Aún no se han subido archivos de evidencia.",
+      "maxSize": "Tamaño máximo de archivo: 50 MB",
+      "categories": {
+        "incident_report": "Reporte de Incidentes",
+        "problem_report": "Reporte de Problemas",
+        "change_control_report": "Reporte de Control de Cambios",
+        "service_request_report": "Reporte de Solicitudes de Servicio",
+        "deviation_report": "Reporte de Desviaciones",
+        "capa_record": "Registro CAPA",
+        "audit_finding": "Hallazgo de Auditoría",
+        "user_access_list": "Lista de Acceso de Usuarios",
+        "access_review": "Revisión de Accesos",
+        "privileged_account_doc": "Documentación de Cuentas Privilegiadas",
+        "security_patch_report": "Reporte de Parches de Seguridad",
+        "backup_log": "Registro de Respaldo",
+        "restore_test": "Prueba de Restauración",
+        "dr_bcp_plan": "Plan DR/BCP",
+        "audit_trail_export": "Exportación de Registro de Auditoría",
+        "system_specification": "Especificación del Sistema",
+        "interface_document": "Documento de Interfaces",
+        "sop": "SOP",
+        "training_record": "Registro de Entrenamiento",
+        "vendor_assessment": "Evaluación de Proveedor",
+        "sla_report": "Reporte de SLA",
+        "validation_document": "Documento de Validación",
+        "software_config": "Configuración de Software",
+        "performance_report": "Reporte de Rendimiento",
+        "ai_analysis_output": "Resultado de Análisis IA",
+        "other": "Otro"
+      }
+    },
+    "validation": {
+      "evidenceAndNoteRequired": "Esta tarea requiere al menos un archivo de evidencia y una nota de trabajo antes de poder ser completada.",
+      "noteRequired": "Esta tarea requiere al menos una nota de trabajo documentando la evaluación antes de poder ser completada.",
+      "approvalNoteRequired": "Esta tarea requiere al menos una nota de trabajo con su declaración de aprobación antes de poder ser completada."
     }
   },
   "pages": {

@@ -13,7 +13,8 @@ export type ReviewConclusion = 'remains_validated' | 'requires_remediation' | 'r
 export type TaskGroup = 'INIT' | 'ITSM' | 'QMS' | 'SEC' | 'INFRA' | 'DOC' | 'AI_EVAL' | 'APPR';
 export type TaskPhase = 'initiation' | 'evidence_gathering' | 'ai_evaluation' | 'approval';
 export type TaskExecutionType = 'manual' | 'ai_assisted' | 'auto_generated';
-export type TaskStatus = 'pending' | 'in_progress' | 'completed' | 'blocked' | 'skipped';
+export type TaskStatus = 'pending' | 'in_progress' | 'completed';
+export type WorkNoteType = 'work_note' | 'status_change' | 'evidence_upload' | 'reopen_reason';
 
 export type FindingSeverity = 'Critical' | 'Major' | 'Minor' | 'Observation';
 export type FindingStatus = 'Open' | 'In Progress' | 'Closed';
@@ -137,9 +138,40 @@ export interface ReviewTask {
   created_by: string;
   updated_at: string;
   is_deleted: boolean;
+  completed_by?: string;
+  reopened_at?: string;
+  reopened_by?: string;
+  reopened_reason?: string;
   // Joined
   assigned_to_name?: string;
   approved_by_name?: string;
+}
+
+export interface TaskWorkNote {
+  id: string;
+  task_id: string;
+  content: string;
+  note_type: WorkNoteType;
+  created_at: string;
+  created_by: string;
+  is_deleted: boolean;
+}
+
+export interface TaskEvidenceFile {
+  id: string;
+  task_id: string;
+  file_name: string;
+  file_size_bytes: number;
+  mime_type: string;
+  storage_path: string;
+  sha256_hash: string;
+  evidence_category: string;
+  description: string;
+  version: number;
+  replaces_file_id: string | null;
+  created_at: string;
+  created_by: string;
+  is_deleted: boolean;
 }
 
 export interface TaskTemplate {
