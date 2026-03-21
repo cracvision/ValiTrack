@@ -124,32 +124,56 @@ export function ReviewActionButtons({ reviewCaseId, currentStatus, canAdvanceSig
 
   return (
     <>
-      <div className="flex gap-2">
-        {validTransitions.map(rule => {
-          // Block forward transitions when signoffs are incomplete
-          const isForwardBlocked =
-            canAdvanceSignoff === false && (
-              (currentStatus === 'plan_review' && rule.to === 'plan_approval') ||
-              (currentStatus === 'execution_review' && (rule.to === 'approved' || rule.to === 'rejected'))
+      <TooltipProvider>
+        <div className="flex gap-2">
+          {validTransitions.map(rule => {
+            // Block forward transitions when signoffs are incomplete
+            const isForwardBlocked =
+              canAdvanceSignoff === false && (
+                (currentStatus === 'plan_review' && rule.to === 'plan_approval') ||
+                (currentStatus === 'execution_review' && (rule.to === 'approved' || rule.to === 'rejected'))
+              );
+
+            // Block in_progress → execution_review until ALL tasks completed
+            const isTasksIncomplete =
+              currentStatus === 'in_progress' && rule.to === 'execution_review' && tasks &&
+              tasks.some(t => t.status !== 'completed');
+
+            const totalTasks = tasks?.length || 0;
+            const completedTasks = tasks?.filter(t => t.status === 'completed').length || 0;
+
+            const isBlocked = isForwardBlocked || !!isTasksIncomplete;
+
+            const tooltipText = isTasksIncomplete
+              ? t('reviews.actions.tasksIncomplete', { completed: completedTasks, total: totalTasks })
+              : isForwardBlocked
+                ? (hasObjections
+                  ? t('reviews.signoffs.blockedObjections')
+                  : t('reviews.signoffs.blockedPending'))
+                : undefined;
+
+            return (
+              <Tooltip key={rule.to}>
+                <TooltipTrigger asChild>
+                  <span>
+                    <Button
+                      variant={getButtonVariant(rule)}
+                      size="sm"
+                      onClick={() => handleTransition(rule)}
+                      disabled={transitionMutation.isPending || isBlocked}
+                    >
+                      {t(rule.labelKey, { defaultValue: rule.label })}
+                    </Button>
+                  </span>
+                </TooltipTrigger>
+                {tooltipText && (
+                  <TooltipContent className="max-w-xs">{tooltipText}</TooltipContent>
+                )}
+              </Tooltip>
             );
-
-          const tooltipText = isForwardBlocked
-            ? (hasObjections
-              ? t('reviews.signoffs.blockedObjections')
-              : t('reviews.signoffs.blockedPending'))
-            : undefined;
-
-          return (
-            <Button
-              key={rule.to}
-              variant={getButtonVariant(rule)}
-              size="sm"
-              onClick={() => handleTransition(rule)}
-              disabled={transitionMutation.isPending || isForwardBlocked}
-              title={tooltipText}
-            >
-              {t(rule.labelKey, { defaultValue: rule.label })}
-            </Button>
+          })}
+        </div>
+      </TooltipProvider>
           );
         })}
       </div>
