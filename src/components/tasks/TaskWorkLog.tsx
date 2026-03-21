@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { ClipboardList, Paperclip, AlertTriangle, User } from 'lucide-react';
+import { ClipboardList, Paperclip, AlertTriangle, User, UserRoundPen } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
 import { Skeleton } from '@/components/ui/skeleton';
@@ -12,6 +12,7 @@ interface TaskWorkLogProps {
   taskStatus: string;
   onAddNote: (content: string) => void;
   isAdding: boolean;
+  canAddNotes?: boolean;
 }
 
 const NOTE_TYPE_STYLES: Record<string, { bg: string; icon: React.ReactNode }> = {
@@ -31,9 +32,13 @@ const NOTE_TYPE_STYLES: Record<string, { bg: string; icon: React.ReactNode }> = 
     bg: '',
     icon: <User className="h-3.5 w-3.5 text-muted-foreground shrink-0" />,
   },
+  reassignment: {
+    bg: 'bg-muted/60',
+    icon: <UserRoundPen className="h-3.5 w-3.5 text-muted-foreground shrink-0" />,
+  },
 };
 
-export function TaskWorkLog({ notes, isLoading, taskStatus, onAddNote, isAdding }: TaskWorkLogProps) {
+export function TaskWorkLog({ notes, isLoading, taskStatus, onAddNote, isAdding, canAddNotes = true }: TaskWorkLogProps) {
   const { t } = useTranslation();
   const [noteContent, setNoteContent] = useState('');
 
@@ -43,7 +48,7 @@ export function TaskWorkLog({ notes, isLoading, taskStatus, onAddNote, isAdding 
     setNoteContent('');
   };
 
-  const showNoteForm = taskStatus === 'in_progress';
+  const showNoteForm = canAddNotes && taskStatus === 'in_progress';
 
   return (
     <div className="space-y-3">

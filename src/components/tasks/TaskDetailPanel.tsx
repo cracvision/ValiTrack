@@ -1,7 +1,8 @@
 import { useTranslation } from 'react-i18next';
-import { AlertTriangle, User, Sparkles, Calendar } from 'lucide-react';
+import { AlertTriangle, User, Sparkles, Calendar, Info } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
 import { Separator } from '@/components/ui/separator';
+import { Alert, AlertDescription } from '@/components/ui/alert';
 import { toast } from '@/hooks/use-toast';
 import {
   Sheet,
@@ -19,6 +20,7 @@ import { useResolveUserNames } from '@/hooks/useResolveUserNames';
 import { useTaskExecution } from '@/hooks/useTaskExecution';
 import { useTaskWorkNotes } from '@/hooks/useTaskWorkNotes';
 import { TaskActionButtons } from '@/components/tasks/TaskActionButtons';
+import { TaskReassignDialog } from '@/components/tasks/TaskReassignDialog';
 import { TaskWorkLog } from '@/components/tasks/TaskWorkLog';
 import type { ReviewTask, TaskGroup } from '@/types';
 
@@ -48,9 +50,10 @@ interface TaskDetailPanelProps {
   onClose: () => void;
   reviewCaseId: string;
   reviewCaseStatus: string;
+  systemOwnerId?: string;
 }
 
-export function TaskDetailPanel({ task, open, onClose, reviewCaseId, reviewCaseStatus }: TaskDetailPanelProps) {
+export function TaskDetailPanel({ task, open, onClose, reviewCaseId, reviewCaseStatus, systemOwnerId }: TaskDetailPanelProps) {
   const { t } = useTranslation();
 
   const { data: userNames = {} } = useResolveUserNames(
@@ -61,6 +64,7 @@ export function TaskDetailPanel({ task, open, onClose, reviewCaseId, reviewCaseS
     task: task || undefined,
     reviewCaseId,
     reviewCaseStatus,
+    systemOwnerId,
   });
 
   const workNotes = useTaskWorkNotes(task?.id);
@@ -76,7 +80,6 @@ export function TaskDetailPanel({ task, open, onClose, reviewCaseId, reviewCaseS
     const isEvidenceGroup = EVIDENCE_GROUPS.includes(task.task_group as TaskGroup);
 
     if (isEvidenceGroup) {
-      // Phase 2 will add evidence check. For now, just check work notes.
       if (workNotes.noteCount < 1) {
         return t('tasks.validation.evidenceAndNoteRequired');
       }
@@ -114,6 +117,16 @@ export function TaskDetailPanel({ task, open, onClose, reviewCaseId, reviewCaseS
           <SheetDescription className="sr-only">{t('tasks.detail.title')}</SheetDescription>
         </SheetHeader>
 
+        {/* Read-only info banner for non-authorized users */}
+        {execution.isReadOnly && (
+          <Alert className="mb-4 bg-blue-50 border-blue-200">
+            <Info className="h-4 w-4 text-blue-700" />
+            <AlertDescription className="text-blue-700 text-xs">
+              {t('tasks.actions.readOnlyMessage', { assignee: assigneeName })}
+            </AlertDescription>
+          </Alert>
+        )}
+
         {/* Meta info */}
         <div className="grid grid-cols-2 gap-2 text-sm mb-4">
           <div>
@@ -121,6 +134,16 @@ export function TaskDetailPanel({ task, open, onClose, reviewCaseId, reviewCaseS
             <div className="flex items-center gap-1">
               <User className="h-3.5 w-3.5 text-muted-foreground" />
               <span>{assigneeName}</span>
+              {execution.canReassign && (
+                <TaskReassignDialog
+                  task={task}
+                  reviewCaseId={reviewCaseId}
+                  onReassign={(newId, newName, reason) =>
+                    execution.reassignTask.mutate({ newAssigneeId: newId, newAssigneeName: newName, reason })
+                  }
+                  isReassigning={execution.reassignTask.isPending}
+                />
+              )}
             </div>
           </div>
           <div>
@@ -155,21 +178,23 @@ export function TaskDetailPanel({ task, open, onClose, reviewCaseId, reviewCaseS
           )}
         </div>
 
-        {/* Action Buttons */}
-        <TaskActionButtons
-          task={task}
-          canStart={execution.canStart}
-          canComplete={execution.canComplete}
-          canReopen={execution.canReopen}
-          isInProgress={execution.isInProgress}
-          onStart={() => execution.startTask.mutate()}
-          onComplete={handleComplete}
-          onReopen={(reason) => execution.reopenTask.mutate(reason)}
-          isStarting={execution.startTask.isPending}
-          isCompleting={execution.completeTask.isPending}
-          isReopening={execution.reopenTask.isPending}
-          completionBlocked={completionBlocked}
-        />
+        {/* Action Buttons — hidden for read-only users */}
+        {!execution.isReadOnly && (
+          <TaskActionButtons
+            task={task}
+            canStart={execution.canStart}
+            canComplete={execution.canComplete}
+            canReopen={execution.canReopen}
+            isInProgress={execution.isInProgress}
+            onStart={() => execution.startTask.mutate()}
+            onComplete={handleComplete}
+            onReopen={(reason) => execution.reopenTask.mutate(reason)}
+            isStarting={execution.startTask.isPending}
+            isCompleting={execution.completeTask.isPending}
+            isReopening={execution.reopenTask.isPending}
+            completionBlocked={completionBlocked}
+          />
+        )}
 
         <Separator className="my-4" />
 
@@ -180,6 +205,7 @@ export function TaskDetailPanel({ task, open, onClose, reviewCaseId, reviewCaseS
           taskStatus={task.status}
           onAddNote={(content) => workNotes.addNote.mutate(content)}
           isAdding={workNotes.addNote.isPending}
+          canAddNotes={execution.canAddNotes}
         />
 
         <Separator className="my-4" />

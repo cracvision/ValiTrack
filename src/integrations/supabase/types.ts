@@ -464,6 +464,10 @@ export type Database = {
           id: string
           is_deleted: boolean
           phase: string
+          reassigned_at: string | null
+          reassigned_by: string | null
+          reassigned_from: string | null
+          reassignment_reason: string | null
           reopened_at: string | null
           reopened_by: string | null
           reopened_reason: string | null
@@ -493,6 +497,10 @@ export type Database = {
           id?: string
           is_deleted?: boolean
           phase: string
+          reassigned_at?: string | null
+          reassigned_by?: string | null
+          reassigned_from?: string | null
+          reassignment_reason?: string | null
           reopened_at?: string | null
           reopened_by?: string | null
           reopened_reason?: string | null
@@ -522,6 +530,10 @@ export type Database = {
           id?: string
           is_deleted?: boolean
           phase?: string
+          reassigned_at?: string | null
+          reassigned_by?: string | null
+          reassigned_from?: string | null
+          reassignment_reason?: string | null
           reopened_at?: string | null
           reopened_by?: string | null
           reopened_reason?: string | null

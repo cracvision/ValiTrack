@@ -254,6 +254,7 @@
       "conclusionNotes": "Notes (optional)",
       "conclusionNotesPlaceholder": "Additional notes about the conclusion...",
       "confirmApprove": "Approve",
+      "tasksIncomplete": "All review tasks must be completed before submitting for final review. {{completed}} of {{total}} tasks completed.",
       "startPreparation": "Start preparation",
       "beginReview": "Begin review",
       "returnToPreparation": "Return to preparation",
@@ -387,8 +388,14 @@
       "completeTask": "Complete task",
       "reopenTask": "Reopen task",
       "reopenReason": "Provide a reason for reopening this task. This is mandatory.",
-      "notAuthorized": "Only the assigned user, System Owner, or Super User can perform this action",
-      "reviewCaseNotInProgress": "The review case must be in 'In Progress' state to work on tasks"
+      "notAuthorized": "Only the assigned user or Super User can perform this action",
+      "reviewCaseNotInProgress": "The review case must be in 'In Progress' state to work on tasks",
+      "readOnlyMessage": "This task is assigned to {{assignee}}. You can view the details but cannot modify this task.",
+      "reassignTask": "Reassign task",
+      "reassignReason": "Provide a reason for reassigning this task. This is mandatory.",
+      "reassignedNote": "Task reassigned from {{from}} to {{to}} by {{actor}}. Reason: {{reason}}",
+      "selectNewAssignee": "Select new assignee...",
+      "noUsersAvailable": "No eligible users available"
     },
     "workLog": {
       "title": "Work Log",
@@ -400,7 +407,8 @@
         "work_note": "Work note",
         "status_change": "Status change",
         "evidence_upload": "Evidence uploaded",
-        "reopen_reason": "Reopen reason"
+        "reopen_reason": "Reopen reason",
+        "reassignment": "Reassignment"
       }
     },
     "evidence": {
