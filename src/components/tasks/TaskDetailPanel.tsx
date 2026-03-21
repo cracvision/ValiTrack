@@ -70,6 +70,7 @@ export function TaskDetailPanel({ task, open, onClose, reviewCaseId, reviewCaseS
   });
 
   const workNotes = useTaskWorkNotes(task?.id);
+  const evidenceFiles = useTaskEvidenceFiles({ taskId: task?.id, reviewCaseId });
 
   if (!task) return null;
 
