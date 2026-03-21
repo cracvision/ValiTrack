@@ -173,8 +173,7 @@ export function ReviewActionButtons({ reviewCaseId, currentStatus, canAdvanceSig
             );
           })}
         </div>
-
-
+      </TooltipProvider>
 
       {/* Reason dialog — reused for rejections AND return/step-back transitions */}
       <Dialog open={reasonDialogOpen} onOpenChange={setReasonDialogOpen}>
