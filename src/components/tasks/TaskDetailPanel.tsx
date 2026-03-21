@@ -199,6 +199,20 @@ export function TaskDetailPanel({ task, open, onClose, reviewCaseId, reviewCaseS
           />
         )}
 
+        {/* Evidence Files — only for evidence-gathering task groups */}
+        {EVIDENCE_GROUPS.includes(task.task_group as TaskGroup) && (
+          <>
+            <Separator className="my-4" />
+            <TaskEvidenceSection
+              taskId={task.id}
+              taskGroup={task.task_group}
+              taskTitle={task.title}
+              reviewCaseId={reviewCaseId}
+              canUpload={!execution.isReadOnly && (execution.canStart || execution.canComplete || task.status === 'in_progress') && (execution.canAddNotes)}
+            />
+          </>
+        )}
+
         <Separator className="my-4" />
 
         {/* Work Log */}
