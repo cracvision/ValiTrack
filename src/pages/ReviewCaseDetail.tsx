@@ -305,6 +305,7 @@ export default function ReviewCaseDetail() {
           reviewCaseId={reviewCase.id}
           reviewLevel={reviewCase.review_level as any}
           reviewCaseStatus={reviewCase.status}
+          systemOwnerId={reviewCase.system_owner_id}
         />
       )}
 
