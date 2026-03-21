@@ -77,13 +77,13 @@ export function TaskDetailPanel({ task, open, onClose, reviewCaseId, reviewCaseS
   const isOverdue = task.status !== 'completed' && new Date(task.due_date) < new Date();
   const assigneeName = userNames[task.assigned_to] || task.assigned_to_name || '—';
 
-  // Completion validation
+  // Completion validation with evidence check
   const getCompletionBlockedReason = (): string | null => {
     if (task.status !== 'in_progress') return null;
     const isEvidenceGroup = EVIDENCE_GROUPS.includes(task.task_group as TaskGroup);
 
     if (isEvidenceGroup) {
-      if (workNotes.noteCount < 1) {
+      if (evidenceFiles.fileCount < 1 || workNotes.noteCount < 1) {
         return t('tasks.validation.evidenceAndNoteRequired');
       }
     } else if (task.task_group === 'AI_EVAL') {
