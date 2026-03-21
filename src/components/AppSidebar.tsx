@@ -6,10 +6,10 @@ import {
   AlertTriangle,
   BarChart3,
   ScrollText,
-  Shield,
   Users,
   LogOut,
 } from 'lucide-react';
+import valiTrackLogo from '@/assets/ValiTrack_Logo.png';
 import { useTranslation } from 'react-i18next';
 import { NavLink } from '@/components/NavLink';
 import { useLocation } from 'react-router-dom';

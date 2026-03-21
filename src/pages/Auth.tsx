@@ -53,8 +53,8 @@ export default function Auth() {
     <div className="flex min-h-screen items-center justify-center bg-muted/30 px-4">
       <Card className="w-full max-w-md">
         <CardHeader className="text-center">
-          <div className="mx-auto mb-4 flex h-14 w-14 items-center justify-center rounded-full bg-primary">
-            <Shield className="h-7 w-7 text-primary-foreground" />
+          <div className="mx-auto mb-4">
+            <img src={valiTrackLogo} alt="ValiTrack" className="h-16 w-16 object-contain" />
           </div>
           <CardTitle className="text-2xl">{t('title')}</CardTitle>
           <CardDescription>{t('subtitle')}</CardDescription>
