@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { ClipboardList, Paperclip, AlertTriangle, User } from 'lucide-react';
+import { ClipboardList, Paperclip, AlertTriangle, User, UserRoundPen } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
 import { Skeleton } from '@/components/ui/skeleton';
@@ -12,6 +12,7 @@ interface TaskWorkLogProps {
   taskStatus: string;
   onAddNote: (content: string) => void;
   isAdding: boolean;
+  canAddNotes?: boolean;
 }
 
 const NOTE_TYPE_STYLES: Record<string, { bg: string; icon: React.ReactNode }> = {
