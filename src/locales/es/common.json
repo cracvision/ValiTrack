@@ -254,6 +254,7 @@
       "conclusionNotes": "Notas (opcional)",
       "conclusionNotesPlaceholder": "Notas adicionales sobre la conclusión...",
       "confirmApprove": "Aprobar",
+      "tasksIncomplete": "Todas las tareas deben estar completadas antes de enviar a revisión final. {{completed}} de {{total}} tareas completadas.",
       "startPreparation": "Iniciar preparación",
       "beginReview": "Comenzar revisión",
       "returnToPreparation": "Volver a preparación",

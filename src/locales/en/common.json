@@ -254,6 +254,7 @@
       "conclusionNotes": "Notes (optional)",
       "conclusionNotesPlaceholder": "Additional notes about the conclusion...",
       "confirmApprove": "Approve",
+      "tasksIncomplete": "All review tasks must be completed before submitting for final review. {{completed}} of {{total}} tasks completed.",
       "startPreparation": "Start preparation",
       "beginReview": "Begin review",
       "returnToPreparation": "Return to preparation",
