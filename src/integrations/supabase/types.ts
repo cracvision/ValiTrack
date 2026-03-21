@@ -452,6 +452,7 @@ export type Database = {
           approved_by_user: string | null
           assigned_to: string
           completed_at: string | null
+          completed_by: string | null
           completion_notes: string | null
           created_at: string
           created_by: string
@@ -463,6 +464,9 @@ export type Database = {
           id: string
           is_deleted: boolean
           phase: string
+          reopened_at: string | null
+          reopened_by: string | null
+          reopened_reason: string | null
           review_case_id: string
           sort_order: number
           started_at: string | null
@@ -477,6 +481,7 @@ export type Database = {
           approved_by_user?: string | null
           assigned_to: string
           completed_at?: string | null
+          completed_by?: string | null
           completion_notes?: string | null
           created_at?: string
           created_by: string
@@ -488,6 +493,9 @@ export type Database = {
           id?: string
           is_deleted?: boolean
           phase: string
+          reopened_at?: string | null
+          reopened_by?: string | null
+          reopened_reason?: string | null
           review_case_id: string
           sort_order?: number
           started_at?: string | null
@@ -502,6 +510,7 @@ export type Database = {
           approved_by_user?: string | null
           assigned_to?: string
           completed_at?: string | null
+          completed_by?: string | null
           completion_notes?: string | null
           created_at?: string
           created_by?: string
@@ -513,6 +522,9 @@ export type Database = {
           id?: string
           is_deleted?: boolean
           phase?: string
+          reopened_at?: string | null
+          reopened_by?: string | null
+          reopened_reason?: string | null
           review_case_id?: string
           sort_order?: number
           started_at?: string | null
@@ -704,6 +716,56 @@ export type Database = {
           updated_by?: string | null
         }
         Relationships: []
+      }
+      task_work_notes: {
+        Row: {
+          content: string
+          created_at: string
+          created_by: string
+          deleted_at: string | null
+          deleted_by: string | null
+          id: string
+          is_deleted: boolean
+          note_type: string
+          task_id: string
+          updated_at: string
+          updated_by: string | null
+        }
+        Insert: {
+          content: string
+          created_at?: string
+          created_by: string
+          deleted_at?: string | null
+          deleted_by?: string | null
+          id?: string
+          is_deleted?: boolean
+          note_type?: string
+          task_id: string
+          updated_at?: string
+          updated_by?: string | null
+        }
+        Update: {
+          content?: string
+          created_at?: string
+          created_by?: string
+          deleted_at?: string | null
+          deleted_by?: string | null
+          id?: string
+          is_deleted?: boolean
+          note_type?: string
+          task_id?: string
+          updated_at?: string
+          updated_by?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "task_work_notes_task_id_fkey"
+            columns: ["task_id"]
+            isOneToOne: false
+            referencedRelation: "review_tasks"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       user_language_preference: {
         Row: {
