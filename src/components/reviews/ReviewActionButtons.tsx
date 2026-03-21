@@ -5,8 +5,10 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } f
 import { Textarea } from '@/components/ui/textarea';
 import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
 import { useAuth } from '@/hooks/useAuth';
 import { useReviewCaseTransition } from '@/hooks/useReviewCase';
+import { useReviewTasks } from '@/hooks/useReviewTasks';
 import { getValidTransitions, CONCLUSION_CONFIG } from '@/lib/reviewWorkflow';
 import { toast } from '@/hooks/use-toast';
 import type { ReviewStatus, ReviewConclusion } from '@/types';
