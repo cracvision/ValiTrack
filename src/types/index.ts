@@ -13,7 +13,8 @@ export type ReviewConclusion = 'remains_validated' | 'requires_remediation' | 'r
 export type TaskGroup = 'INIT' | 'ITSM' | 'QMS' | 'SEC' | 'INFRA' | 'DOC' | 'AI_EVAL' | 'APPR';
 export type TaskPhase = 'initiation' | 'evidence_gathering' | 'ai_evaluation' | 'approval';
 export type TaskExecutionType = 'manual' | 'ai_assisted' | 'auto_generated';
-export type TaskStatus = 'pending' | 'in_progress' | 'completed' | 'blocked' | 'skipped';
+export type TaskStatus = 'pending' | 'in_progress' | 'completed';
+export type WorkNoteType = 'work_note' | 'status_change' | 'evidence_upload' | 'reopen_reason';
 
 export type FindingSeverity = 'Critical' | 'Major' | 'Minor' | 'Observation';
 export type FindingStatus = 'Open' | 'In Progress' | 'Closed';
