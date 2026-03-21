@@ -663,6 +663,84 @@ export type Database = {
         }
         Relationships: []
       }
+      task_evidence_files: {
+        Row: {
+          created_at: string
+          created_by: string
+          deleted_at: string | null
+          deleted_by: string | null
+          description: string | null
+          evidence_category: string
+          file_name: string
+          file_size_bytes: number
+          id: string
+          is_deleted: boolean
+          mime_type: string
+          replaces_file_id: string | null
+          sha256_hash: string
+          storage_path: string
+          task_id: string
+          updated_at: string
+          updated_by: string | null
+          version: number
+        }
+        Insert: {
+          created_at?: string
+          created_by: string
+          deleted_at?: string | null
+          deleted_by?: string | null
+          description?: string | null
+          evidence_category: string
+          file_name: string
+          file_size_bytes: number
+          id?: string
+          is_deleted?: boolean
+          mime_type: string
+          replaces_file_id?: string | null
+          sha256_hash: string
+          storage_path: string
+          task_id: string
+          updated_at?: string
+          updated_by?: string | null
+          version?: number
+        }
+        Update: {
+          created_at?: string
+          created_by?: string
+          deleted_at?: string | null
+          deleted_by?: string | null
+          description?: string | null
+          evidence_category?: string
+          file_name?: string
+          file_size_bytes?: number
+          id?: string
+          is_deleted?: boolean
+          mime_type?: string
+          replaces_file_id?: string | null
+          sha256_hash?: string
+          storage_path?: string
+          task_id?: string
+          updated_at?: string
+          updated_by?: string | null
+          version?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "task_evidence_files_replaces_file_id_fkey"
+            columns: ["replaces_file_id"]
+            isOneToOne: false
+            referencedRelation: "task_evidence_files"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "task_evidence_files_task_id_fkey"
+            columns: ["task_id"]
+            isOneToOne: false
+            referencedRelation: "review_tasks"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       task_templates: {
         Row: {
           code: string
