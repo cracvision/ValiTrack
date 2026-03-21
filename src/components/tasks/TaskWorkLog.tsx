@@ -32,6 +32,10 @@ const NOTE_TYPE_STYLES: Record<string, { bg: string; icon: React.ReactNode }> = 
     bg: '',
     icon: <User className="h-3.5 w-3.5 text-muted-foreground shrink-0" />,
   },
+  reassignment: {
+    bg: 'bg-muted/60',
+    icon: <UserRoundPen className="h-3.5 w-3.5 text-muted-foreground shrink-0" />,
+  },
 };
 
 export function TaskWorkLog({ notes, isLoading, taskStatus, onAddNote, isAdding }: TaskWorkLogProps) {
