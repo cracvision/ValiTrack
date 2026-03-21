@@ -19,9 +19,11 @@ import {
 import { useResolveUserNames } from '@/hooks/useResolveUserNames';
 import { useTaskExecution } from '@/hooks/useTaskExecution';
 import { useTaskWorkNotes } from '@/hooks/useTaskWorkNotes';
+import { useTaskEvidenceFiles } from '@/hooks/useTaskEvidenceFiles';
 import { TaskActionButtons } from '@/components/tasks/TaskActionButtons';
 import { TaskReassignDialog } from '@/components/tasks/TaskReassignDialog';
 import { TaskWorkLog } from '@/components/tasks/TaskWorkLog';
+import { TaskEvidenceSection } from '@/components/tasks/TaskEvidenceSection';
 import type { ReviewTask, TaskGroup } from '@/types';
 
 const STATUS_BADGE: Record<string, string> = {
