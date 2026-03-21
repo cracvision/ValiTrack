@@ -25,7 +25,7 @@ const STATUS_STYLES: Record<string, string> = {
   completed: 'bg-emerald-100 text-emerald-800 border-emerald-200',
 };
 
-export function ReviewTasksPanel({ reviewCaseId, reviewLevel, reviewCaseStatus }: ReviewTasksPanelProps) {
+export function ReviewTasksPanel({ reviewCaseId, reviewLevel, reviewCaseStatus, systemOwnerId }: ReviewTasksPanelProps) {
   const { t } = useTranslation();
   const { data: tasks, isLoading } = useReviewTasks(reviewCaseId);
   const [selectedTaskId, setSelectedTaskId] = useState<string | null>(null);
