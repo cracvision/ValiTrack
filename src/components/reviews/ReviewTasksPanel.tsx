@@ -16,6 +16,7 @@ interface ReviewTasksPanelProps {
   reviewCaseId: string;
   reviewLevel: ReviewLevel;
   reviewCaseStatus: string;
+  systemOwnerId?: string;
 }
 
 const STATUS_STYLES: Record<string, string> = {
