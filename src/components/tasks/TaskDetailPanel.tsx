@@ -92,9 +92,7 @@ export function TaskDetailPanel({ task, open, onClose, reviewCaseId, reviewCaseS
 
   const handleComplete = () => {
     if (completionBlocked) {
-      // Show validation toast instead
-      const { toast: showToast } = require('@/hooks/use-toast');
-      showToast({ title: t('common.error'), description: completionBlocked, variant: 'destructive' });
+      toast({ title: t('common.error'), description: completionBlocked, variant: 'destructive' });
       return;
     }
     execution.completeTask.mutate();
