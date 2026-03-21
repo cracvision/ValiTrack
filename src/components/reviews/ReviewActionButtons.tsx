@@ -26,6 +26,9 @@ export function ReviewActionButtons({ reviewCaseId, currentStatus, canAdvanceSig
   const { roles } = useAuth();
   const transitionMutation = useReviewCaseTransition();
 
+  // Fetch tasks to check completion for in_progress → execution_review gate
+  const { data: tasks } = useReviewTasks(currentStatus === 'in_progress' ? reviewCaseId : undefined);
+
   const [reasonDialogOpen, setReasonDialogOpen] = useState(false);
   const [approveDialogOpen, setApproveDialogOpen] = useState(false);
   const [pendingRule, setPendingRule] = useState<TransitionRule | null>(null);
