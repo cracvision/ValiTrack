@@ -387,8 +387,14 @@
       "completeTask": "Completar tarea",
       "reopenTask": "Reabrir tarea",
       "reopenReason": "Proporcione una razón para reabrir esta tarea. Esto es obligatorio.",
-      "notAuthorized": "Solo el usuario asignado, el System Owner o el Super User pueden realizar esta acción",
-      "reviewCaseNotInProgress": "El caso de revisión debe estar en estado 'En Progreso' para trabajar en las tareas"
+      "notAuthorized": "Solo el usuario asignado o el Super User pueden realizar esta acción",
+      "reviewCaseNotInProgress": "El caso de revisión debe estar en estado 'En Progreso' para trabajar en las tareas",
+      "readOnlyMessage": "Esta tarea está asignada a {{assignee}}. Puedes ver los detalles pero no puedes modificar esta tarea.",
+      "reassignTask": "Reasignar tarea",
+      "reassignReason": "Proporcione una razón para reasignar esta tarea. Esto es obligatorio.",
+      "reassignedNote": "Tarea reasignada de {{from}} a {{to}} por {{actor}}. Razón: {{reason}}",
+      "selectNewAssignee": "Seleccionar nuevo asignado...",
+      "noUsersAvailable": "No hay usuarios elegibles disponibles"
     },
     "workLog": {
       "title": "Registro de Trabajo",
@@ -400,7 +406,8 @@
         "work_note": "Nota de trabajo",
         "status_change": "Cambio de estado",
         "evidence_upload": "Evidencia subida",
-        "reopen_reason": "Razón de reapertura"
+        "reopen_reason": "Razón de reapertura",
+        "reassignment": "Reasignación"
       }
     },
     "evidence": {
