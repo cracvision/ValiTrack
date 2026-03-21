@@ -142,6 +142,7 @@ export default function ReviewCaseDetail() {
           currentStatus={reviewCase.status}
           canAdvanceSignoff={isSignoffPhase ? signoffData.canAdvance : undefined}
           hasObjections={isSignoffPhase ? signoffData.hasObjections : undefined}
+          reviewCaseTasks={reviewCase.status === 'in_progress' ? tasks : undefined}
         />
       </div>
 
