@@ -344,10 +344,8 @@
       "completed": "completed",
       "status": {
         "pending": "Pending",
-        "in_progress": "In progress",
-        "completed": "Completed",
-        "blocked": "Blocked",
-        "skipped": "Skipped"
+        "in_progress": "In Progress",
+        "completed": "Completed"
       },
       "groups": {
         "INIT": "Initiation",
@@ -363,6 +361,96 @@
         "manual": "Manual",
         "ai_assisted": "AI-assisted"
       }
+    }
+  },
+  "tasks": {
+    "detail": {
+      "title": "Task Details",
+      "assignedTo": "Assigned to",
+      "dueDate": "Due date",
+      "overdue": "Overdue",
+      "executionType": "Execution type",
+      "manual": "Manual",
+      "aiAssisted": "AI-Assisted",
+      "templateId": "Template ID",
+      "reviewLevelMin": "Review level minimum",
+      "taskGroup": "Task group",
+      "description": "Description"
+    },
+    "status": {
+      "pending": "Pending",
+      "in_progress": "In Progress",
+      "completed": "Completed"
+    },
+    "actions": {
+      "startTask": "Start task",
+      "completeTask": "Complete task",
+      "reopenTask": "Reopen task",
+      "reopenReason": "Provide a reason for reopening this task. This is mandatory.",
+      "notAuthorized": "Only the assigned user, System Owner, or Super User can perform this action",
+      "reviewCaseNotInProgress": "The review case must be in 'In Progress' state to work on tasks"
+    },
+    "workLog": {
+      "title": "Work Log",
+      "addNote": "Add note",
+      "placeholder": "Document your work on this task...",
+      "minLength": "Work notes must be at least 10 characters",
+      "emptyState": "No work notes yet. Start documenting your work.",
+      "noteTypes": {
+        "work_note": "Work note",
+        "status_change": "Status change",
+        "evidence_upload": "Evidence uploaded",
+        "reopen_reason": "Reopen reason"
+      }
+    },
+    "evidence": {
+      "title": "Evidence Files",
+      "upload": "Upload evidence",
+      "dragDrop": "Drag and drop files here, or click to browse",
+      "category": "Evidence category",
+      "description": "Description (optional)",
+      "hash": "SHA-256",
+      "copyHash": "Copy full hash",
+      "hashCopied": "Hash copied to clipboard",
+      "preview": "Preview",
+      "download": "Download",
+      "version": "Version",
+      "uploadedBy": "Uploaded by",
+      "emptyState": "No evidence files uploaded yet.",
+      "maxSize": "Maximum file size: 50 MB",
+      "categories": {
+        "incident_report": "Incident Report",
+        "problem_report": "Problem Report",
+        "change_control_report": "Change Control Report",
+        "service_request_report": "Service Request Report",
+        "deviation_report": "Deviation Report",
+        "capa_record": "CAPA Record",
+        "audit_finding": "Audit Finding",
+        "user_access_list": "User Access List",
+        "access_review": "Access Review",
+        "privileged_account_doc": "Privileged Account Documentation",
+        "security_patch_report": "Security Patch Report",
+        "backup_log": "Backup Log",
+        "restore_test": "Restore Test",
+        "dr_bcp_plan": "DR/BCP Plan",
+        "audit_trail_export": "Audit Trail Export",
+        "system_specification": "System Specification",
+        "interface_document": "Interface Document",
+        "sop": "SOP",
+        "training_record": "Training Record",
+        "vendor_assessment": "Vendor Assessment",
+        "sla_report": "SLA Report",
+        "validation_document": "Validation Document",
+        "software_config": "Software Configuration",
+        "performance_report": "Performance Report",
+        "ai_analysis_output": "AI Analysis Output",
+        "other": "Other"
+      }
+    },
+    "validation": {
+      "evidenceAndNoteRequired": "This task requires at least one evidence file and one work note before it can be completed.",
+      "noteRequired": "This task requires at least one work note documenting the evaluation before it can be completed.",
+      "approvalNoteRequired": "This task requires at least one work note with your approval statement before it can be completed."
     }
   },
   "pages": {
