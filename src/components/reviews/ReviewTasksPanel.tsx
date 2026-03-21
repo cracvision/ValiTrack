@@ -125,6 +125,7 @@ export function ReviewTasksPanel({ reviewCaseId, reviewLevel, reviewCaseStatus, 
         onClose={() => setSelectedTaskId(null)}
         reviewCaseId={reviewCaseId}
         reviewCaseStatus={reviewCaseStatus}
+        systemOwnerId={systemOwnerId}
       />
     </>
   );
