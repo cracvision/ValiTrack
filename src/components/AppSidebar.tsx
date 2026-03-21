@@ -69,7 +69,7 @@ export function AppSidebar() {
     <Sidebar collapsible="icon">
       <SidebarHeader className="border-b border-sidebar-border">
         <div className="flex items-center gap-2 px-2 py-2">
-          <Shield className="h-6 w-6 shrink-0 text-sidebar-primary" />
+          <img src={valiTrackLogo} alt="ValiTrack" className="h-8 w-8 shrink-0 object-contain" />
           {!collapsed && (
             <div className="flex flex-col">
               <span className="text-sm font-bold text-sidebar-foreground">{t('app.name')}</span>
