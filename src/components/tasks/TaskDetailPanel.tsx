@@ -2,7 +2,7 @@ import { useTranslation } from 'react-i18next';
 import { AlertTriangle, User, Sparkles, Calendar } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
 import { Separator } from '@/components/ui/separator';
-import {
+import { toast } from '@/hooks/use-toast';
   Sheet,
   SheetContent,
   SheetHeader,
