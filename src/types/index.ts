@@ -138,9 +138,40 @@ export interface ReviewTask {
   created_by: string;
   updated_at: string;
   is_deleted: boolean;
+  completed_by?: string;
+  reopened_at?: string;
+  reopened_by?: string;
+  reopened_reason?: string;
   // Joined
   assigned_to_name?: string;
   approved_by_name?: string;
+}
+
+export interface TaskWorkNote {
+  id: string;
+  task_id: string;
+  content: string;
+  note_type: WorkNoteType;
+  created_at: string;
+  created_by: string;
+  is_deleted: boolean;
+}
+
+export interface TaskEvidenceFile {
+  id: string;
+  task_id: string;
+  file_name: string;
+  file_size_bytes: number;
+  mime_type: string;
+  storage_path: string;
+  sha256_hash: string;
+  evidence_category: string;
+  description: string;
+  version: number;
+  replaces_file_id: string | null;
+  created_at: string;
+  created_by: string;
+  is_deleted: boolean;
 }
 
 export interface TaskTemplate {
