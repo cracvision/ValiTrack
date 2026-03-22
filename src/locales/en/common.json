@@ -427,6 +427,7 @@
       "uploadedBy": "Uploaded by",
       "emptyState": "No evidence files uploaded yet. Upload your first file above.",
       "emptyStateReadOnly": "No evidence files uploaded yet.",
+      "startFirst": "Start this task to begin uploading evidence.",
       "maxSize": "Maximum file size: 50 MB",
       "categories": {
         "incident_report": "Incident Report",
