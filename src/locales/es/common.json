@@ -427,6 +427,7 @@
       "uploadedBy": "Subido por",
       "emptyState": "Aún no se han subido archivos de evidencia. Sube tu primer archivo arriba.",
       "emptyStateReadOnly": "Aún no se han subido archivos de evidencia.",
+      "startFirst": "Inicia esta tarea para comenzar a subir evidencia.",
       "maxSize": "Tamaño máximo de archivo: 50 MB",
       "categories": {
         "incident_report": "Reporte de Incidentes",
