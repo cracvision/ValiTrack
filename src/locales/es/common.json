@@ -403,6 +403,7 @@
       "placeholder": "Documenta tu trabajo en esta tarea...",
       "minLength": "Las notas de trabajo deben tener al menos 10 caracteres",
       "emptyState": "Aún no hay notas de trabajo. Comienza a documentar tu trabajo.",
+      "emptyStateReadOnly": "Aún no hay notas de trabajo.",
       "noteTypes": {
         "work_note": "Nota de trabajo",
         "status_change": "Cambio de estado",
