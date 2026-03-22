@@ -13,6 +13,7 @@ interface TaskWorkLogProps {
   onAddNote: (content: string) => void;
   isAdding: boolean;
   canAddNotes?: boolean;
+  isReadOnly?: boolean;
 }
 
 const NOTE_TYPE_STYLES: Record<string, { bg: string; icon: React.ReactNode }> = {
