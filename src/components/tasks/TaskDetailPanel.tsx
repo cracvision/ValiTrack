@@ -197,6 +197,7 @@ export function TaskDetailPanel({ task, open, onClose, reviewCaseId, reviewCaseS
 
         {/* Action Buttons — hidden for read-only users */}
         {!execution.isReadOnly && (
+          <div className="mt-4">
           <TaskActionButtons
             task={task}
             canStart={execution.canStart}
