@@ -179,14 +179,16 @@ function TaskRow({ task, onClick }: { task: ReviewTask; onClick: () => void }) {
       tabIndex={0}
       onKeyDown={e => e.key === 'Enter' && onClick()}
     >
-      {/* Status badge */}
-      {isCompleted ? (
-        <CheckCircle2 className="h-4 w-4 text-emerald-600 shrink-0" />
-      ) : (
-        <Badge variant="outline" className={`text-[10px] px-1.5 py-0 shrink-0 ${STATUS_STYLES[task.status] || ''}`}>
-          {t(`tasks.status.${task.status}`)}
-        </Badge>
-      )}
+      {/* Status badge — fixed width container for alignment */}
+      <div className="w-[90px] shrink-0 flex items-center">
+        {isCompleted ? (
+          <CheckCircle2 className="h-4 w-4 text-emerald-600" />
+        ) : (
+          <Badge variant="outline" className={`text-[10px] px-1.5 py-0 ${STATUS_STYLES[task.status] || ''}`}>
+            {t(`tasks.status.${task.status}`)}
+          </Badge>
+        )}
+      </div>
 
       {/* Template code */}
       {task.template_id && (
