@@ -51,7 +51,7 @@ interface TaskEvidenceSectionProps {
   isReadOnly?: boolean;
 }
 
-export function TaskEvidenceSection({ taskId, taskGroup, taskTitle, reviewCaseId, canUpload }: TaskEvidenceSectionProps) {
+export function TaskEvidenceSection({ taskId, taskGroup, taskTitle, reviewCaseId, canUpload, isReadOnly = false }: TaskEvidenceSectionProps) {
   const { t } = useTranslation();
   const { files, isLoading, uploadFile, getDownloadUrl } = useTaskEvidenceFiles({ taskId, reviewCaseId });
 
