@@ -1,4 +1,4 @@
-import { useState, useCallback } from 'react';
+import { useState, useCallback, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import { AlertTriangle, User, Sparkles, Calendar, Info } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
@@ -24,6 +24,7 @@ import { TaskActionButtons } from '@/components/tasks/TaskActionButtons';
 import { TaskReassignDialog } from '@/components/tasks/TaskReassignDialog';
 import { TaskWorkLog } from '@/components/tasks/TaskWorkLog';
 import { TaskEvidenceSection } from '@/components/tasks/TaskEvidenceSection';
+import { TaskInstructionsSection } from '@/components/tasks/TaskInstructionsSection';
 import type { ReviewTask, TaskGroup } from '@/types';
 
 const STATUS_BADGE: Record<string, string> = {
@@ -185,6 +186,14 @@ export function TaskDetailPanel({ task, open, onClose, reviewCaseId, reviewCaseS
             </div>
           )}
         </div>
+
+        {/* Instructions section */}
+        {task.execution_instructions && task.execution_instructions.trim() !== '' && (
+          <TaskInstructionsSection
+            instructions={task.execution_instructions}
+            taskStatus={task.status}
+          />
+        )}
 
         {/* Action Buttons — hidden for read-only users */}
         {!execution.isReadOnly && (

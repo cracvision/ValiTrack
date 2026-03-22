@@ -369,6 +369,11 @@
       "allTasks": "All tasks",
       "myTasks": "My tasks"
     },
+    "instructions": {
+      "title": "Instructions",
+      "collapse": "Hide instructions",
+      "expand": "Show instructions"
+    },
     "detail": {
       "title": "Task Details",
       "assignedTo": "Assigned to",
