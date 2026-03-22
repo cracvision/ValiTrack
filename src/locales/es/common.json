@@ -404,6 +404,7 @@
       "minLength": "Las notas de trabajo deben tener al menos 10 caracteres",
       "emptyState": "Aún no hay notas de trabajo. Comienza a documentar tu trabajo.",
       "emptyStateReadOnly": "Aún no hay notas de trabajo.",
+      "startFirst": "Inicia esta tarea para comenzar a documentar tu trabajo.",
       "noteTypes": {
         "work_note": "Nota de trabajo",
         "status_change": "Cambio de estado",

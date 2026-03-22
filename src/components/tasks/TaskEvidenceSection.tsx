@@ -190,7 +190,7 @@ export function TaskEvidenceSection({ taskId, taskGroup, taskTitle, reviewCaseId
 
       {/* File list */}
       {files.length === 0 ? (
-        <p className="text-xs text-muted-foreground italic">{t(isReadOnly ? 'tasks.evidence.emptyStateReadOnly' : 'tasks.evidence.emptyState')}</p>
+        <p className="text-xs text-muted-foreground italic">{t(isPending ? 'tasks.evidence.startFirst' : isReadOnly ? 'tasks.evidence.emptyStateReadOnly' : 'tasks.evidence.emptyState')}</p>
       ) : (
         <div className="space-y-2">
           {files.map(file => (

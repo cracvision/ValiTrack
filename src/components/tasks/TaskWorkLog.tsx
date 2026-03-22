@@ -91,7 +91,7 @@ export function TaskWorkLog({ notes, isLoading, taskStatus, onAddNote, isAdding,
           <Skeleton className="h-12 w-full" />
         </div>
       ) : notes.length === 0 ? (
-        <p className="text-xs text-muted-foreground py-2">{t(isReadOnly ? 'tasks.workLog.emptyStateReadOnly' : 'tasks.workLog.emptyState')}</p>
+        <p className="text-xs text-muted-foreground py-2">{t(isPending ? 'tasks.workLog.startFirst' : isReadOnly ? 'tasks.workLog.emptyStateReadOnly' : 'tasks.workLog.emptyState')}</p>
       ) : (
         <div className="space-y-1.5 max-h-[400px] overflow-y-auto">
           {notes.map(note => {
