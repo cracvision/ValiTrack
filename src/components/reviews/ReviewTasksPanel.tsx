@@ -60,34 +60,65 @@ export function ReviewTasksPanel({ reviewCaseId, reviewLevel, reviewCaseStatus, 
     );
   }
 
-  // Group tasks
+  // Apply filter
+  const filteredTasks = filter === 'mine' && user
+    ? tasks.filter(t => t.assigned_to === user.id)
+    : tasks;
+
+  // Group filtered tasks
   const grouped = TASK_GROUP_ORDER
     .map(group => ({
       group,
-      tasks: tasks.filter(t => t.task_group === group),
+      tasks: filteredTasks.filter(t => t.task_group === group),
     }))
     .filter(g => g.tasks.length > 0);
 
-  const totalCompleted = tasks.filter(t => t.status === 'completed').length;
+  const totalCompleted = filteredTasks.filter(t => t.status === 'completed').length;
+  const totalCount = filteredTasks.length;
 
   return (
     <>
       <div className="border rounded-lg p-4 space-y-4">
         {/* Header */}
         <div className="flex items-center justify-between">
-          <h3 className="text-sm font-semibold text-foreground">{t('reviews.tasks.title')}</h3>
+          <div className="flex items-center gap-3">
+            <h3 className="text-sm font-semibold text-foreground">{t('reviews.tasks.title')}</h3>
+            {/* Filter toggle */}
+            <div className="flex items-center rounded-full border bg-muted/50 p-0.5">
+              <button
+                onClick={() => setFilter('all')}
+                className={`px-3 py-1 text-xs font-medium rounded-full transition-colors ${
+                  filter === 'all'
+                    ? 'bg-background text-foreground shadow-sm'
+                    : 'text-muted-foreground hover:text-foreground'
+                }`}
+              >
+                {t('tasks.filter.allTasks')}
+              </button>
+              <button
+                onClick={() => setFilter('mine')}
+                className={`px-3 py-1 text-xs font-medium rounded-full transition-colors ${
+                  filter === 'mine'
+                    ? 'bg-background text-foreground shadow-sm'
+                    : 'text-muted-foreground hover:text-foreground'
+                }`}
+              >
+                {t('tasks.filter.myTasks')}
+              </button>
+            </div>
+          </div>
           <Badge variant="secondary" className="text-xs font-mono">
-            {t('reviews.tasks.taskCount', { count: tasks.length, level: reviewLevel })}
+            {t('reviews.tasks.taskCount', { count: totalCount, level: reviewLevel })}
           </Badge>
         </div>
 
         {/* Overall progress */}
         <div className="space-y-1">
           <div className="flex justify-between text-xs text-muted-foreground">
-            <span>{t('reviews.tasks.progressOverall', { completed: totalCompleted, total: tasks.length })}</span>
-            <span>{Math.round((totalCompleted / tasks.length) * 100)}%</span>
+            <span>{t('reviews.tasks.progressOverall', { completed: totalCompleted, total: totalCount })}</span>
+            <span>{totalCount > 0 ? Math.round((totalCompleted / totalCount) * 100) : 0}%</span>
           </div>
-          <Progress value={(totalCompleted / tasks.length) * 100} className="h-2" />
+          <Progress value={totalCount > 0 ? (totalCompleted / totalCount) * 100 : 0} className="h-2" />
         </div>
 
         {/* Grouped accordion — all expanded by default */}
