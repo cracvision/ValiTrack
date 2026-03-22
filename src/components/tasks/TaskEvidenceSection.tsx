@@ -48,6 +48,7 @@ interface TaskEvidenceSectionProps {
   taskTitle: string;
   reviewCaseId: string;
   canUpload: boolean;
+  isReadOnly?: boolean;
 }
 
 export function TaskEvidenceSection({ taskId, taskGroup, taskTitle, reviewCaseId, canUpload }: TaskEvidenceSectionProps) {
