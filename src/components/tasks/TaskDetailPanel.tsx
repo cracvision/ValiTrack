@@ -197,21 +197,23 @@ export function TaskDetailPanel({ task, open, onClose, reviewCaseId, reviewCaseS
 
         {/* Action Buttons — hidden for read-only users */}
         {!execution.isReadOnly && (
-          <TaskActionButtons
-            task={task}
-            canStart={execution.canStart}
-            canComplete={execution.canComplete}
-            canReopen={execution.canReopen}
-            isInProgress={execution.isInProgress}
-            onStart={() => execution.startTask.mutate()}
-            onComplete={handleComplete}
-            onReopen={(reason) => execution.reopenTask.mutate(reason)}
-            isStarting={execution.startTask.isPending}
-            isCompleting={execution.completeTask.isPending}
-            isReopening={execution.reopenTask.isPending}
-            completionBlocked={completionBlocked}
-            onValidationError={handleValidationError}
-          />
+           <div className="mt-4">
+            <TaskActionButtons
+              task={task}
+              canStart={execution.canStart}
+              canComplete={execution.canComplete}
+              canReopen={execution.canReopen}
+              isInProgress={execution.isInProgress}
+              onStart={() => execution.startTask.mutate()}
+              onComplete={handleComplete}
+              onReopen={(reason) => execution.reopenTask.mutate(reason)}
+              isStarting={execution.startTask.isPending}
+              isCompleting={execution.completeTask.isPending}
+              isReopening={execution.reopenTask.isPending}
+              completionBlocked={completionBlocked}
+              onValidationError={handleValidationError}
+            />
+          </div>
         )}
 
         {/* Evidence Files — only for evidence-gathering task groups */}
