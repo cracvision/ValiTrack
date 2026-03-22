@@ -214,9 +214,10 @@ export function TaskDetailPanel({ task, open, onClose, reviewCaseId, reviewCaseS
               taskGroup={task.task_group}
               taskTitle={task.title}
               reviewCaseId={reviewCaseId}
-              canUpload={!execution.isReadOnly && (execution.canStart || execution.canComplete || task.status === 'in_progress') && (execution.canAddNotes)}
-              isReadOnly={execution.isReadOnly}
+              canUpload={!execution.isReadOnly && task.status === 'in_progress' && execution.canAddNotes}
+              isReadOnly={execution.isReadOnly || task.status !== 'in_progress'}
               highlight={highlightSections && evidenceFiles.fileCount < 1}
+              isPending={task.status === 'pending'}
             />
           </>
         )}
@@ -230,9 +231,10 @@ export function TaskDetailPanel({ task, open, onClose, reviewCaseId, reviewCaseS
           taskStatus={task.status}
           onAddNote={(content) => workNotes.addNote.mutate(content)}
           isAdding={workNotes.addNote.isPending}
-          canAddNotes={execution.canAddNotes}
-          isReadOnly={execution.isReadOnly}
+          canAddNotes={execution.canAddNotes && task.status === 'in_progress'}
+          isReadOnly={execution.isReadOnly || task.status !== 'in_progress'}
           highlight={highlightSections && workNotes.noteCount < 1}
+          isPending={task.status === 'pending'}
         />
 
         <Separator className="my-4" />

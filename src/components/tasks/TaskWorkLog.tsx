@@ -15,6 +15,7 @@ interface TaskWorkLogProps {
   canAddNotes?: boolean;
   isReadOnly?: boolean;
   highlight?: boolean;
+  isPending?: boolean;
 }
 
 const NOTE_TYPE_STYLES: Record<string, { bg: string; icon: React.ReactNode }> = {
@@ -40,7 +41,7 @@ const NOTE_TYPE_STYLES: Record<string, { bg: string; icon: React.ReactNode }> = 
   },
 };
 
-export function TaskWorkLog({ notes, isLoading, taskStatus, onAddNote, isAdding, canAddNotes = true, isReadOnly = false, highlight = false }: TaskWorkLogProps) {
+export function TaskWorkLog({ notes, isLoading, taskStatus, onAddNote, isAdding, canAddNotes = true, isReadOnly = false, highlight = false, isPending = false }: TaskWorkLogProps) {
   const { t } = useTranslation();
   const [noteContent, setNoteContent] = useState('');
 
@@ -50,7 +51,7 @@ export function TaskWorkLog({ notes, isLoading, taskStatus, onAddNote, isAdding,
     setNoteContent('');
   };
 
-  const showNoteForm = canAddNotes && taskStatus === 'in_progress';
+  const showNoteForm = canAddNotes && taskStatus === 'in_progress' && !isPending;
 
   return (
     <div className={`space-y-3 rounded-md p-2 -m-2 transition-colors ${highlight ? 'border border-destructive bg-destructive/5' : ''}`}>
@@ -90,7 +91,7 @@ export function TaskWorkLog({ notes, isLoading, taskStatus, onAddNote, isAdding,
           <Skeleton className="h-12 w-full" />
         </div>
       ) : notes.length === 0 ? (
-        <p className="text-xs text-muted-foreground py-2">{t(isReadOnly ? 'tasks.workLog.emptyStateReadOnly' : 'tasks.workLog.emptyState')}</p>
+        <p className="text-xs text-muted-foreground py-2">{t(isPending ? 'tasks.workLog.startFirst' : isReadOnly ? 'tasks.workLog.emptyStateReadOnly' : 'tasks.workLog.emptyState')}</p>
       ) : (
         <div className="space-y-1.5 max-h-[400px] overflow-y-auto">
           {notes.map(note => {
