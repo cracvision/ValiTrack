@@ -1,9 +1,9 @@
+import { useState, useCallback } from 'react';
 import { useTranslation } from 'react-i18next';
 import { AlertTriangle, User, Sparkles, Calendar, Info } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
 import { Separator } from '@/components/ui/separator';
 import { Alert, AlertDescription } from '@/components/ui/alert';
-import { toast } from '@/hooks/use-toast';
 import {
   Sheet,
   SheetContent,
@@ -57,6 +57,7 @@ interface TaskDetailPanelProps {
 
 export function TaskDetailPanel({ task, open, onClose, reviewCaseId, reviewCaseStatus, systemOwnerId }: TaskDetailPanelProps) {
   const { t } = useTranslation();
+  const [highlightSections, setHighlightSections] = useState(false);
 
   const { data: userNames = {} } = useResolveUserNames(
     task ? [task.assigned_to, task.approved_by_user, task.completed_by] : []
@@ -71,6 +72,10 @@ export function TaskDetailPanel({ task, open, onClose, reviewCaseId, reviewCaseS
 
   const workNotes = useTaskWorkNotes(task?.id);
   const evidenceFiles = useTaskEvidenceFiles({ taskId: task?.id, reviewCaseId });
+
+  const handleValidationError = useCallback((blocked: boolean) => {
+    setHighlightSections(blocked);
+  }, []);
 
   if (!task) return null;
 
@@ -98,7 +103,7 @@ export function TaskDetailPanel({ task, open, onClose, reviewCaseId, reviewCaseS
 
   const handleComplete = () => {
     if (completionBlocked) {
-      toast({ title: t('common.error'), description: completionBlocked, variant: 'destructive' });
+      // Validation error shown inline by TaskActionButtons
       return;
     }
     execution.completeTask.mutate();
@@ -196,6 +201,7 @@ export function TaskDetailPanel({ task, open, onClose, reviewCaseId, reviewCaseS
             isCompleting={execution.completeTask.isPending}
             isReopening={execution.reopenTask.isPending}
             completionBlocked={completionBlocked}
+            onValidationError={handleValidationError}
           />
         )}
 
@@ -210,6 +216,7 @@ export function TaskDetailPanel({ task, open, onClose, reviewCaseId, reviewCaseS
               reviewCaseId={reviewCaseId}
               canUpload={!execution.isReadOnly && (execution.canStart || execution.canComplete || task.status === 'in_progress') && (execution.canAddNotes)}
               isReadOnly={execution.isReadOnly}
+              highlight={highlightSections && evidenceFiles.fileCount < 1}
             />
           </>
         )}
@@ -225,6 +232,7 @@ export function TaskDetailPanel({ task, open, onClose, reviewCaseId, reviewCaseS
           isAdding={workNotes.addNote.isPending}
           canAddNotes={execution.canAddNotes}
           isReadOnly={execution.isReadOnly}
+          highlight={highlightSections && workNotes.noteCount < 1}
         />
 
         <Separator className="my-4" />
