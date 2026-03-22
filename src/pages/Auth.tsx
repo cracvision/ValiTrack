@@ -55,7 +55,7 @@ export default function Auth() {
       <Card className="w-full max-w-md">
         <CardHeader className="text-center">
           <div className="mx-auto mb-4">
-            <img src={valiTrackLogo} alt="ValiTrack" className="h-28 w-28 object-contain" />
+            <img src={LOGO_URL} alt="ValiTrack" className="h-28 w-28 object-contain" />
           </div>
           <CardTitle className="text-2xl">{t('title')}</CardTitle>
           <CardDescription>{t('subtitle')}</CardDescription>
