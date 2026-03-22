@@ -209,6 +209,7 @@ export function TaskDetailPanel({ task, open, onClose, reviewCaseId, reviewCaseS
               taskTitle={task.title}
               reviewCaseId={reviewCaseId}
               canUpload={!execution.isReadOnly && (execution.canStart || execution.canComplete || task.status === 'in_progress') && (execution.canAddNotes)}
+              isReadOnly={execution.isReadOnly}
             />
           </>
         )}
