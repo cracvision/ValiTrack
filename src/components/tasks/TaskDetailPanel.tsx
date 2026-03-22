@@ -73,6 +73,10 @@ export function TaskDetailPanel({ task, open, onClose, reviewCaseId, reviewCaseS
   const workNotes = useTaskWorkNotes(task?.id);
   const evidenceFiles = useTaskEvidenceFiles({ taskId: task?.id, reviewCaseId });
 
+  const handleValidationError = useCallback((blocked: boolean) => {
+    setHighlightSections(blocked);
+  }, []);
+
   if (!task) return null;
 
   const isOverdue = task.status !== 'completed' && new Date(task.due_date) < new Date();
@@ -104,10 +108,6 @@ export function TaskDetailPanel({ task, open, onClose, reviewCaseId, reviewCaseS
     }
     execution.completeTask.mutate();
   };
-
-  const handleValidationError = useCallback((blocked: boolean) => {
-    setHighlightSections(blocked);
-  }, []);
 
   return (
     <Sheet open={open} onOpenChange={v => !v && onClose()}>
