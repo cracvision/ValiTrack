@@ -39,7 +39,7 @@ const NOTE_TYPE_STYLES: Record<string, { bg: string; icon: React.ReactNode }> = 
   },
 };
 
-export function TaskWorkLog({ notes, isLoading, taskStatus, onAddNote, isAdding, canAddNotes = true }: TaskWorkLogProps) {
+export function TaskWorkLog({ notes, isLoading, taskStatus, onAddNote, isAdding, canAddNotes = true, isReadOnly = false }: TaskWorkLogProps) {
   const { t } = useTranslation();
   const [noteContent, setNoteContent] = useState('');
 
