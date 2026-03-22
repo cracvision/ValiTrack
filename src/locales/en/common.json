@@ -403,6 +403,7 @@
       "placeholder": "Document your work on this task...",
       "minLength": "Work notes must be at least 10 characters",
       "emptyState": "No work notes yet. Start documenting your work.",
+      "emptyStateReadOnly": "No work notes yet.",
       "noteTypes": {
         "work_note": "Work note",
         "status_change": "Status change",
