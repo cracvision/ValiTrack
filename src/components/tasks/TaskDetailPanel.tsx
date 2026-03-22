@@ -224,6 +224,7 @@ export function TaskDetailPanel({ task, open, onClose, reviewCaseId, reviewCaseS
           onAddNote={(content) => workNotes.addNote.mutate(content)}
           isAdding={workNotes.addNote.isPending}
           canAddNotes={execution.canAddNotes}
+          isReadOnly={execution.isReadOnly}
         />
 
         <Separator className="my-4" />
