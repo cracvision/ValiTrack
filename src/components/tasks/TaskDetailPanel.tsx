@@ -201,6 +201,7 @@ export function TaskDetailPanel({ task, open, onClose, reviewCaseId, reviewCaseS
             isCompleting={execution.completeTask.isPending}
             isReopening={execution.reopenTask.isPending}
             completionBlocked={completionBlocked}
+            onValidationError={handleValidationError}
           />
         )}
 
