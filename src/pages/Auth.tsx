@@ -8,7 +8,8 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { useToast } from '@/hooks/use-toast';
-import valiTrackLogo from '@/assets/ValiTrack_Logo.png';
+
+const LOGO_URL = `${import.meta.env.VITE_SUPABASE_URL}/storage/v1/object/public/images/ValiTrack_Logo.png`;
 
 export default function Auth() {
   const { t } = useTranslation('auth');
@@ -54,7 +55,7 @@ export default function Auth() {
       <Card className="w-full max-w-md">
         <CardHeader className="text-center">
           <div className="mx-auto mb-4">
-            <img src={valiTrackLogo} alt="ValiTrack" className="h-28 w-28 object-contain" />
+            <img src={LOGO_URL} alt="ValiTrack" className="h-28 w-28 object-contain" />
           </div>
           <CardTitle className="text-2xl">{t('title')}</CardTitle>
           <CardDescription>{t('subtitle')}</CardDescription>

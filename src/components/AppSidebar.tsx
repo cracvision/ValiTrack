@@ -9,7 +9,7 @@ import {
   Users,
   LogOut,
 } from 'lucide-react';
-import valiTrackLogo from '@/assets/ValiTrack_Logo.png';
+const LOGO_URL = `${import.meta.env.VITE_SUPABASE_URL}/storage/v1/object/public/images/ValiTrack_Logo.png`;
 import { useTranslation } from 'react-i18next';
 import { NavLink } from '@/components/NavLink';
 import { useLocation } from 'react-router-dom';
@@ -69,7 +69,7 @@ export function AppSidebar() {
     <Sidebar collapsible="icon">
       <SidebarHeader className="border-b border-sidebar-border">
         <div className="flex items-center gap-2 px-2 py-2">
-          <img src={valiTrackLogo} alt="ValiTrack" className="h-8 w-8 shrink-0 object-contain" />
+          <img src={LOGO_URL} alt="ValiTrack" className="h-8 w-8 shrink-0 object-contain" />
           {!collapsed && (
             <div className="flex flex-col">
               <span className="text-sm font-bold text-sidebar-foreground">{t('app.name')}</span>
