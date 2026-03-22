@@ -57,6 +57,7 @@ interface TaskDetailPanelProps {
 
 export function TaskDetailPanel({ task, open, onClose, reviewCaseId, reviewCaseStatus, systemOwnerId }: TaskDetailPanelProps) {
   const { t } = useTranslation();
+  const [highlightSections, setHighlightSections] = useState(false);
 
   const { data: userNames = {} } = useResolveUserNames(
     task ? [task.assigned_to, task.approved_by_user, task.completed_by] : []
