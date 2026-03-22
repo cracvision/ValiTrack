@@ -41,7 +41,7 @@ const NOTE_TYPE_STYLES: Record<string, { bg: string; icon: React.ReactNode }> = 
   },
 };
 
-export function TaskWorkLog({ notes, isLoading, taskStatus, onAddNote, isAdding, canAddNotes = true, isReadOnly = false, highlight = false }: TaskWorkLogProps) {
+export function TaskWorkLog({ notes, isLoading, taskStatus, onAddNote, isAdding, canAddNotes = true, isReadOnly = false, highlight = false, isPending = false }: TaskWorkLogProps) {
   const { t } = useTranslation();
   const [noteContent, setNoteContent] = useState('');
 
@@ -51,7 +51,7 @@ export function TaskWorkLog({ notes, isLoading, taskStatus, onAddNote, isAdding,
     setNoteContent('');
   };
 
-  const showNoteForm = canAddNotes && taskStatus === 'in_progress';
+  const showNoteForm = canAddNotes && taskStatus === 'in_progress' && !isPending;
 
   return (
     <div className={`space-y-3 rounded-md p-2 -m-2 transition-colors ${highlight ? 'border border-destructive bg-destructive/5' : ''}`}>
