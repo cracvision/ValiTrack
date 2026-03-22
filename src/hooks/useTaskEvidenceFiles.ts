@@ -127,7 +127,8 @@ export function useTaskEvidenceFiles({ taskId, reviewCaseId }: UseTaskEvidenceFi
 
       // 2. Upload to storage
       const timestamp = Date.now();
-      const storagePath = `${reviewCaseId}/${taskId}/${timestamp}_${file.name}`;
+      const safeName = sanitizeStoragePath(file.name);
+      const storagePath = `${reviewCaseId}/${taskId}/${timestamp}_${safeName}`;
 
       const { error: uploadError } = await supabase.storage
         .from('review-evidence')
