@@ -6,6 +6,7 @@ interface TaskTemplate {
   task_group: string;
   title: string;
   description: string;
+  execution_instructions: string;
   default_assignee_role: string;
   default_approver_role: string;
   phase: string;
