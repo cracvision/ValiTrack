@@ -49,9 +49,10 @@ interface TaskEvidenceSectionProps {
   reviewCaseId: string;
   canUpload: boolean;
   isReadOnly?: boolean;
+  highlight?: boolean;
 }
 
-export function TaskEvidenceSection({ taskId, taskGroup, taskTitle, reviewCaseId, canUpload, isReadOnly = false }: TaskEvidenceSectionProps) {
+export function TaskEvidenceSection({ taskId, taskGroup, taskTitle, reviewCaseId, canUpload, isReadOnly = false, highlight = false }: TaskEvidenceSectionProps) {
   const { t } = useTranslation();
   const { files, isLoading, uploadFile, getDownloadUrl } = useTaskEvidenceFiles({ taskId, reviewCaseId });
 
