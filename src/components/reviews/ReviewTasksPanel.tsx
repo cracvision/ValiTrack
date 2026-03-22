@@ -7,6 +7,7 @@ import { Progress } from '@/components/ui/progress';
 import { Alert, AlertTitle, AlertDescription } from '@/components/ui/alert';
 import { Skeleton } from '@/components/ui/skeleton';
 import { useReviewTasks } from '@/hooks/useReviewTasks';
+import { useAuth } from '@/hooks/useAuth';
 import { TaskDetailPanel } from '@/components/tasks/TaskDetailPanel';
 import type { ReviewTask, TaskGroup, ReviewLevel } from '@/types';
 
@@ -25,10 +26,14 @@ const STATUS_STYLES: Record<string, string> = {
   completed: 'bg-emerald-100 text-emerald-800 border-emerald-200',
 };
 
+type TaskFilter = 'all' | 'mine';
+
 export function ReviewTasksPanel({ reviewCaseId, reviewLevel, reviewCaseStatus, systemOwnerId }: ReviewTasksPanelProps) {
   const { t } = useTranslation();
+  const { user } = useAuth();
   const { data: tasks, isLoading } = useReviewTasks(reviewCaseId);
   const [selectedTaskId, setSelectedTaskId] = useState<string | null>(null);
+  const [filter, setFilter] = useState<TaskFilter>('all');
 
   const selectedTask = tasks?.find(t => t.id === selectedTaskId) || null;
 
