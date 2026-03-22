@@ -1,4 +1,4 @@
-import { useState, useCallback } from 'react';
+import { useState, useCallback, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import { AlertTriangle, User, Sparkles, Calendar, Info } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
