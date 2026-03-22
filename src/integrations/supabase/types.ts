@@ -460,6 +460,7 @@ export type Database = {
           deleted_by: string | null
           description: string
           due_date: string
+          execution_instructions: string | null
           execution_type: string
           id: string
           is_deleted: boolean
@@ -493,6 +494,7 @@ export type Database = {
           deleted_by?: string | null
           description?: string
           due_date: string
+          execution_instructions?: string | null
           execution_type?: string
           id?: string
           is_deleted?: boolean
@@ -526,6 +528,7 @@ export type Database = {
           deleted_by?: string | null
           description?: string
           due_date?: string
+          execution_instructions?: string | null
           execution_type?: string
           id?: string
           is_deleted?: boolean
@@ -751,6 +754,7 @@ export type Database = {
           deleted_at: string | null
           deleted_by: string | null
           description: string
+          execution_instructions: string | null
           execution_type: string
           id: string
           is_active: boolean
@@ -772,6 +776,7 @@ export type Database = {
           deleted_at?: string | null
           deleted_by?: string | null
           description?: string
+          execution_instructions?: string | null
           execution_type?: string
           id?: string
           is_active?: boolean
@@ -793,6 +798,7 @@ export type Database = {
           deleted_at?: string | null
           deleted_by?: string | null
           description?: string
+          execution_instructions?: string | null
           execution_type?: string
           id?: string
           is_active?: boolean
