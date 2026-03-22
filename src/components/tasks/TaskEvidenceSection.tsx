@@ -50,6 +50,7 @@ interface TaskEvidenceSectionProps {
   canUpload: boolean;
   isReadOnly?: boolean;
   highlight?: boolean;
+  isPending?: boolean;
 }
 
 export function TaskEvidenceSection({ taskId, taskGroup, taskTitle, reviewCaseId, canUpload, isReadOnly = false, highlight = false }: TaskEvidenceSectionProps) {
