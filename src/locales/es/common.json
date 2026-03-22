@@ -365,6 +365,10 @@
     }
   },
   "tasks": {
+    "filter": {
+      "allTasks": "Todas las tareas",
+      "myTasks": "Mis tareas"
+    },
     "detail": {
       "title": "Detalles de la Tarea",
       "assignedTo": "Asignado a",

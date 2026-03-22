@@ -7,6 +7,7 @@ import { Progress } from '@/components/ui/progress';
 import { Alert, AlertTitle, AlertDescription } from '@/components/ui/alert';
 import { Skeleton } from '@/components/ui/skeleton';
 import { useReviewTasks } from '@/hooks/useReviewTasks';
+import { useAuth } from '@/hooks/useAuth';
 import { TaskDetailPanel } from '@/components/tasks/TaskDetailPanel';
 import type { ReviewTask, TaskGroup, ReviewLevel } from '@/types';
 
@@ -25,10 +26,14 @@ const STATUS_STYLES: Record<string, string> = {
   completed: 'bg-emerald-100 text-emerald-800 border-emerald-200',
 };
 
+type TaskFilter = 'all' | 'mine';
+
 export function ReviewTasksPanel({ reviewCaseId, reviewLevel, reviewCaseStatus, systemOwnerId }: ReviewTasksPanelProps) {
   const { t } = useTranslation();
+  const { user } = useAuth();
   const { data: tasks, isLoading } = useReviewTasks(reviewCaseId);
   const [selectedTaskId, setSelectedTaskId] = useState<string | null>(null);
+  const [filter, setFilter] = useState<TaskFilter>('all');
 
   const selectedTask = tasks?.find(t => t.id === selectedTaskId) || null;
 
@@ -55,34 +60,65 @@ export function ReviewTasksPanel({ reviewCaseId, reviewLevel, reviewCaseStatus, 
     );
   }
 
-  // Group tasks
+  // Apply filter
+  const filteredTasks = filter === 'mine' && user
+    ? tasks.filter(t => t.assigned_to === user.id)
+    : tasks;
+
+  // Group filtered tasks
   const grouped = TASK_GROUP_ORDER
     .map(group => ({
       group,
-      tasks: tasks.filter(t => t.task_group === group),
+      tasks: filteredTasks.filter(t => t.task_group === group),
     }))
     .filter(g => g.tasks.length > 0);
 
-  const totalCompleted = tasks.filter(t => t.status === 'completed').length;
+  const totalCompleted = filteredTasks.filter(t => t.status === 'completed').length;
+  const totalCount = filteredTasks.length;
 
   return (
     <>
       <div className="border rounded-lg p-4 space-y-4">
         {/* Header */}
         <div className="flex items-center justify-between">
-          <h3 className="text-sm font-semibold text-foreground">{t('reviews.tasks.title')}</h3>
+          <div className="flex items-center gap-3">
+            <h3 className="text-sm font-semibold text-foreground">{t('reviews.tasks.title')}</h3>
+            {/* Filter toggle */}
+            <div className="flex items-center rounded-full border bg-muted/50 p-0.5">
+              <button
+                onClick={() => setFilter('all')}
+                className={`px-3 py-1 text-xs font-medium rounded-full transition-colors ${
+                  filter === 'all'
+                    ? 'bg-background text-foreground shadow-sm'
+                    : 'text-muted-foreground hover:text-foreground'
+                }`}
+              >
+                {t('tasks.filter.allTasks')}
+              </button>
+              <button
+                onClick={() => setFilter('mine')}
+                className={`px-3 py-1 text-xs font-medium rounded-full transition-colors ${
+                  filter === 'mine'
+                    ? 'bg-background text-foreground shadow-sm'
+                    : 'text-muted-foreground hover:text-foreground'
+                }`}
+              >
+                {t('tasks.filter.myTasks')}
+              </button>
+            </div>
+          </div>
           <Badge variant="secondary" className="text-xs font-mono">
-            {t('reviews.tasks.taskCount', { count: tasks.length, level: reviewLevel })}
+            {t('reviews.tasks.taskCount', { count: totalCount, level: reviewLevel })}
           </Badge>
         </div>
 
         {/* Overall progress */}
         <div className="space-y-1">
           <div className="flex justify-between text-xs text-muted-foreground">
-            <span>{t('reviews.tasks.progressOverall', { completed: totalCompleted, total: tasks.length })}</span>
-            <span>{Math.round((totalCompleted / tasks.length) * 100)}%</span>
+            <span>{t('reviews.tasks.progressOverall', { completed: totalCompleted, total: totalCount })}</span>
+            <span>{totalCount > 0 ? Math.round((totalCompleted / totalCount) * 100) : 0}%</span>
           </div>
-          <Progress value={(totalCompleted / tasks.length) * 100} className="h-2" />
+          <Progress value={totalCount > 0 ? (totalCompleted / totalCount) * 100 : 0} className="h-2" />
         </div>
 
         {/* Grouped accordion — all expanded by default */}
@@ -143,14 +179,16 @@ function TaskRow({ task, onClick }: { task: ReviewTask; onClick: () => void }) {
       tabIndex={0}
       onKeyDown={e => e.key === 'Enter' && onClick()}
     >
-      {/* Status badge */}
-      {isCompleted ? (
-        <CheckCircle2 className="h-4 w-4 text-emerald-600 shrink-0" />
-      ) : (
-        <Badge variant="outline" className={`text-[10px] px-1.5 py-0 shrink-0 ${STATUS_STYLES[task.status] || ''}`}>
-          {t(`tasks.status.${task.status}`)}
-        </Badge>
-      )}
+      {/* Status badge — fixed width container for alignment */}
+      <div className="w-[90px] shrink-0 flex items-center">
+        {isCompleted ? (
+          <CheckCircle2 className="h-4 w-4 text-emerald-600" />
+        ) : (
+          <Badge variant="outline" className={`text-[10px] px-1.5 py-0 ${STATUS_STYLES[task.status] || ''}`}>
+            {t(`tasks.status.${task.status}`)}
+          </Badge>
+        )}
+      </div>
 
       {/* Template code */}
       {task.template_id && (
