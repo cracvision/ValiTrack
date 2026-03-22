@@ -1,9 +1,9 @@
+import { useState, useCallback } from 'react';
 import { useTranslation } from 'react-i18next';
 import { AlertTriangle, User, Sparkles, Calendar, Info } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
 import { Separator } from '@/components/ui/separator';
 import { Alert, AlertDescription } from '@/components/ui/alert';
-import { toast } from '@/hooks/use-toast';
 import {
   Sheet,
   SheetContent,
