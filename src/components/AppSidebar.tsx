@@ -9,7 +9,7 @@ import {
   Users,
   LogOut,
 } from 'lucide-react';
-import valiTrackLogo from '@/assets/ValiTrack_Logo.png';
+const LOGO_URL = `${import.meta.env.VITE_SUPABASE_URL}/storage/v1/object/public/images/ValiTrack_Logo.png`;
 import { useTranslation } from 'react-i18next';
 import { NavLink } from '@/components/NavLink';
 import { useLocation } from 'react-router-dom';
