@@ -11,6 +11,15 @@ function formatFileSize(bytes: number): string {
   return `${(bytes / (1024 * 1024)).toFixed(1)} MB`;
 }
 
+/** Sanitize filename for Supabase Storage keys (no accents, no special chars) */
+function sanitizeStoragePath(filename: string): string {
+  return filename
+    .normalize('NFD')
+    .replace(/[\u0300-\u036f]/g, '')
+    .replace(/[^a-zA-Z0-9._-]/g, '_')
+    .replace(/_+/g, '_');
+}
+
 async function calculateSHA256(file: File): Promise<string> {
   const buffer = await file.arrayBuffer();
   const hashBuffer = await crypto.subtle.digest('SHA-256', buffer);
@@ -118,7 +127,8 @@ export function useTaskEvidenceFiles({ taskId, reviewCaseId }: UseTaskEvidenceFi
 
       // 2. Upload to storage
       const timestamp = Date.now();
-      const storagePath = `${reviewCaseId}/${taskId}/${timestamp}_${file.name}`;
+      const safeName = sanitizeStoragePath(file.name);
+      const storagePath = `${reviewCaseId}/${taskId}/${timestamp}_${safeName}`;
 
       const { error: uploadError } = await supabase.storage
         .from('review-evidence')
