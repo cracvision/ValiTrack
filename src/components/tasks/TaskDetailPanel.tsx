@@ -187,6 +187,14 @@ export function TaskDetailPanel({ task, open, onClose, reviewCaseId, reviewCaseS
           )}
         </div>
 
+        {/* Instructions section */}
+        {task.execution_instructions && task.execution_instructions.trim() !== '' && (
+          <TaskInstructionsSection
+            instructions={task.execution_instructions}
+            taskStatus={task.status}
+          />
+        )}
+
         {/* Action Buttons — hidden for read-only users */}
         {!execution.isReadOnly && (
           <TaskActionButtons
