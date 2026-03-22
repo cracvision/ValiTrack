@@ -53,7 +53,7 @@ interface TaskEvidenceSectionProps {
   isPending?: boolean;
 }
 
-export function TaskEvidenceSection({ taskId, taskGroup, taskTitle, reviewCaseId, canUpload, isReadOnly = false, highlight = false }: TaskEvidenceSectionProps) {
+export function TaskEvidenceSection({ taskId, taskGroup, taskTitle, reviewCaseId, canUpload, isReadOnly = false, highlight = false, isPending = false }: TaskEvidenceSectionProps) {
   const { t } = useTranslation();
   const { files, isLoading, uploadFile, getDownloadUrl } = useTaskEvidenceFiles({ taskId, reviewCaseId });
 
