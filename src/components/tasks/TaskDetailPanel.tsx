@@ -99,11 +99,15 @@ export function TaskDetailPanel({ task, open, onClose, reviewCaseId, reviewCaseS
 
   const handleComplete = () => {
     if (completionBlocked) {
-      toast({ title: t('common.error'), description: completionBlocked, variant: 'destructive' });
+      // Validation error shown inline by TaskActionButtons
       return;
     }
     execution.completeTask.mutate();
   };
+
+  const handleValidationError = useCallback((blocked: boolean) => {
+    setHighlightSections(blocked);
+  }, []);
 
   return (
     <Sheet open={open} onOpenChange={v => !v && onClose()}>
