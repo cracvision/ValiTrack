@@ -403,6 +403,7 @@
       "placeholder": "Documenta tu trabajo en esta tarea...",
       "minLength": "Las notas de trabajo deben tener al menos 10 caracteres",
       "emptyState": "Aún no hay notas de trabajo. Comienza a documentar tu trabajo.",
+      "emptyStateReadOnly": "Aún no hay notas de trabajo.",
       "noteTypes": {
         "work_note": "Nota de trabajo",
         "status_change": "Cambio de estado",
@@ -424,7 +425,8 @@
       "download": "Descargar",
       "version": "Versión",
       "uploadedBy": "Subido por",
-      "emptyState": "Aún no se han subido archivos de evidencia.",
+      "emptyState": "Aún no se han subido archivos de evidencia. Sube tu primer archivo arriba.",
+      "emptyStateReadOnly": "Aún no se han subido archivos de evidencia.",
       "maxSize": "Tamaño máximo de archivo: 50 MB",
       "categories": {
         "incident_report": "Reporte de Incidentes",

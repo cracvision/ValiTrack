@@ -403,6 +403,7 @@
       "placeholder": "Document your work on this task...",
       "minLength": "Work notes must be at least 10 characters",
       "emptyState": "No work notes yet. Start documenting your work.",
+      "emptyStateReadOnly": "No work notes yet.",
       "noteTypes": {
         "work_note": "Work note",
         "status_change": "Status change",
@@ -424,7 +425,8 @@
       "download": "Download",
       "version": "Version",
       "uploadedBy": "Uploaded by",
-      "emptyState": "No evidence files uploaded yet.",
+      "emptyState": "No evidence files uploaded yet. Upload your first file above.",
+      "emptyStateReadOnly": "No evidence files uploaded yet.",
       "maxSize": "Maximum file size: 50 MB",
       "categories": {
         "incident_report": "Incident Report",
