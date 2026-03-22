@@ -971,6 +971,10 @@ export type Database = {
           id: string
         }[]
       }
+      user_has_assigned_tasks: {
+        Args: { _review_case_id: string; _user_id: string }
+        Returns: boolean
+      }
     }
     Enums: {
       app_role:
