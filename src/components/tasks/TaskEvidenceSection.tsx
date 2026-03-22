@@ -108,7 +108,7 @@ export function TaskEvidenceSection({ taskId, taskGroup, taskTitle, reviewCaseId
   if (isLoading) return <Skeleton className="h-24 w-full" />;
 
   return (
-    <div className="space-y-3">
+    <div className={`space-y-3 rounded-md p-2 -m-2 transition-colors ${highlight ? 'border border-destructive bg-destructive/5' : ''}`}>
       <h4 className="text-sm font-semibold text-foreground">{t('tasks.evidence.title')}</h4>
 
       {/* Upload zone — only for authorized users */}

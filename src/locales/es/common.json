@@ -593,7 +593,8 @@
   },
   "common": {
     "error": "Error",
-    "loading": "Cargando..."
+    "loading": "Cargando...",
+    "cancel": "Cancelar"
   },
   "systemProfiles": {
     "approval": {

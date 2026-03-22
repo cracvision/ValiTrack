@@ -53,7 +53,7 @@ export function TaskWorkLog({ notes, isLoading, taskStatus, onAddNote, isAdding,
   const showNoteForm = canAddNotes && taskStatus === 'in_progress';
 
   return (
-    <div className="space-y-3">
+    <div className={`space-y-3 rounded-md p-2 -m-2 transition-colors ${highlight ? 'border border-destructive bg-destructive/5' : ''}`}>
       <h4 className="text-sm font-semibold text-foreground">{t('tasks.workLog.title')}</h4>
 
       {/* Note form — only when in_progress */}
