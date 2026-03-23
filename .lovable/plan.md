@@ -1,26 +1,29 @@
 
 
-## Fix: Logo caching on published site
+## Diagnosis: Published version is not a code bug
 
-### Root Cause
+After thorough code review, **all code is correct**:
 
-Supabase Storage serves public objects through a CDN with aggressive caching headers. When you replaced the file at the same path (`images/ValiTrack_Logo.png`), the CDN continued serving the cached (old) version. The preview works because it hits Supabase directly or uses a different cache layer.
+- `TaskInstructionsSection` is properly imported and used in `TaskDetailPanel.tsx` (line 27, lines 191-196)
+- `execution_instructions` is in the `ReviewTask` type (`src/types/index.ts`)
+- `execution_instructions` is fetched in `useReviewTasks.ts` (line 47)
+- The filter toggle ("All tasks" / "My tasks") is fully implemented in `ReviewTasksPanel.tsx` with proper i18n keys
+- Task generation copies `execution_instructions` in `taskGeneration.ts` (line 87)
+- No missing imports, no type mismatches
 
-This is a known Supabase Storage CDN behavior — same filename = cached response until the CDN TTL expires (can take hours or even days).
+The published HTML at `vali-track.lovable.app` is serving a **stale build** — it still shows the Shield icon instead of the logo image, confirming the CDN/build cache is outdated.
 
-### Solution: Cache-busting query parameter
+### Root cause
 
-Append a version query string to the logo URL so the CDN treats it as a new resource. This forces a fresh fetch without changing the actual storage path.
+This is a **deployment cache issue**, not a code error. The published version is serving an older JS bundle. Vite dev server (preview) serves fresh code, but the published CDN may cache the previous bundle.
 
-**File: `src/pages/Auth.tsx`** (line 12)
-```typescript
-const LOGO_URL = `${import.meta.env.VITE_SUPABASE_URL}/storage/v1/object/public/images/ValiTrack_Logo.png?v=2`;
-```
+### Fix
 
-**File: `src/components/AppSidebar.tsx`** (line 12)
-```typescript
-const LOGO_URL = `${import.meta.env.VITE_SUPABASE_URL}/storage/v1/object/public/images/ValiTrack_Logo_small.png?v=2`;
-```
+No code changes needed. Simply:
 
-Two lines changed, no other files affected. After publishing, the `?v=2` parameter bypasses the CDN cache. Any future logo replacement just needs bumping `v=2` to `v=3`, etc.
+1. Click **Publish** again from Lovable to trigger a fresh build and deploy
+2. After publish completes, hard-refresh the published URL (`Ctrl+Shift+R`)
+3. If still stale, wait 2-3 minutes for CDN cache invalidation
+
+If the features still don't appear after re-publishing, the next step would be to run a production build check to see if there's a silent build error that only manifests in `vite build` (not dev mode). I can investigate that path if re-publishing doesn't resolve it.
 
