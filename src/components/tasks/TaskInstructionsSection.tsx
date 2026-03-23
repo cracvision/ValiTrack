@@ -1,22 +1,74 @@
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { ClipboardList, ChevronDown, ChevronUp } from 'lucide-react';
+import { Checkbox } from '@/components/ui/checkbox';
 import type { TaskStatus } from '@/types';
+import type { CheckoffDetail } from '@/hooks/useTaskCheckoffs';
 
 interface TaskInstructionsSectionProps {
   instructions: string;
   taskStatus: TaskStatus;
+  instructionStepCount: number;
+  canInteract: boolean;
+  checkedSteps: Set<number>;
+  checkoffDetails: Map<number, CheckoffDetail>;
+  onToggleStep: (stepIndex: number) => void;
+  isToggling: boolean;
+  highlight?: boolean;
 }
 
-export function TaskInstructionsSection({ instructions, taskStatus }: TaskInstructionsSectionProps) {
+/** Parse instruction text into numbered steps. Returns array of { index (1-based), text }. */
+function parseSteps(text: string): Array<{ index: number; text: string }> {
+  const lines = text.split('\n');
+  const steps: Array<{ index: number; text: string }> = [];
+  let currentStep: { index: number; text: string } | null = null;
+
+  for (const line of lines) {
+    const match = line.match(/^(\d+)\.\s+(.*)/);
+    if (match) {
+      if (currentStep) steps.push(currentStep);
+      currentStep = { index: parseInt(match[1], 10), text: match[2] };
+    } else if (currentStep && line.trim()) {
+      currentStep.text += '\n' + line;
+    }
+  }
+  if (currentStep) steps.push(currentStep);
+  return steps;
+}
+
+function formatDate(iso: string): string {
+  return new Date(iso).toLocaleDateString();
+}
+
+export function TaskInstructionsSection({
+  instructions,
+  taskStatus,
+  instructionStepCount,
+  canInteract,
+  checkedSteps,
+  checkoffDetails,
+  onToggleStep,
+  isToggling,
+  highlight = false,
+}: TaskInstructionsSectionProps) {
   const { t } = useTranslation();
   const defaultExpanded = taskStatus !== 'completed';
   const [expanded, setExpanded] = useState(defaultExpanded);
 
   if (!instructions || instructions.trim() === '') return null;
 
+  const steps = parseSteps(instructions);
+  const showCheckboxes = taskStatus === 'in_progress' || taskStatus === 'completed';
+  const completedCount = checkedSteps.size;
+  const totalSteps = instructionStepCount || steps.length;
+  const allComplete = totalSteps > 0 && completedCount >= totalSteps;
+
+  const borderColor = highlight && !allComplete
+    ? 'border-destructive'
+    : 'border-blue-400';
+
   return (
-    <div className="bg-blue-50 dark:bg-blue-950/30 border-l-4 border-blue-400 rounded-lg p-4">
+    <div className={`bg-blue-50 dark:bg-blue-950/30 border-l-4 ${borderColor} rounded-lg p-4`}>
       <button
         type="button"
         onClick={() => setExpanded(!expanded)}
@@ -27,6 +79,11 @@ export function TaskInstructionsSection({ instructions, taskStatus }: TaskInstru
           <span className="text-sm font-medium text-blue-900 dark:text-blue-200">
             {t('tasks.instructions.title')}
           </span>
+          {showCheckboxes && totalSteps > 0 && (
+            <span className={`text-xs ml-1 ${allComplete ? 'text-emerald-700 dark:text-emerald-400' : 'text-blue-600 dark:text-blue-400'}`}>
+              {t('tasks.instructions.progress', { completed: completedCount, total: totalSteps })}
+            </span>
+          )}
         </div>
         <div className="flex items-center gap-1 text-xs text-blue-600 dark:text-blue-400">
           <span>{expanded ? t('tasks.instructions.collapse') : t('tasks.instructions.expand')}</span>
@@ -35,8 +92,47 @@ export function TaskInstructionsSection({ instructions, taskStatus }: TaskInstru
       </button>
 
       {expanded && (
-        <div className="mt-3 text-sm text-gray-700 dark:text-gray-300 whitespace-pre-line leading-relaxed">
-          {instructions}
+        <div className="mt-3 space-y-2">
+          {showCheckboxes && steps.length > 0 ? (
+            steps.map((step) => {
+              const isChecked = checkedSteps.has(step.index);
+              const detail = checkoffDetails.get(step.index);
+              const isDisabled = !canInteract || taskStatus === 'completed' || isToggling;
+
+              return (
+                <div key={step.index} className="flex items-start gap-2.5 group">
+                  <Checkbox
+                    checked={isChecked}
+                    onCheckedChange={() => onToggleStep(step.index)}
+                    disabled={isDisabled}
+                    className="mt-0.5 shrink-0"
+                  />
+                  <div className="flex-1 min-w-0">
+                    <p className={`text-sm leading-relaxed ${
+                      isChecked
+                        ? 'text-muted-foreground line-through'
+                        : 'text-gray-700 dark:text-gray-300'
+                    }`}>
+                      {step.index}. {step.text}
+                    </p>
+                    {isChecked && detail && (
+                      <p className="text-[11px] text-muted-foreground mt-0.5">
+                        {t('tasks.instructions.checkedBy', {
+                          name: detail.checkedByName || '—',
+                          date: formatDate(detail.checkedAt),
+                        })}
+                      </p>
+                    )}
+                  </div>
+                </div>
+              );
+            })
+          ) : (
+            // Plain text mode for pending/blocked tasks
+            <div className="text-sm text-gray-700 dark:text-gray-300 whitespace-pre-line leading-relaxed">
+              {instructions}
+            </div>
+          )}
         </div>
       )}
     </div>

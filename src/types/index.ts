@@ -167,6 +167,7 @@ export interface ReviewTask {
   reassignment_reason?: string;
   execution_instructions?: string;
   execution_phase: number;
+  instruction_step_count?: number;
   // Joined
   assigned_to_name?: string;
   approved_by_name?: string;
@@ -212,6 +213,21 @@ export interface TaskTemplate {
   review_level_min: number;
   sort_order: number;
   is_active: boolean;
+  execution_instructions?: string;
+  instruction_step_count?: number;
+}
+
+export interface TaskInstructionCheckoff {
+  id: string;
+  task_id: string;
+  step_index: number;
+  created_by: string;
+  created_at: string;
+  updated_at: string;
+  updated_by?: string;
+  is_deleted: boolean;
+  deleted_at?: string;
+  deleted_by?: string;
 }
 
 export interface EvidenceItem {

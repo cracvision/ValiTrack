@@ -372,7 +372,9 @@
     "instructions": {
       "title": "Instrucciones",
       "collapse": "Ocultar instrucciones",
-      "expand": "Mostrar instrucciones"
+      "expand": "Mostrar instrucciones",
+      "progress": "{{completed}} / {{total}} pasos completados",
+      "checkedBy": "Verificado por {{name}} · {{date}}"
     },
     "phases": {
       "title": "Fases de Ejecución",
@@ -489,7 +491,8 @@
     "validation": {
       "evidenceAndNoteRequired": "Esta tarea requiere al menos un archivo de evidencia y una nota de trabajo antes de poder ser completada.",
       "noteRequired": "Esta tarea requiere al menos una nota de trabajo documentando la evaluación antes de poder ser completada.",
-      "approvalNoteRequired": "Esta tarea requiere al menos una nota de trabajo con su declaración de aprobación antes de poder ser completada."
+      "approvalNoteRequired": "Esta tarea requiere al menos una nota de trabajo con su declaración de aprobación antes de poder ser completada.",
+      "instructionsIncomplete": "Todos los pasos de las instrucciones deben estar marcados antes de completar esta tarea."
     }
   },
   "pages": {

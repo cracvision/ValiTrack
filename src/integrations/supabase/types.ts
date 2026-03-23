@@ -464,6 +464,7 @@ export type Database = {
           execution_phase: number
           execution_type: string
           id: string
+          instruction_step_count: number
           is_deleted: boolean
           phase: string
           reassigned_at: string | null
@@ -499,6 +500,7 @@ export type Database = {
           execution_phase?: number
           execution_type?: string
           id?: string
+          instruction_step_count?: number
           is_deleted?: boolean
           phase: string
           reassigned_at?: string | null
@@ -534,6 +536,7 @@ export type Database = {
           execution_phase?: number
           execution_type?: string
           id?: string
+          instruction_step_count?: number
           is_deleted?: boolean
           phase?: string
           reassigned_at?: string | null
@@ -747,6 +750,53 @@ export type Database = {
           },
         ]
       }
+      task_instruction_checkoffs: {
+        Row: {
+          created_at: string
+          created_by: string
+          deleted_at: string | null
+          deleted_by: string | null
+          id: string
+          is_deleted: boolean
+          step_index: number
+          task_id: string
+          updated_at: string
+          updated_by: string | null
+        }
+        Insert: {
+          created_at?: string
+          created_by: string
+          deleted_at?: string | null
+          deleted_by?: string | null
+          id?: string
+          is_deleted?: boolean
+          step_index: number
+          task_id: string
+          updated_at?: string
+          updated_by?: string | null
+        }
+        Update: {
+          created_at?: string
+          created_by?: string
+          deleted_at?: string | null
+          deleted_by?: string | null
+          id?: string
+          is_deleted?: boolean
+          step_index?: number
+          task_id?: string
+          updated_at?: string
+          updated_by?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "task_instruction_checkoffs_task_id_fkey"
+            columns: ["task_id"]
+            isOneToOne: false
+            referencedRelation: "review_tasks"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       task_templates: {
         Row: {
           code: string
@@ -761,6 +811,7 @@ export type Database = {
           execution_phase: number
           execution_type: string
           id: string
+          instruction_step_count: number
           is_active: boolean
           is_deleted: boolean
           phase: string
@@ -784,6 +835,7 @@ export type Database = {
           execution_phase?: number
           execution_type?: string
           id?: string
+          instruction_step_count?: number
           is_active?: boolean
           is_deleted?: boolean
           phase: string
@@ -807,6 +859,7 @@ export type Database = {
           execution_phase?: number
           execution_type?: string
           id?: string
+          instruction_step_count?: number
           is_active?: boolean
           is_deleted?: boolean
           phase?: string

@@ -1,4 +1,4 @@
-// build v2
+// build v3
 import { useState, useCallback } from 'react';
 import { useTranslation } from 'react-i18next';
 import { AlertTriangle, User, Sparkles, Calendar, Info, Lock } from 'lucide-react';
@@ -22,6 +22,7 @@ import { useTaskExecution } from '@/hooks/useTaskExecution';
 import { useTaskWorkNotes } from '@/hooks/useTaskWorkNotes';
 import { useTaskEvidenceFiles } from '@/hooks/useTaskEvidenceFiles';
 import { useTaskPhaseUnlocked } from '@/hooks/useTaskPhaseStatus';
+import { useTaskCheckoffs } from '@/hooks/useTaskCheckoffs';
 import { TaskActionButtons } from '@/components/tasks/TaskActionButtons';
 import { TaskReassignDialog } from '@/components/tasks/TaskReassignDialog';
 import { TaskWorkLog } from '@/components/tasks/TaskWorkLog';
@@ -81,6 +82,7 @@ export function TaskDetailPanel({ task, open, onClose, reviewCaseId, reviewCaseS
 
   const workNotes = useTaskWorkNotes(task?.id);
   const evidenceFiles = useTaskEvidenceFiles({ taskId: task?.id, reviewCaseId });
+  const checkoffs = useTaskCheckoffs(task?.id);
 
   // Phase lock check via RPC (backend source of truth)
   const { data: phaseStatus } = useTaskPhaseUnlocked(
@@ -97,8 +99,17 @@ export function TaskDetailPanel({ task, open, onClose, reviewCaseId, reviewCaseS
   const isOverdue = task.status !== 'completed' && new Date(task.due_date) < new Date();
   const assigneeName = userNames[task.assigned_to] || task.assigned_to_name || '—';
 
+  const instructionStepCount = task.instruction_step_count ?? 0;
+  const instructionsIncomplete = instructionStepCount > 0 && checkoffs.completedCount < instructionStepCount;
+
   const getCompletionBlockedReason = (): string | null => {
     if (task.status !== 'in_progress') return null;
+
+    // Instruction checkoff gate
+    if (instructionsIncomplete) {
+      return t('tasks.validation.instructionsIncomplete');
+    }
+
     const isEvidenceGroup = EVIDENCE_GROUPS.includes(task.task_group as TaskGroup);
 
     if (isEvidenceGroup) {
@@ -202,6 +213,13 @@ export function TaskDetailPanel({ task, open, onClose, reviewCaseId, reviewCaseS
           <TaskInstructionsSection
             instructions={task.execution_instructions}
             taskStatus={task.status}
+            instructionStepCount={instructionStepCount}
+            canInteract={execution.canAddNotes && task.status === 'in_progress'}
+            checkedSteps={checkoffs.checkedSteps}
+            checkoffDetails={checkoffs.checkoffDetails}
+            onToggleStep={(stepIndex) => checkoffs.toggleCheckoff.mutate(stepIndex)}
+            isToggling={checkoffs.toggleCheckoff.isPending}
+            highlight={highlightSections && instructionsIncomplete}
           />
         )}
 
