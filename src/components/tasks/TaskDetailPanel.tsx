@@ -1,3 +1,4 @@
+// build v2
 import { useState, useCallback, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import { AlertTriangle, User, Sparkles, Calendar, Info } from 'lucide-react';
