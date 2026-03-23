@@ -167,6 +167,7 @@ export interface ReviewTask {
   reassignment_reason?: string;
   execution_instructions?: string;
   execution_phase: number;
+  instruction_step_count?: number;
   // Joined
   assigned_to_name?: string;
   approved_by_name?: string;
