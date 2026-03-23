@@ -461,6 +461,7 @@ export type Database = {
           description: string
           due_date: string
           execution_instructions: string | null
+          execution_phase: number
           execution_type: string
           id: string
           is_deleted: boolean
@@ -495,6 +496,7 @@ export type Database = {
           description?: string
           due_date: string
           execution_instructions?: string | null
+          execution_phase?: number
           execution_type?: string
           id?: string
           is_deleted?: boolean
@@ -529,6 +531,7 @@ export type Database = {
           description?: string
           due_date?: string
           execution_instructions?: string | null
+          execution_phase?: number
           execution_type?: string
           id?: string
           is_deleted?: boolean
@@ -755,6 +758,7 @@ export type Database = {
           deleted_by: string | null
           description: string
           execution_instructions: string | null
+          execution_phase: number
           execution_type: string
           id: string
           is_active: boolean
@@ -777,6 +781,7 @@ export type Database = {
           deleted_by?: string | null
           description?: string
           execution_instructions?: string | null
+          execution_phase?: number
           execution_type?: string
           id?: string
           is_active?: boolean
@@ -799,6 +804,7 @@ export type Database = {
           deleted_by?: string | null
           description?: string
           execution_instructions?: string | null
+          execution_phase?: number
           execution_type?: string
           id?: string
           is_active?: boolean
@@ -919,6 +925,7 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
+      check_task_phase_unlocked: { Args: { p_task_id: string }; Returns: Json }
       get_admin_users_list: {
         Args: never
         Returns: {
@@ -942,6 +949,10 @@ export type Database = {
           total_completed: number
           total_required: number
         }[]
+      }
+      get_review_case_phase_summary: {
+        Args: { p_review_case_id: string }
+        Returns: Json
       }
       get_signoff_summary: {
         Args: { p_phase: string; p_review_case_id: string }

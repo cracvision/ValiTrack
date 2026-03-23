@@ -1,7 +1,7 @@
 // build v2
-import { useState, useCallback, useEffect } from 'react';
+import { useState, useCallback } from 'react';
 import { useTranslation } from 'react-i18next';
-import { AlertTriangle, User, Sparkles, Calendar, Info } from 'lucide-react';
+import { AlertTriangle, User, Sparkles, Calendar, Info, Lock } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
 import { Separator } from '@/components/ui/separator';
 import { Alert, AlertDescription } from '@/components/ui/alert';
@@ -21,6 +21,7 @@ import { useResolveUserNames } from '@/hooks/useResolveUserNames';
 import { useTaskExecution } from '@/hooks/useTaskExecution';
 import { useTaskWorkNotes } from '@/hooks/useTaskWorkNotes';
 import { useTaskEvidenceFiles } from '@/hooks/useTaskEvidenceFiles';
+import { useTaskPhaseUnlocked } from '@/hooks/useTaskPhaseStatus';
 import { TaskActionButtons } from '@/components/tasks/TaskActionButtons';
 import { TaskReassignDialog } from '@/components/tasks/TaskReassignDialog';
 import { TaskWorkLog } from '@/components/tasks/TaskWorkLog';
@@ -45,8 +46,14 @@ const GROUP_COLORS: Record<string, string> = {
   APPR: 'bg-green-100 text-green-700',
 };
 
-// Evidence-gathering task groups require evidence files for completion
 const EVIDENCE_GROUPS: TaskGroup[] = ['INIT', 'ITSM', 'QMS', 'SEC', 'INFRA', 'DOC'];
+
+const PHASE_SHORT_KEYS: Record<number, string> = {
+  1: 'tasks.phases.phase1Short',
+  2: 'tasks.phases.phase2Short',
+  3: 'tasks.phases.phase3Short',
+  4: 'tasks.phases.phase4Short',
+};
 
 interface TaskDetailPanelProps {
   task: ReviewTask | null;
@@ -75,6 +82,12 @@ export function TaskDetailPanel({ task, open, onClose, reviewCaseId, reviewCaseS
   const workNotes = useTaskWorkNotes(task?.id);
   const evidenceFiles = useTaskEvidenceFiles({ taskId: task?.id, reviewCaseId });
 
+  // Phase lock check via RPC (backend source of truth)
+  const { data: phaseStatus } = useTaskPhaseUnlocked(
+    task?.status === 'pending' ? task?.id : undefined
+  );
+  const isPhaseBlocked = task?.status === 'pending' && phaseStatus && !phaseStatus.unlocked;
+
   const handleValidationError = useCallback((blocked: boolean) => {
     setHighlightSections(blocked);
   }, []);
@@ -84,7 +97,6 @@ export function TaskDetailPanel({ task, open, onClose, reviewCaseId, reviewCaseS
   const isOverdue = task.status !== 'completed' && new Date(task.due_date) < new Date();
   const assigneeName = userNames[task.assigned_to] || task.assigned_to_name || '—';
 
-  // Completion validation with evidence check
   const getCompletionBlockedReason = (): string | null => {
     if (task.status !== 'in_progress') return null;
     const isEvidenceGroup = EVIDENCE_GROUPS.includes(task.task_group as TaskGroup);
@@ -104,10 +116,7 @@ export function TaskDetailPanel({ task, open, onClose, reviewCaseId, reviewCaseS
   const completionBlocked = getCompletionBlockedReason();
 
   const handleComplete = () => {
-    if (completionBlocked) {
-      // Validation error shown inline by TaskActionButtons
-      return;
-    }
+    if (completionBlocked) return;
     execution.completeTask.mutate();
   };
 
@@ -196,8 +205,29 @@ export function TaskDetailPanel({ task, open, onClose, reviewCaseId, reviewCaseS
           />
         )}
 
-        {/* Action Buttons — hidden for read-only users */}
-        {!execution.isReadOnly && (
+        {/* Phase blocked message */}
+        {isPhaseBlocked && phaseStatus && (
+          <div className="mt-4 rounded-lg border border-amber-200 bg-amber-50 dark:bg-amber-950/30 dark:border-amber-800 p-4">
+            <div className="flex items-start gap-3">
+              <Lock className="h-5 w-5 text-amber-700 dark:text-amber-400 shrink-0 mt-0.5" />
+              <div>
+                <p className="font-semibold text-amber-800 dark:text-amber-300 text-sm">
+                  {t('tasks.phases.blocked.title')}
+                </p>
+                <p className="text-amber-700 dark:text-amber-400 text-sm mt-1">
+                  {t('tasks.phases.blocked.message', {
+                    phaseName: t(PHASE_SHORT_KEYS[phaseStatus.blocking_phase || 1] || 'tasks.phases.phase1Short'),
+                    completed: phaseStatus.blocking_phase_completed || 0,
+                    total: phaseStatus.blocking_phase_total || 0,
+                  })}
+                </p>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* Action Buttons — hidden for read-only users and phase-blocked tasks */}
+        {!execution.isReadOnly && !isPhaseBlocked && (
            <div className="mt-4">
             <TaskActionButtons
               task={task}
@@ -217,7 +247,7 @@ export function TaskDetailPanel({ task, open, onClose, reviewCaseId, reviewCaseS
           </div>
         )}
 
-        {/* Evidence Files — only for evidence-gathering task groups */}
+        {/* Evidence Files */}
         {EVIDENCE_GROUPS.includes(task.task_group as TaskGroup) && (
           <>
             <Separator className="my-4" />

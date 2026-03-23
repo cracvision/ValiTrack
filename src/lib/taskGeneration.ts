@@ -11,6 +11,7 @@ interface TaskTemplate {
   default_approver_role: string;
   phase: string;
   execution_type: string;
+  execution_phase: number;
   review_level_min: number;
   sort_order: number;
 }
@@ -85,6 +86,7 @@ export function buildTaskPayloads(
       title: template.title,
       description: template.description,
       execution_instructions: template.execution_instructions,
+      execution_phase: template.execution_phase,
       assigned_to: resolveRoleToUserId(template.default_assignee_role, reviewCase),
       approved_by_user: resolveRoleToUserId(template.default_approver_role, reviewCase),
       status: 'pending' as const,
