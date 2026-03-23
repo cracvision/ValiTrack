@@ -79,6 +79,6 @@ export function useMyTasks() {
       });
     },
     enabled: !!userId,
-    staleTime: 60_000,
+    placeholderData: keepPreviousData,
   });
 }

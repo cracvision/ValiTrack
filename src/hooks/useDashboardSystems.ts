@@ -210,6 +210,7 @@ export function useDashboardSystems() {
       return dashboardSystems;
     },
     enabled: !!userId && roles.length > 0,
-    staleTime: 2 * 60 * 1000,
+    staleTime: 2 * 60 * 1000, // Same as global default; explicit for documentation
+    placeholderData: keepPreviousData,
   });
 }

@@ -63,6 +63,7 @@ export function useReviewCases(filters?: { status?: ReviewStatus; systemId?: str
       }));
     },
     enabled: !!user,
+    placeholderData: keepPreviousData,
   });
 }
 
