@@ -82,6 +82,7 @@ export function TaskDetailPanel({ task, open, onClose, reviewCaseId, reviewCaseS
 
   const workNotes = useTaskWorkNotes(task?.id);
   const evidenceFiles = useTaskEvidenceFiles({ taskId: task?.id, reviewCaseId });
+  const checkoffs = useTaskCheckoffs(task?.id);
 
   // Phase lock check via RPC (backend source of truth)
   const { data: phaseStatus } = useTaskPhaseUnlocked(
@@ -98,8 +99,17 @@ export function TaskDetailPanel({ task, open, onClose, reviewCaseId, reviewCaseS
   const isOverdue = task.status !== 'completed' && new Date(task.due_date) < new Date();
   const assigneeName = userNames[task.assigned_to] || task.assigned_to_name || '—';
 
+  const instructionStepCount = task.instruction_step_count ?? 0;
+  const instructionsIncomplete = instructionStepCount > 0 && checkoffs.completedCount < instructionStepCount;
+
   const getCompletionBlockedReason = (): string | null => {
     if (task.status !== 'in_progress') return null;
+
+    // Instruction checkoff gate
+    if (instructionsIncomplete) {
+      return t('tasks.validation.instructionsIncomplete');
+    }
+
     const isEvidenceGroup = EVIDENCE_GROUPS.includes(task.task_group as TaskGroup);
 
     if (isEvidenceGroup) {
