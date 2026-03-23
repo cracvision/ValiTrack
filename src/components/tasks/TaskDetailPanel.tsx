@@ -69,6 +69,11 @@ export function TaskDetailPanel({ task, open, onClose, reviewCaseId, reviewCaseS
   const { t } = useTranslation();
   const [highlightSections, setHighlightSections] = useState(false);
 
+  // Reset validation highlights when task changes or panel opens/closes
+  useEffect(() => {
+    setHighlightSections(false);
+  }, [task?.id, open]);
+
   const { data: userNames = {} } = useResolveUserNames(
     task ? [task.assigned_to, task.approved_by_user, task.completed_by] : []
   );
