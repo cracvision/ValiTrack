@@ -372,7 +372,9 @@
     "instructions": {
       "title": "Instructions",
       "collapse": "Hide instructions",
-      "expand": "Show instructions"
+      "expand": "Show instructions",
+      "progress": "{{completed}} / {{total}} steps completed",
+      "checkedBy": "Checked by {{name}} · {{date}}"
     },
     "phases": {
       "title": "Execution Phases",
