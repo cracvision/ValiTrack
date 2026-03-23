@@ -1,5 +1,5 @@
 // build v3
-import { useState, useCallback } from 'react';
+import { useState, useCallback, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import { AlertTriangle, User, Sparkles, Calendar, Info, Lock } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
@@ -68,6 +68,11 @@ interface TaskDetailPanelProps {
 export function TaskDetailPanel({ task, open, onClose, reviewCaseId, reviewCaseStatus, systemOwnerId }: TaskDetailPanelProps) {
   const { t } = useTranslation();
   const [highlightSections, setHighlightSections] = useState(false);
+
+  // Reset validation highlights when task changes or panel opens/closes
+  useEffect(() => {
+    setHighlightSections(false);
+  }, [task?.id, open]);
 
   const { data: userNames = {} } = useResolveUserNames(
     task ? [task.assigned_to, task.approved_by_user, task.completed_by] : []
