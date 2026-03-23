@@ -1,29 +1,53 @@
 
 
-## Diagnosis: Published version is not a code bug
+## Fix: Instruction Checkbox Bugs + Refined Business Rules
 
-After thorough code review, **all code is correct**:
+### Root Causes
 
-- `TaskInstructionsSection` is properly imported and used in `TaskDetailPanel.tsx` (line 27, lines 191-196)
-- `execution_instructions` is in the `ReviewTask` type (`src/types/index.ts`)
-- `execution_instructions` is fetched in `useReviewTasks.ts` (line 47)
-- The filter toggle ("All tasks" / "My tasks") is fully implemented in `ReviewTasksPanel.tsx` with proper i18n keys
-- Task generation copies `execution_instructions` in `taskGeneration.ts` (line 87)
-- No missing imports, no type mismatches
+1. **Bug 1 (checkboxes on pending)**: `TaskInstructionsSection` shows checkboxes when `taskStatus === 'in_progress' || taskStatus === 'completed'` (line 61) — this is correct. But the `canInteract` prop passed from `TaskDetailPanel` is `execution.canAddNotes && task.status === 'in_progress'`. The `canAddNotes` check doesn't include the System Owner. However, the actual checkbox enable/disable depends on `canInteract` AND `taskStatus === 'completed'` being hardcoded as disabled in the component (line 107: `isDisabled = !canInteract || taskStatus === 'completed'`). So completed tasks are always disabled. The real issue is that `canInteract` should also be `true` for SO on in_progress tasks, and for SO/super_user on completed tasks.
 
-The published HTML at `vali-track.lovable.app` is serving a **stale build** — it still shows the Shield icon instead of the logo image, confirming the CDN/build cache is outdated.
+2. **Bug 2 (can't uncheck)**: The RLS UPDATE policy exists and looks correct from the last migration. Need to verify the frontend toggle mutation is using the right update fields (`updated_by` is required). Looking at `useTaskCheckoffs.ts`, the update uses `as any` cast — need to verify the fields match the table schema.
 
-### Root cause
+### Changes
 
-This is a **deployment cache issue**, not a code error. The published version is serving an older JS bundle. Vite dev server (preview) serves fresh code, but the published CDN may cache the previous bundle.
+#### 1. Database: Replace UPDATE policy on `task_instruction_checkoffs`
+New policy handles both `in_progress` (assignee/SO/super_user) and `completed` (SO/super_user only) states.
 
-### Fix
+#### 2. `TaskDetailPanel.tsx` — Fix `canInteract` prop
+Replace the single `canInteract` with status-aware logic:
+```typescript
+const canInteractCheckoffs = useMemo(() => {
+  if (task.status === 'in_progress') {
+    return execution.isAssignee || execution.isSystemOwner || execution.isSuperUser;
+  }
+  if (task.status === 'completed') {
+    return execution.isSystemOwner || execution.isSuperUser;
+  }
+  return false;
+}, [task.status, ...]);
+```
 
-No code changes needed. Simply:
+This requires exposing `isAssignee`, `isSystemOwner`, `isSuperUser` from `useTaskExecution` hook.
 
-1. Click **Publish** again from Lovable to trigger a fresh build and deploy
-2. After publish completes, hard-refresh the published URL (`Ctrl+Shift+R`)
-3. If still stale, wait 2-3 minutes for CDN cache invalidation
+#### 3. `useTaskExecution.ts` — Expose role booleans
+Add `isAssignee`, `isSystemOwner`, `isSuperUser` to the return object.
 
-If the features still don't appear after re-publishing, the next step would be to run a production build check to see if there's a silent build error that only manifests in `vite build` (not dev mode). I can investigate that path if re-publishing doesn't resolve it.
+#### 4. `TaskInstructionsSection.tsx` — Fix disabled logic
+Remove the hardcoded `taskStatus === 'completed'` disable. The parent now controls interactivity correctly via `canInteract`:
+```typescript
+const isDisabled = !canInteract || isToggling;
+```
+(No longer force-disabling on completed status — parent decides.)
+
+#### 5. `useTaskCheckoffs.ts` — Verify uncheck mutation
+Ensure the soft-delete UPDATE includes `updated_by: user.id` (required by schema). Check current code has this field.
+
+### Files Changed
+
+| File | Change |
+|------|--------|
+| New migration | Replace UPDATE policy with status-aware rules |
+| `src/hooks/useTaskExecution.ts` | Expose `isAssignee`, `isSystemOwner`, `isSuperUser` |
+| `src/components/tasks/TaskDetailPanel.tsx` | Status-aware `canInteract` logic |
+| `src/components/tasks/TaskInstructionsSection.tsx` | Remove hardcoded completed disable |
 
