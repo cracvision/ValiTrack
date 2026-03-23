@@ -97,7 +97,7 @@ export function TaskInstructionsSection({
             steps.map((step) => {
               const isChecked = checkedSteps.has(step.index);
               const detail = checkoffDetails.get(step.index);
-              const isDisabled = !canInteract || taskStatus === 'completed' || isToggling;
+              const isDisabled = !canInteract || isToggling;
 
               return (
                 <div key={step.index} className="flex items-start gap-2.5 group">

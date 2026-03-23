@@ -249,5 +249,8 @@ export function useTaskExecution({ task, reviewCaseId, reviewCaseStatus, systemO
     canReassign,
     isReadOnly,
     isInProgress,
+    isAssignee,
+    isSystemOwner,
+    isSuperUser,
   };
 }
