@@ -27,7 +27,7 @@ import { TaskReassignDialog } from '@/components/tasks/TaskReassignDialog';
 import { TaskWorkLog } from '@/components/tasks/TaskWorkLog';
 import { TaskEvidenceSection } from '@/components/tasks/TaskEvidenceSection';
 import { TaskInstructionsSection } from '@/components/tasks/TaskInstructionsSection';
-import type { ReviewTask, TaskGroup, ExecutionPhase, EXECUTION_PHASE_LABELS } from '@/types';
+import type { ReviewTask, TaskGroup } from '@/types';
 
 const STATUS_BADGE: Record<string, string> = {
   pending: 'bg-muted text-muted-foreground',
