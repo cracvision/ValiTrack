@@ -374,6 +374,24 @@
       "collapse": "Hide instructions",
       "expand": "Show instructions"
     },
+    "phases": {
+      "title": "Execution Phases",
+      "phase1": "Phase 1: Initiation",
+      "phase2": "Phase 2: Evidence Gathering",
+      "phase3": "Phase 3: AI Evaluation",
+      "phase4": "Phase 4: Approvals",
+      "phase1Short": "Initiation",
+      "phase2Short": "Evidence Gathering",
+      "phase3Short": "AI Evaluation",
+      "phase4Short": "Approvals",
+      "complete": "Complete",
+      "active": "Active",
+      "locked": "Locked",
+      "blocked": {
+        "title": "This task cannot be started yet",
+        "message": "All {{phaseName}} tasks must be completed first. Progress: {{completed}}/{{total}} completed."
+      }
+    },
     "detail": {
       "title": "Task Details",
       "assignedTo": "Assigned to",

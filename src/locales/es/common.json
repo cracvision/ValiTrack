@@ -374,6 +374,24 @@
       "collapse": "Ocultar instrucciones",
       "expand": "Mostrar instrucciones"
     },
+    "phases": {
+      "title": "Fases de Ejecución",
+      "phase1": "Fase 1: Iniciación",
+      "phase2": "Fase 2: Recopilación de Evidencia",
+      "phase3": "Fase 3: Evaluación IA",
+      "phase4": "Fase 4: Aprobaciones",
+      "phase1Short": "Iniciación",
+      "phase2Short": "Recopilación de Evidencia",
+      "phase3Short": "Evaluación IA",
+      "phase4Short": "Aprobaciones",
+      "complete": "Completa",
+      "active": "Activa",
+      "locked": "Bloqueada",
+      "blocked": {
+        "title": "Esta tarea aún no puede iniciarse",
+        "message": "Todas las tareas de {{phaseName}} deben completarse primero. Progreso: {{completed}}/{{total}} completadas."
+      }
+    },
     "detail": {
       "title": "Detalles de la Tarea",
       "assignedTo": "Asignado a",
