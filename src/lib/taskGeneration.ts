@@ -14,6 +14,7 @@ interface TaskTemplate {
   execution_phase: number;
   review_level_min: number;
   sort_order: number;
+  instruction_step_count: number;
 }
 
 /**
