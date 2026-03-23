@@ -214,7 +214,13 @@ export function TaskDetailPanel({ task, open, onClose, reviewCaseId, reviewCaseS
             instructions={task.execution_instructions}
             taskStatus={task.status}
             instructionStepCount={instructionStepCount}
-            canInteract={execution.canAddNotes && task.status === 'in_progress'}
+            canInteract={
+              task.status === 'in_progress'
+                ? (execution.isAssignee || execution.isSystemOwner || execution.isSuperUser)
+                : task.status === 'completed'
+                  ? (execution.isSystemOwner || execution.isSuperUser)
+                  : false
+            }
             checkedSteps={checkoffs.checkedSteps}
             checkoffDetails={checkoffs.checkoffDetails}
             onToggleStep={(stepIndex) => checkoffs.toggleCheckoff.mutate(stepIndex)}
