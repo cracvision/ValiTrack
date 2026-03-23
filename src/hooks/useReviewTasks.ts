@@ -1,4 +1,4 @@
-import { useQuery } from '@tanstack/react-query';
+import { useQuery, keepPreviousData } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import type { ReviewTask } from '@/types';
 
@@ -68,5 +68,6 @@ export function useReviewTasks(reviewCaseId: string | undefined) {
       }));
     },
     enabled: !!reviewCaseId,
+    placeholderData: keepPreviousData,
   });
 }

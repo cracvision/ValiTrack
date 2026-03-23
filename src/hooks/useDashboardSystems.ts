@@ -1,4 +1,4 @@
-import { useQuery } from '@tanstack/react-query';
+import { useQuery, keepPreviousData } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/hooks/useAuth';
 import type { SystemProfile, ReviewStatus as CaseStatus } from '@/types';
@@ -210,6 +210,7 @@ export function useDashboardSystems() {
       return dashboardSystems;
     },
     enabled: !!userId && roles.length > 0,
-    staleTime: 2 * 60 * 1000,
+    staleTime: 2 * 60 * 1000, // Same as global default; explicit for documentation
+    placeholderData: keepPreviousData,
   });
 }
