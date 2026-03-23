@@ -1,4 +1,4 @@
-// build v2
+// build v3
 import { useState, useCallback } from 'react';
 import { useTranslation } from 'react-i18next';
 import { AlertTriangle, User, Sparkles, Calendar, Info, Lock } from 'lucide-react';
@@ -22,6 +22,7 @@ import { useTaskExecution } from '@/hooks/useTaskExecution';
 import { useTaskWorkNotes } from '@/hooks/useTaskWorkNotes';
 import { useTaskEvidenceFiles } from '@/hooks/useTaskEvidenceFiles';
 import { useTaskPhaseUnlocked } from '@/hooks/useTaskPhaseStatus';
+import { useTaskCheckoffs } from '@/hooks/useTaskCheckoffs';
 import { TaskActionButtons } from '@/components/tasks/TaskActionButtons';
 import { TaskReassignDialog } from '@/components/tasks/TaskReassignDialog';
 import { TaskWorkLog } from '@/components/tasks/TaskWorkLog';
