@@ -56,6 +56,7 @@ export function useReviewTasks(reviewCaseId: string | undefined) {
         reopened_by: row.reopened_by ?? undefined,
         reopened_reason: row.reopened_reason ?? undefined,
         execution_instructions: row.execution_instructions ?? undefined,
+        execution_phase: row.execution_phase ?? 1,
         sort_order: row.sort_order,
         created_at: row.created_at,
         created_by: row.created_by,
