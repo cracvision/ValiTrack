@@ -24,13 +24,9 @@ export function useTaskExecution({ task, reviewCaseId, reviewCaseStatus, systemO
   const isSuperUser = roles.includes('super_user');
   const isSystemOwner = !!userId && !!systemOwnerId && systemOwnerId === userId;
 
-  // Permission: only assignee or super_user can start/complete
   const canExecute = !!task && !!userId && (isAssignee || isSuperUser);
-  // Permission: only SO or super_user can reopen
   const canReopen_ = !!task && !!userId && (isSystemOwner || isSuperUser);
-  // Permission: only assignee or super_user can add notes
   const canAddNotes = !!task && !!userId && (isAssignee || isSuperUser);
-  // Permission: only SO or super_user can reassign
   const canReassign = !!task && !!userId && (isSystemOwner || isSuperUser);
 
   const isInProgress = reviewCaseStatus === 'in_progress';
@@ -39,18 +35,29 @@ export function useTaskExecution({ task, reviewCaseId, reviewCaseStatus, systemO
   const canComplete = canExecute && task?.status === 'in_progress' && isInProgress;
   const canReopen = canReopen_ && task?.status === 'completed' && isInProgress;
 
-  // Read-only: user cannot execute, reopen, or add notes
   const isReadOnly = !canExecute && !canReopen_ && !isSuperUser;
 
   const invalidateQueries = () => {
     queryClient.invalidateQueries({ queryKey: ['review-tasks', reviewCaseId] });
     queryClient.invalidateQueries({ queryKey: ['task-work-notes', task?.id] });
     queryClient.invalidateQueries({ queryKey: ['review-case', reviewCaseId] });
+    queryClient.invalidateQueries({ queryKey: ['review-case-phases', reviewCaseId] });
+    queryClient.invalidateQueries({ queryKey: ['task-phase-unlocked'] });
   };
 
   const startTask = useMutation({
     mutationFn: async () => {
       if (!task || !userId) throw new Error('Missing task or user');
+
+      // Phase guard: check if prior phases are complete
+      const { data: phaseCheck, error: phaseError } = await supabase.rpc('check_task_phase_unlocked', {
+        p_task_id: task.id,
+      } as any);
+      if (phaseError) throw phaseError;
+      const phaseResult = phaseCheck as unknown as { unlocked: boolean; error?: string };
+      if (!phaseResult?.unlocked) {
+        throw new Error('Cannot start this task. All tasks in prior execution phases must be completed first.');
+      }
 
       const now = new Date().toISOString();
 

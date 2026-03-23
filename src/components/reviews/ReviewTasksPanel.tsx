@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { User, Sparkles, AlertTriangle, CheckCircle2 } from 'lucide-react';
+import { User, Sparkles, AlertTriangle, CheckCircle2, Lock } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@/components/ui/accordion';
 import { Progress } from '@/components/ui/progress';
@@ -9,7 +9,9 @@ import { Skeleton } from '@/components/ui/skeleton';
 import { useReviewTasks } from '@/hooks/useReviewTasks';
 import { useAuth } from '@/hooks/useAuth';
 import { TaskDetailPanel } from '@/components/tasks/TaskDetailPanel';
-import type { ReviewTask, TaskGroup, ReviewLevel } from '@/types';
+import { ExecutionPhaseProgress } from '@/components/reviews/ExecutionPhaseProgress';
+import type { ReviewTask, TaskGroup, ReviewLevel, ExecutionPhase, TASK_GROUP_TO_PHASE } from '@/types';
+import { TASK_GROUP_TO_PHASE as PHASE_MAP } from '@/types';
 
 const TASK_GROUP_ORDER: TaskGroup[] = ['INIT', 'ITSM', 'QMS', 'SEC', 'INFRA', 'DOC', 'AI_EVAL', 'APPR'];
 
@@ -46,7 +48,6 @@ export function ReviewTasksPanel({ reviewCaseId, reviewLevel, reviewCaseStatus, 
     );
   }
 
-  // Error state: tasks should exist but don't
   if (!tasks || tasks.length === 0) {
     return (
       <div className="border rounded-lg p-4 space-y-3">
@@ -59,6 +60,28 @@ export function ReviewTasksPanel({ reviewCaseId, reviewLevel, reviewCaseStatus, 
       </div>
     );
   }
+
+  // Compute phase completion from loaded tasks (client-side for task list lock icons)
+  const phaseCompletion: Record<number, { total: number; completed: number; isComplete: boolean }> = {};
+  for (const t of tasks) {
+    const phase = t.execution_phase || PHASE_MAP[t.task_group] || 1;
+    if (!phaseCompletion[phase]) phaseCompletion[phase] = { total: 0, completed: 0, isComplete: false };
+    phaseCompletion[phase].total++;
+    if (t.status === 'completed') phaseCompletion[phase].completed++;
+  }
+  for (const key of Object.keys(phaseCompletion)) {
+    const p = phaseCompletion[Number(key)];
+    p.isComplete = p.total > 0 && p.completed === p.total;
+  }
+
+  const isPhaseBlocked = (taskPhase: number): boolean => {
+    if (taskPhase <= 1) return false;
+    for (let i = 1; i < taskPhase; i++) {
+      const p = phaseCompletion[i];
+      if (p && !p.isComplete) return true;
+    }
+    return false;
+  };
 
   // Apply filter
   const filteredTasks = filter === 'mine' && user
@@ -121,6 +144,9 @@ export function ReviewTasksPanel({ reviewCaseId, reviewLevel, reviewCaseStatus, 
           <Progress value={totalCount > 0 ? (totalCompleted / totalCount) * 100 : 0} className="h-2" />
         </div>
 
+        {/* Execution Phase Progress — always shows GLOBAL counts */}
+        <ExecutionPhaseProgress reviewCaseId={reviewCaseId} />
+
         {/* Grouped accordion — all expanded by default */}
         <Accordion type="multiple" defaultValue={grouped.map(g => g.group)}>
           {grouped.map(({ group, tasks: groupTasks }) => {
@@ -144,6 +170,7 @@ export function ReviewTasksPanel({ reviewCaseId, reviewLevel, reviewCaseStatus, 
                         key={task.id}
                         task={task}
                         onClick={() => setSelectedTaskId(task.id)}
+                        isPhaseBlocked={task.status === 'pending' && isPhaseBlocked(task.execution_phase || PHASE_MAP[task.task_group] || 1)}
                       />
                     ))}
                   </div>
@@ -167,13 +194,15 @@ export function ReviewTasksPanel({ reviewCaseId, reviewLevel, reviewCaseStatus, 
   );
 }
 
-function TaskRow({ task, onClick }: { task: ReviewTask; onClick: () => void }) {
+function TaskRow({ task, onClick, isPhaseBlocked }: { task: ReviewTask; onClick: () => void; isPhaseBlocked: boolean }) {
   const { t } = useTranslation();
   const isCompleted = task.status === 'completed';
 
   return (
     <div
-      className={`flex items-center gap-2 py-1.5 px-2 rounded hover:bg-muted/50 text-sm cursor-pointer transition-colors ${isCompleted ? 'opacity-70' : ''}`}
+      className={`flex items-center gap-2 py-1.5 px-2 rounded hover:bg-muted/50 text-sm cursor-pointer transition-colors ${
+        isCompleted ? 'opacity-70' : ''
+      } ${isPhaseBlocked ? 'opacity-50' : ''}`}
       onClick={onClick}
       role="button"
       tabIndex={0}
@@ -181,7 +210,14 @@ function TaskRow({ task, onClick }: { task: ReviewTask; onClick: () => void }) {
     >
       {/* Status badge — fixed width container for alignment */}
       <div className="w-[90px] shrink-0 flex items-center">
-        {isCompleted ? (
+        {isPhaseBlocked ? (
+          <div className="flex items-center gap-1">
+            <Lock className="h-3.5 w-3.5 text-muted-foreground" />
+            <Badge variant="outline" className={`text-[10px] px-1.5 py-0 ${STATUS_STYLES['pending']}`}>
+              {t('tasks.status.pending')}
+            </Badge>
+          </div>
+        ) : isCompleted ? (
           <CheckCircle2 className="h-4 w-4 text-emerald-600" />
         ) : (
           <Badge variant="outline" className={`text-[10px] px-1.5 py-0 ${STATUS_STYLES[task.status] || ''}`}>
@@ -212,7 +248,7 @@ function TaskRow({ task, onClick }: { task: ReviewTask; onClick: () => void }) {
         {task.assigned_to_name}
       </span>
 
-      {/* Date — show completed date for completed tasks, due date otherwise */}
+      {/* Date */}
       <span className="text-xs text-muted-foreground shrink-0 tabular-nums">
         {isCompleted && task.completed_at
           ? new Date(task.completed_at).toLocaleDateString()
