@@ -11,6 +11,7 @@ interface TaskTemplate {
   default_approver_role: string;
   phase: string;
   execution_type: string;
+  execution_phase: number;
   review_level_min: number;
   sort_order: number;
 }
