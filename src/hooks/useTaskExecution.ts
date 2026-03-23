@@ -43,6 +43,7 @@ export function useTaskExecution({ task, reviewCaseId, reviewCaseStatus, systemO
     queryClient.invalidateQueries({ queryKey: ['review-case', reviewCaseId] });
     queryClient.invalidateQueries({ queryKey: ['review-case-phases', reviewCaseId] });
     queryClient.invalidateQueries({ queryKey: ['task-phase-unlocked'] });
+    queryClient.invalidateQueries({ queryKey: ['task-checkoffs', task?.id] });
   };
 
   const startTask = useMutation({
