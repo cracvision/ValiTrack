@@ -213,6 +213,13 @@ export function TaskDetailPanel({ task, open, onClose, reviewCaseId, reviewCaseS
           <TaskInstructionsSection
             instructions={task.execution_instructions}
             taskStatus={task.status}
+            instructionStepCount={instructionStepCount}
+            canInteract={execution.canAddNotes && task.status === 'in_progress'}
+            checkedSteps={checkoffs.checkedSteps}
+            checkoffDetails={checkoffs.checkoffDetails}
+            onToggleStep={(stepIndex) => checkoffs.toggleCheckoff.mutate(stepIndex)}
+            isToggling={checkoffs.toggleCheckoff.isPending}
+            highlight={highlightSections && instructionsIncomplete}
           />
         )}
 
