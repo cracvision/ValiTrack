@@ -68,5 +68,6 @@ export function useReviewTasks(reviewCaseId: string | undefined) {
       }));
     },
     enabled: !!reviewCaseId,
+    placeholderData: keepPreviousData,
   });
 }
