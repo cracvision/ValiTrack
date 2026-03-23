@@ -12,6 +12,25 @@ export type ReviewLevel = '1' | '2' | '3';
 export type ReviewConclusion = 'remains_validated' | 'requires_remediation' | 'requires_revalidation';
 export type TaskGroup = 'INIT' | 'ITSM' | 'QMS' | 'SEC' | 'INFRA' | 'DOC' | 'AI_EVAL' | 'APPR';
 export type TaskPhase = 'initiation' | 'evidence_gathering' | 'ai_evaluation' | 'approval';
+export type ExecutionPhase = 1 | 2 | 3 | 4;
+
+export const EXECUTION_PHASE_LABELS: Record<ExecutionPhase, string> = {
+  1: 'tasks.phases.phase1Short',
+  2: 'tasks.phases.phase2Short',
+  3: 'tasks.phases.phase3Short',
+  4: 'tasks.phases.phase4Short',
+};
+
+export const TASK_GROUP_TO_PHASE: Record<string, ExecutionPhase> = {
+  'INIT': 1,
+  'ITSM': 2,
+  'QMS': 2,
+  'SEC': 2,
+  'INFRA': 2,
+  'DOC': 2,
+  'AI_EVAL': 3,
+  'APPR': 4,
+};
 export type TaskExecutionType = 'manual' | 'ai_assisted' | 'auto_generated';
 export type TaskStatus = 'pending' | 'in_progress' | 'completed';
 export type WorkNoteType = 'work_note' | 'status_change' | 'evidence_upload' | 'reopen_reason' | 'reassignment';
