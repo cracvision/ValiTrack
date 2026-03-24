@@ -273,6 +273,8 @@
       "period": "Review Period",
       "level": "Review Level",
       "dueDate": "Due Date",
+      "completionDue": "Completion Due",
+      "periodEndDate": "Period End Date",
       "initiatedBy": "Initiated By",
       "created": "Created",
       "roleAssignments": "Role Assignments",
