@@ -309,6 +309,7 @@ export type Database = {
           initiated_by: string
           is_deleted: boolean
           it_manager_id: string | null
+          period_end_date: string | null
           qa_id: string
           review_level: string
           review_period_end: string
@@ -336,6 +337,7 @@ export type Database = {
           initiated_by: string
           is_deleted?: boolean
           it_manager_id?: string | null
+          period_end_date?: string | null
           qa_id: string
           review_level: string
           review_period_end: string
@@ -363,6 +365,7 @@ export type Database = {
           initiated_by?: string
           is_deleted?: boolean
           it_manager_id?: string | null
+          period_end_date?: string | null
           qa_id?: string
           review_level?: string
           review_period_end?: string
@@ -583,6 +586,7 @@ export type Database = {
         Row: {
           approval_status: string
           business_owner_id: string | null
+          completion_window_days: number
           created_at: string
           created_by: string
           deleted_at: string | null
@@ -615,6 +619,7 @@ export type Database = {
         Insert: {
           approval_status?: string
           business_owner_id?: string | null
+          completion_window_days?: number
           created_at?: string
           created_by: string
           deleted_at?: string | null
@@ -647,6 +652,7 @@ export type Database = {
         Update: {
           approval_status?: string
           business_owner_id?: string | null
+          completion_window_days?: number
           created_at?: string
           created_by?: string
           deleted_at?: string | null
