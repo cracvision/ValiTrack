@@ -763,7 +763,10 @@
       "createProfile": "Create Profile",
       "selectPlaceholder": "Select {{label}}",
       "loadingUsers": "Loading...",
-      "noUsersForRole": "No users with this role"
+      "noUsersForRole": "No users with this role",
+      "completionWindow": "Completion Window",
+      "completionWindowDays": "days",
+      "completionWindowHelp": "Days after review period ends to complete the review. Standard: 90 days."
     },
     "approval": {
       "status": {
