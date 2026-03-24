@@ -461,6 +461,7 @@ export type Database = {
           description: string
           due_date: string
           execution_instructions: string | null
+          execution_instructions_es: string | null
           execution_phase: number
           execution_type: string
           id: string
@@ -497,6 +498,7 @@ export type Database = {
           description?: string
           due_date: string
           execution_instructions?: string | null
+          execution_instructions_es?: string | null
           execution_phase?: number
           execution_type?: string
           id?: string
@@ -533,6 +535,7 @@ export type Database = {
           description?: string
           due_date?: string
           execution_instructions?: string | null
+          execution_instructions_es?: string | null
           execution_phase?: number
           execution_type?: string
           id?: string
@@ -808,6 +811,7 @@ export type Database = {
           deleted_by: string | null
           description: string
           execution_instructions: string | null
+          execution_instructions_es: string | null
           execution_phase: number
           execution_type: string
           id: string
@@ -832,6 +836,7 @@ export type Database = {
           deleted_by?: string | null
           description?: string
           execution_instructions?: string | null
+          execution_instructions_es?: string | null
           execution_phase?: number
           execution_type?: string
           id?: string
@@ -856,6 +861,7 @@ export type Database = {
           deleted_by?: string | null
           description?: string
           execution_instructions?: string | null
+          execution_instructions_es?: string | null
           execution_phase?: number
           execution_type?: string
           id?: string
