@@ -5,6 +5,7 @@ export interface TransitionRule {
   requiredRoles: string[];
   requiresReason?: boolean;
   requiresConclusion?: boolean;
+  requiresESignature?: boolean;
   label: string;
   labelKey: string;
 }
