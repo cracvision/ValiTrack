@@ -482,6 +482,7 @@ export type Database = {
           task_group: string
           template_id: string | null
           title: string
+          title_es: string | null
           updated_at: string
           updated_by: string | null
         }
@@ -519,6 +520,7 @@ export type Database = {
           task_group: string
           template_id?: string | null
           title: string
+          title_es?: string | null
           updated_at?: string
           updated_by?: string | null
         }
@@ -556,6 +558,7 @@ export type Database = {
           task_group?: string
           template_id?: string | null
           title?: string
+          title_es?: string | null
           updated_at?: string
           updated_by?: string | null
         }
@@ -823,6 +826,7 @@ export type Database = {
           sort_order: number
           task_group: string
           title: string
+          title_es: string | null
           updated_at: string
           updated_by: string | null
         }
@@ -848,6 +852,7 @@ export type Database = {
           sort_order?: number
           task_group: string
           title: string
+          title_es?: string | null
           updated_at?: string
           updated_by?: string | null
         }
@@ -873,6 +878,7 @@ export type Database = {
           sort_order?: number
           task_group?: string
           title?: string
+          title_es?: string | null
           updated_at?: string
           updated_by?: string | null
         }
