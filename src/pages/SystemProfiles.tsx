@@ -82,8 +82,8 @@ export default function SystemProfiles() {
 
     if (success) {
       toast({
-        title: isEdit ? 'System updated' : 'System created',
-        description: `${system.name} (${system.system_identifier}) has been saved.`,
+        title: isEdit ? t('systemProfiles.toast.systemUpdated') : t('systemProfiles.toast.systemCreated'),
+        description: t('systemProfiles.toast.systemSaved', { name: system.name, id: system.system_identifier }),
       });
     }
     setEditingSystem(null);
@@ -102,8 +102,8 @@ export default function SystemProfiles() {
     setDeleteId(null);
     if (success) {
       toast({
-        title: 'System deleted',
-        description: `${system?.name} has been removed.`,
+        title: t('systemProfiles.toast.systemDeleted'),
+        description: t('systemProfiles.toast.systemRemoved', { name: system?.name }),
       });
     }
   };
@@ -138,15 +138,15 @@ export default function SystemProfiles() {
     <div className="space-y-6">
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-2xl font-bold text-foreground">System Profiles</h1>
+          <h1 className="text-2xl font-bold text-foreground">{t('systemProfiles.title')}</h1>
           <p className="text-sm text-muted-foreground">
-            Register and manage your validated computerized systems
+            {t('systemProfiles.subtitle')}
           </p>
         </div>
         {canEdit && (
           <Button onClick={handleNewSystem}>
             <Plus className="mr-2 h-4 w-4" />
-            New System Profile
+            {t('systemProfiles.newSystemProfile')}
           </Button>
         )}
       </div>
@@ -155,13 +155,13 @@ export default function SystemProfiles() {
         <Card>
           <CardContent className="flex flex-col items-center justify-center py-16">
             <Server className="h-12 w-12 text-muted-foreground/40 mb-4" />
-            <h3 className="text-lg font-semibold text-foreground mb-1">No systems registered</h3>
+            <h3 className="text-lg font-semibold text-foreground mb-1">{t('systemProfiles.empty.title')}</h3>
             <p className="text-sm text-muted-foreground mb-4">
-              Create your first System Profile to get started with periodic reviews.
+              {t('systemProfiles.empty.description')}
             </p>
             <Button onClick={handleNewSystem}>
               <Plus className="mr-2 h-4 w-4" />
-              Create First System
+              {t('systemProfiles.empty.action')}
             </Button>
           </CardContent>
         </Card>
@@ -170,15 +170,15 @@ export default function SystemProfiles() {
           <CardHeader className="pb-3">
             <div className="flex items-center justify-between">
               <CardTitle className="text-base">
-                {filtered.length} of {systems.length} system{systems.length !== 1 ? 's' : ''}
+                {t(systems.length === 1 ? 'systemProfiles.countOfSingular' : 'systemProfiles.countOf', { count: filtered.length, total: systems.length })}
               </CardTitle>
               <div className="flex gap-2">
                 <Select value={filterEnvironment} onValueChange={setFilterEnvironment}>
                   <SelectTrigger className="w-[160px] h-8 text-xs">
-                    <SelectValue placeholder="Environment" />
+                    <SelectValue placeholder={t('systemProfiles.columns.environment')} />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="all">All Environments</SelectItem>
+                    <SelectItem value="all">{t('systemProfiles.filters.allEnvironments')}</SelectItem>
                     {SYSTEM_ENVIRONMENT_OPTIONS.map((e) => (
                       <SelectItem key={e.value} value={e.value}>{e.label}</SelectItem>
                     ))}
@@ -186,10 +186,10 @@ export default function SystemProfiles() {
                 </Select>
                 <Select value={filterStatus} onValueChange={setFilterStatus}>
                   <SelectTrigger className="w-[150px] h-8 text-xs">
-                    <SelectValue placeholder="Status" />
+                    <SelectValue placeholder={t('systemProfiles.columns.status')} />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="all">All Statuses</SelectItem>
+                    <SelectItem value="all">{t('systemProfiles.filters.allStatuses')}</SelectItem>
                     {['Active', 'Retired', 'Under Validation'].map((s) => (
                       <SelectItem key={s} value={s}>{s}</SelectItem>
                     ))}
@@ -197,10 +197,10 @@ export default function SystemProfiles() {
                 </Select>
                 <Select value={filterApproval} onValueChange={setFilterApproval}>
                   <SelectTrigger className="w-[150px] h-8 text-xs">
-                    <SelectValue placeholder="Approval" />
+                    <SelectValue placeholder={t('systemProfiles.columns.approval')} />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="all">{t('systemProfiles.approval.filters.allApproval', { defaultValue: 'All Approval' })}</SelectItem>
+                    <SelectItem value="all">{t('systemProfiles.approval.filters.allApproval')}</SelectItem>
                     <SelectItem value="draft">{t('systemProfiles.approval.status.draft')}</SelectItem>
                     <SelectItem value="in_review">{t('systemProfiles.approval.status.inReview')}</SelectItem>
                     <SelectItem value="approved">{t('systemProfiles.approval.status.approved')}</SelectItem>
@@ -213,15 +213,15 @@ export default function SystemProfiles() {
             <Table>
               <TableHeader>
                 <TableRow>
-                  <TableHead>System</TableHead>
-                  <TableHead>Environment</TableHead>
-                  <TableHead>Classification</TableHead>
-                  <TableHead>GAMP</TableHead>
-                  <TableHead>Risk</TableHead>
-                  <TableHead>Status</TableHead>
-                  <TableHead>Approval</TableHead>
-                  <TableHead>Next Review</TableHead>
-                  {canEdit && <TableHead className="w-[80px]">Actions</TableHead>}
+                  <TableHead>{t('systemProfiles.columns.system')}</TableHead>
+                  <TableHead>{t('systemProfiles.columns.environment')}</TableHead>
+                  <TableHead>{t('systemProfiles.columns.classification')}</TableHead>
+                  <TableHead>{t('systemProfiles.columns.gamp')}</TableHead>
+                  <TableHead>{t('systemProfiles.columns.risk')}</TableHead>
+                  <TableHead>{t('systemProfiles.columns.status')}</TableHead>
+                  <TableHead>{t('systemProfiles.columns.approval')}</TableHead>
+                  <TableHead>{t('systemProfiles.columns.nextReview')}</TableHead>
+                  {canEdit && <TableHead className="w-[80px]">{t('systemProfiles.columns.actions')}</TableHead>}
                 </TableRow>
               </TableHeader>
               <TableBody>
@@ -287,8 +287,8 @@ export default function SystemProfiles() {
                               {system.approval_status !== 'draft' && (
                                 <TooltipContent>
                                   {system.approval_status === 'in_review'
-                                    ? t('systemProfiles.approval.banners.inReviewReadonly', { defaultValue: 'This profile is under review' })
-                                    : t('systemProfiles.approval.banners.approvedReadonly', { defaultValue: 'Return this profile to Draft to edit' })}
+                                    ? t('systemProfiles.approval.banners.inReviewReadonly')
+                                    : t('systemProfiles.approval.banners.approvedReadonly')}
                                 </TooltipContent>
                               )}
                             </Tooltip>
@@ -318,7 +318,6 @@ export default function SystemProfiles() {
         onTransition={async (profileId, fromStatus, toStatus, reason) => {
           const success = await transitionApprovalStatus(profileId, fromStatus, toStatus, reason);
           if (success) {
-            // Re-fetch the updated system for the detail dialog
             const updated = systems.find(s => s.id === profileId);
             if (updated) setViewingSystem(null);
           }
@@ -339,15 +338,15 @@ export default function SystemProfiles() {
       <AlertDialog open={!!deleteId} onOpenChange={(open) => !open && setDeleteId(null)}>
         <AlertDialogContent>
           <AlertDialogHeader>
-            <AlertDialogTitle>Delete System Profile</AlertDialogTitle>
+            <AlertDialogTitle>{t('systemProfiles.deleteDialog.title')}</AlertDialogTitle>
             <AlertDialogDescription>
-              This action cannot be undone. This will permanently delete the system profile and all associated data.
+              {t('systemProfiles.deleteDialog.description')}
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
-            <AlertDialogCancel>Cancel</AlertDialogCancel>
+            <AlertDialogCancel>{t('systemProfiles.deleteDialog.cancel')}</AlertDialogCancel>
             <AlertDialogAction onClick={handleDelete} className="bg-destructive text-destructive-foreground hover:bg-destructive/90">
-              Delete
+              {t('systemProfiles.deleteDialog.confirm')}
             </AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>

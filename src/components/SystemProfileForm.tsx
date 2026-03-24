@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState } from 'react';
 import { useForm } from 'react-hook-form';
+import { useTranslation } from 'react-i18next';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
 import {
@@ -87,9 +88,12 @@ interface RoleSelectFieldProps {
   users: RoleUser[];
   loading: boolean;
   required?: boolean;
+  loadingText: string;
+  noUsersText: string;
+  selectText: string;
 }
 
-function RoleSelectField({ form, name, label, users, loading, required }: RoleSelectFieldProps) {
+function RoleSelectField({ form, name, label, users, loading, required, loadingText, noUsersText, selectText }: RoleSelectFieldProps) {
   const hasUsers = users.length > 0;
   return (
     <FormField control={form.control} name={name} render={({ field }) => (
@@ -102,7 +106,7 @@ function RoleSelectField({ form, name, label, users, loading, required }: RoleSe
         >
           <FormControl>
             <SelectTrigger>
-              <SelectValue placeholder={loading ? 'Loading...' : !hasUsers ? 'No users with this role' : `Select ${label}`} />
+              <SelectValue placeholder={loading ? loadingText : !hasUsers ? noUsersText : selectText} />
             </SelectTrigger>
           </FormControl>
           <SelectContent>
@@ -130,6 +134,7 @@ interface SystemProfileFormProps {
 }
 
 export function SystemProfileForm({ open, onOpenChange, onSubmit, editingSystem }: SystemProfileFormProps) {
+  const { t } = useTranslation();
   const { users: systemOwners, loading: loadingOwners } = useRoleUsers('system_owner');
   const { users: systemAdmins, loading: loadingAdmins } = useRoleUsers('system_administrator');
   const { users: qaUsers, loading: loadingQA } = useRoleUsers('quality_assurance');
@@ -193,7 +198,6 @@ export function SystemProfileForm({ open, onOpenChange, onSubmit, editingSystem 
   const watchRisk = form.watch('risk_level');
   const watchGamp = form.watch('gamp_category');
 
-  // Auto-populate review period when classification or risk changes
   useEffect(() => {
     if (isInitialMount.current) {
       isInitialMount.current = false;
@@ -212,7 +216,6 @@ export function SystemProfileForm({ open, onOpenChange, onSubmit, editingSystem 
     }
   }, [watchClassification, watchRisk]);
 
-  // Reset form when editingSystem changes
   useEffect(() => {
     if (editingSystem) {
       form.reset({
@@ -239,7 +242,6 @@ export function SystemProfileForm({ open, onOpenChange, onSubmit, editingSystem 
     }
   }, [editingSystem, form]);
 
-  // Reset state when dialog opens/closes
   useEffect(() => {
     if (open) {
       isInitialMount.current = true;
@@ -292,7 +294,7 @@ export function SystemProfileForm({ open, onOpenChange, onSubmit, editingSystem 
       <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
         <DialogHeader>
           <DialogTitle className="text-lg font-semibold text-foreground">
-            {editingSystem ? 'Edit System Profile' : 'New System Profile'}
+            {editingSystem ? t('systemProfiles.form.editTitle') : t('systemProfiles.form.newTitle')}
           </DialogTitle>
         </DialogHeader>
 
@@ -300,27 +302,27 @@ export function SystemProfileForm({ open, onOpenChange, onSubmit, editingSystem 
           <form onSubmit={form.handleSubmit(handleSubmit)} className="space-y-6">
             {/* System Information */}
             <div>
-              <h3 className="text-sm font-semibold text-foreground mb-3">System Information</h3>
+              <h3 className="text-sm font-semibold text-foreground mb-3">{t('systemProfiles.form.systemInfo')}</h3>
               <div className="grid gap-4 sm:grid-cols-2">
                 <FormField control={form.control} name="name" render={({ field }) => (
                   <FormItem>
-                    <FormLabel>System Name *</FormLabel>
-                    <FormControl><Input placeholder="e.g. BePAS|X" {...field} /></FormControl>
+                    <FormLabel>{t('systemProfiles.form.systemName')} *</FormLabel>
+                    <FormControl><Input placeholder={t('systemProfiles.form.systemNamePlaceholder')} {...field} /></FormControl>
                     <FormMessage />
                   </FormItem>
                 )} />
                 <FormField control={form.control} name="system_identifier" render={({ field }) => (
                   <FormItem>
-                    <FormLabel>System Identifier *</FormLabel>
-                    <FormControl><Input placeholder="e.g. SYS-001" {...field} /></FormControl>
+                    <FormLabel>{t('systemProfiles.form.systemIdentifier')} *</FormLabel>
+                    <FormControl><Input placeholder={t('systemProfiles.form.systemIdentifierPlaceholder')} {...field} /></FormControl>
                     <FormMessage />
                   </FormItem>
                 )} />
                 <FormField control={form.control} name="system_environment" render={({ field }) => (
                   <FormItem>
-                    <FormLabel>System Environment *</FormLabel>
+                    <FormLabel>{t('systemProfiles.form.systemEnvironment')} *</FormLabel>
                     <Select onValueChange={field.onChange} value={field.value || undefined}>
-                      <FormControl><SelectTrigger><SelectValue placeholder="Select the system environment" /></SelectTrigger></FormControl>
+                      <FormControl><SelectTrigger><SelectValue placeholder={t('systemProfiles.form.systemEnvironmentPlaceholder')} /></SelectTrigger></FormControl>
                       <SelectContent>
                         {SYSTEM_ENVIRONMENT_OPTIONS.map((opt) => (
                           <SelectItemWithDescription key={opt.value} value={opt.value} description={opt.description}>
@@ -334,9 +336,9 @@ export function SystemProfileForm({ open, onOpenChange, onSubmit, editingSystem 
                 )} />
                 <FormField control={form.control} name="status" render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Status *</FormLabel>
+                    <FormLabel>{t('systemProfiles.form.statusLabel')} *</FormLabel>
                     <Select onValueChange={field.onChange} value={field.value || undefined}>
-                      <FormControl><SelectTrigger><SelectValue placeholder="Select the system status" /></SelectTrigger></FormControl>
+                      <FormControl><SelectTrigger><SelectValue placeholder={t('systemProfiles.form.statusPlaceholder')} /></SelectTrigger></FormControl>
                       <SelectContent>
                         {systemStatuses.map((s) => (
                           <SelectItem key={s} value={s}>{s}</SelectItem>
@@ -350,8 +352,8 @@ export function SystemProfileForm({ open, onOpenChange, onSubmit, editingSystem 
               <div className="mt-4">
                 <FormField control={form.control} name="intended_use" render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Intended Use *</FormLabel>
-                    <FormControl><Textarea placeholder="Describe the intended use of this system..." rows={3} {...field} /></FormControl>
+                    <FormLabel>{t('systemProfiles.form.intendedUse')} *</FormLabel>
+                    <FormControl><Textarea placeholder={t('systemProfiles.form.intendedUsePlaceholder')} rows={3} {...field} /></FormControl>
                     <FormMessage />
                   </FormItem>
                 )} />
@@ -359,8 +361,8 @@ export function SystemProfileForm({ open, onOpenChange, onSubmit, editingSystem 
               <div className="mt-4">
                 <FormField control={form.control} name="description" render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Description</FormLabel>
-                    <FormControl><Textarea placeholder="Additional details about the system..." rows={2} {...field} /></FormControl>
+                    <FormLabel>{t('systemProfiles.form.description')}</FormLabel>
+                    <FormControl><Textarea placeholder={t('systemProfiles.form.descriptionPlaceholder')} rows={2} {...field} /></FormControl>
                     <FormMessage />
                   </FormItem>
                 )} />
@@ -371,13 +373,13 @@ export function SystemProfileForm({ open, onOpenChange, onSubmit, editingSystem 
 
             {/* Classification & Risk */}
             <div>
-              <h3 className="text-sm font-semibold text-foreground mb-3">Classification & Risk</h3>
+              <h3 className="text-sm font-semibold text-foreground mb-3">{t('systemProfiles.form.classificationRisk')}</h3>
               <div className="grid gap-4 sm:grid-cols-2">
                 <FormField control={form.control} name="gxp_classification" render={({ field }) => (
                   <FormItem>
-                    <FormLabel>GxP Classification *</FormLabel>
+                    <FormLabel>{t('systemProfiles.form.gxpClassification')} *</FormLabel>
                     <Select onValueChange={field.onChange} value={field.value || undefined}>
-                      <FormControl><SelectTrigger><SelectValue placeholder="Choose the corresponding classification" /></SelectTrigger></FormControl>
+                      <FormControl><SelectTrigger><SelectValue placeholder={t('systemProfiles.form.gxpPlaceholder')} /></SelectTrigger></FormControl>
                       <SelectContent>
                         {GXP_OPTIONS.map((opt) => (
                           <SelectItemWithDescription key={opt.value} value={opt.value} description={opt.description}>
@@ -391,9 +393,9 @@ export function SystemProfileForm({ open, onOpenChange, onSubmit, editingSystem 
                 )} />
                 <FormField control={form.control} name="risk_level" render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Risk Level *</FormLabel>
+                    <FormLabel>{t('systemProfiles.form.riskLevel')} *</FormLabel>
                     <Select onValueChange={field.onChange} value={field.value || undefined}>
-                      <FormControl><SelectTrigger><SelectValue placeholder="Choose the risk level" /></SelectTrigger></FormControl>
+                      <FormControl><SelectTrigger><SelectValue placeholder={t('systemProfiles.form.riskPlaceholder')} /></SelectTrigger></FormControl>
                       <SelectContent>
                         {riskLevels.map((r) => (
                           <SelectItem key={r} value={r}>{r}</SelectItem>
@@ -405,9 +407,9 @@ export function SystemProfileForm({ open, onOpenChange, onSubmit, editingSystem 
                 )} />
                 <FormField control={form.control} name="gamp_category" render={({ field }) => (
                   <FormItem>
-                    <FormLabel>GAMP Category *</FormLabel>
+                    <FormLabel>{t('systemProfiles.form.gampCategory')} *</FormLabel>
                     <Select onValueChange={field.onChange} value={field.value || undefined}>
-                      <FormControl><SelectTrigger><SelectValue placeholder="Select the GAMP category" /></SelectTrigger></FormControl>
+                      <FormControl><SelectTrigger><SelectValue placeholder={t('systemProfiles.form.gampPlaceholder')} /></SelectTrigger></FormControl>
                       <SelectContent>
                         {GAMP_CATEGORY_OPTIONS.map((opt) => (
                           <SelectItemWithDescription key={opt.value} value={opt.value} description={opt.description}>
@@ -420,14 +422,14 @@ export function SystemProfileForm({ open, onOpenChange, onSubmit, editingSystem 
                   </FormItem>
                 )} />
                 <div>
-                  <FormLabel className="text-sm font-medium">Review Level</FormLabel>
+                  <FormLabel className="text-sm font-medium">{t('systemProfiles.form.reviewLevel')}</FormLabel>
                   <div className={`mt-2 flex h-10 items-center rounded-md border border-input bg-muted/50 px-3 text-sm ${flashReviewLevel ? 'ring-2 ring-primary/50 bg-primary/5 transition-all duration-500' : 'transition-all duration-500'}`}>
-                    {reviewLevelSuggestion ? `Level ${reviewLevelSuggestion}` : '—'}
+                    {reviewLevelSuggestion ? t('common.level', { level: reviewLevelSuggestion }) : '—'}
                   </div>
                   <p className="text-xs text-muted-foreground mt-1">
                     {reviewLevelSuggestion
-                      ? 'Suggested based on risk level and GAMP category'
-                      : 'Select risk level and GAMP category to calculate'}
+                      ? t('systemProfiles.form.reviewLevelSuggested')
+                      : t('systemProfiles.form.reviewLevelSelect')}
                   </p>
                 </div>
               </div>
@@ -437,19 +439,19 @@ export function SystemProfileForm({ open, onOpenChange, onSubmit, editingSystem 
 
             {/* Vendor Information */}
             <div>
-              <h3 className="text-sm font-semibold text-foreground mb-3">Vendor Information</h3>
+              <h3 className="text-sm font-semibold text-foreground mb-3">{t('systemProfiles.form.vendorInfo')}</h3>
               <div className="grid gap-4 sm:grid-cols-2">
                 <FormField control={form.control} name="vendor_name" render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Vendor Name *</FormLabel>
-                    <FormControl><Input placeholder="e.g. Körber AG" {...field} /></FormControl>
+                    <FormLabel>{t('systemProfiles.form.vendorName')} *</FormLabel>
+                    <FormControl><Input placeholder={t('systemProfiles.form.vendorNamePlaceholder')} {...field} /></FormControl>
                     <FormMessage />
                   </FormItem>
                 )} />
                 <FormField control={form.control} name="vendor_contact" render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Vendor Contact</FormLabel>
-                    <FormControl><Input placeholder="Contact info or email" {...field} /></FormControl>
+                    <FormLabel>{t('systemProfiles.form.vendorContact')}</FormLabel>
+                    <FormControl><Input placeholder={t('systemProfiles.form.vendorContactPlaceholder')} {...field} /></FormControl>
                     <FormMessage />
                   </FormItem>
                 )} />
@@ -457,8 +459,8 @@ export function SystemProfileForm({ open, onOpenChange, onSubmit, editingSystem 
               <div className="mt-4">
                 <FormField control={form.control} name="vendor_contract_ref" render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Contract Reference</FormLabel>
-                    <FormControl><Input placeholder="e.g. CTR-2024-0045" {...field} /></FormControl>
+                    <FormLabel>{t('systemProfiles.form.contractRef')}</FormLabel>
+                    <FormControl><Input placeholder={t('systemProfiles.form.contractRefPlaceholder')} {...field} /></FormControl>
                     <FormMessage />
                   </FormItem>
                 )} />
@@ -469,30 +471,30 @@ export function SystemProfileForm({ open, onOpenChange, onSubmit, editingSystem 
 
             {/* Review Schedule */}
             <div>
-              <h3 className="text-sm font-semibold text-foreground mb-3">Review Schedule</h3>
+              <h3 className="text-sm font-semibold text-foreground mb-3">{t('systemProfiles.form.reviewSchedule')}</h3>
               <div className="grid gap-4 sm:grid-cols-2">
                 <FormField control={form.control} name="validation_date" render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Last Validation Date *</FormLabel>
+                    <FormLabel>{t('systemProfiles.form.lastValidationDate')} *</FormLabel>
                     <FormControl><Input type="date" {...field} /></FormControl>
                     <FormMessage />
                   </FormItem>
                 )} />
                 <FormField control={form.control} name="review_period_months" render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Review Period (months) *</FormLabel>
+                    <FormLabel>{t('systemProfiles.form.reviewPeriodMonths')} *</FormLabel>
                     <FormControl>
                       <Input
                         type="number"
                         {...field}
                         value={field.value || ''}
-                        placeholder="Auto-calculated"
+                        placeholder={t('systemProfiles.form.reviewPeriodAutoCalc')}
                         readOnly
                         className={`${flashPeriod ? 'ring-2 ring-primary/50 bg-primary/5 transition-all duration-500' : 'transition-all duration-500'} read-only:bg-muted/50 read-only:cursor-default`}
                       />
                     </FormControl>
                     <p className="text-xs text-muted-foreground">
-                      {field.value ? 'Auto-calculated based on GxP classification and risk level' : 'Select GxP classification and risk level to calculate'}
+                      {field.value ? t('systemProfiles.form.reviewPeriodHintSet') : t('systemProfiles.form.reviewPeriodHintEmpty')}
                     </p>
                     <FormMessage />
                   </FormItem>
@@ -504,61 +506,76 @@ export function SystemProfileForm({ open, onOpenChange, onSubmit, editingSystem 
 
             {/* Role Assignments */}
             <div>
-              <h3 className="text-sm font-semibold text-foreground mb-1">Role Assignments</h3>
+              <h3 className="text-sm font-semibold text-foreground mb-1">{t('systemProfiles.form.roleAssignments')}</h3>
               <p className="text-xs text-muted-foreground mb-3">
-                Assign users responsible for this system's periodic review process.
+                {t('systemProfiles.form.roleAssignmentsDesc')}
               </p>
               <p className="text-xs text-muted-foreground mb-4">
-                The System Owner and QA Approver must be different users to ensure separation of duties.
+                {t('systemProfiles.form.roleAssignmentsSoD')}
               </p>
               <div className="grid gap-4 sm:grid-cols-2">
                 <RoleSelectField
                   form={form}
                   name="system_owner_id"
-                  label="System Owner"
+                  label={t('systemProfiles.form.systemOwner')}
                   users={systemOwners}
                   loading={loadingOwners}
                   required
+                  loadingText={t('systemProfiles.form.loadingUsers')}
+                  noUsersText={t('systemProfiles.form.noUsersForRole')}
+                  selectText={t('systemProfiles.form.selectPlaceholder', { label: t('systemProfiles.form.systemOwner') })}
                 />
                 <RoleSelectField
                   form={form}
                   name="system_admin_id"
-                  label="System Administrator"
+                  label={t('systemProfiles.form.systemAdministrator')}
                   users={systemAdmins}
                   loading={loadingAdmins}
                   required
+                  loadingText={t('systemProfiles.form.loadingUsers')}
+                  noUsersText={t('systemProfiles.form.noUsersForRole')}
+                  selectText={t('systemProfiles.form.selectPlaceholder', { label: t('systemProfiles.form.systemAdministrator') })}
                 />
                 <RoleSelectField
                   form={form}
                   name="qa_id"
-                  label="Quality Assurance"
+                  label={t('systemProfiles.form.qualityAssurance')}
                   users={qaUsers}
                   loading={loadingQA}
                   required
+                  loadingText={t('systemProfiles.form.loadingUsers')}
+                  noUsersText={t('systemProfiles.form.noUsersForRole')}
+                  selectText={t('systemProfiles.form.selectPlaceholder', { label: t('systemProfiles.form.qualityAssurance') })}
                 />
                 <RoleSelectField
                   form={form}
                   name="it_manager_id"
-                  label="IT Manager"
+                  label={t('systemProfiles.form.itManager')}
                   users={itManagers}
                   loading={loadingIT}
+                  loadingText={t('systemProfiles.form.loadingUsers')}
+                  noUsersText={t('systemProfiles.form.noUsersForRole')}
+                  selectText={t('systemProfiles.form.selectPlaceholder', { label: t('systemProfiles.form.itManager') })}
                 />
                 <RoleSelectField
                   form={form}
                   name="business_owner_id"
-                  label="Business Owner"
+                  label={t('systemProfiles.form.businessOwner')}
                   users={businessOwners}
                   loading={loadingBO}
+                  loadingText={t('systemProfiles.form.loadingUsers')}
+                  noUsersText={t('systemProfiles.form.noUsersForRole')}
+                  selectText={t('systemProfiles.form.selectPlaceholder', { label: t('systemProfiles.form.businessOwner') })}
                 />
               </div>
             </div>
 
             <div className="flex justify-end gap-3 pt-2">
               <Button type="button" variant="outline" onClick={() => onOpenChange(false)}>
-                Cancel
+                {t('systemProfiles.form.cancel')}
               </Button>
               <Button type="submit">
-                {editingSystem ? 'Update Profile' : 'Create Profile'}
+                {editingSystem ? t('systemProfiles.form.updateProfile') : t('systemProfiles.form.createProfile')}
               </Button>
             </div>
           </form>
