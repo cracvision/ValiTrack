@@ -5,6 +5,7 @@ import { useAuth } from '@/hooks/useAuth';
 export interface MyTask {
   id: string;
   title: string;
+  title_es?: string | null;
   task_group: string;
   status: string;
   due_date: string;
@@ -25,7 +26,7 @@ export function useMyTasks() {
       // Get tasks assigned to current user
       const { data: tasks, error } = await supabase
         .from('review_tasks')
-        .select('id, title, task_group, status, due_date, review_case_id')
+        .select('id, title, title_es, task_group, status, due_date, review_case_id')
         .eq('assigned_to', userId)
         .eq('is_deleted', false)
         .in('status', ['pending', 'in_progress'])
@@ -69,6 +70,7 @@ export function useMyTasks() {
         return {
           id: t.id,
           title: t.title,
+          title_es: t.title_es ?? undefined,
           task_group: t.task_group,
           status: t.status,
           due_date: t.due_date,
