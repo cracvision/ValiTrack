@@ -1,53 +1,62 @@
 
 
-## Fix: Instruction Checkbox Bugs + Refined Business Rules
+## 3C-Fix-3: Dual Language Execution Instructions (EN + ES)
 
-### Root Causes
-
-1. **Bug 1 (checkboxes on pending)**: `TaskInstructionsSection` shows checkboxes when `taskStatus === 'in_progress' || taskStatus === 'completed'` (line 61) — this is correct. But the `canInteract` prop passed from `TaskDetailPanel` is `execution.canAddNotes && task.status === 'in_progress'`. The `canAddNotes` check doesn't include the System Owner. However, the actual checkbox enable/disable depends on `canInteract` AND `taskStatus === 'completed'` being hardcoded as disabled in the component (line 107: `isDisabled = !canInteract || taskStatus === 'completed'`). So completed tasks are always disabled. The real issue is that `canInteract` should also be `true` for SO on in_progress tasks, and for SO/super_user on completed tasks.
-
-2. **Bug 2 (can't uncheck)**: The RLS UPDATE policy exists and looks correct from the last migration. Need to verify the frontend toggle mutation is using the right update fields (`updated_by` is required). Looking at `useTaskCheckoffs.ts`, the update uses `as any` cast — need to verify the fields match the table schema.
+### Summary
+Add `execution_instructions_es` column to `task_templates` and `review_tasks`. The frontend selects which language to display based on the user's i18n language preference, falling back to English if no Spanish translation exists.
 
 ### Changes
 
-#### 1. Database: Replace UPDATE policy on `task_instruction_checkoffs`
-New policy handles both `in_progress` (assignee/SO/super_user) and `completed` (SO/super_user only) states.
+#### 1. Database Migration
+- Add `execution_instructions_es TEXT` to `task_templates` and `review_tasks`
+- Populate all 20 templates with Spanish translations (the UPDATE statements provided in the ticket)
+- Backfill existing `review_tasks` from their linked templates
+- Check AI_EVAL/APPR templates for any that have instructions needing translation
 
-#### 2. `TaskDetailPanel.tsx` — Fix `canInteract` prop
-Replace the single `canInteract` with status-aware logic:
+#### 2. Data Insert (separate from migration)
+The 20 UPDATE statements for template Spanish text will use the insert tool since they're data updates, not schema changes. The ALTER TABLE for adding columns goes in a migration.
+
+**Correction**: Per the project's guidelines, UPDATEs use the insert tool, not migrations. So the flow is:
+- **Migration**: `ALTER TABLE` to add the two columns + comments
+- **Insert tool**: All UPDATE statements for populating Spanish text + backfill review_tasks
+
+#### 3. Task Generation — `src/lib/taskGeneration.ts`
+- Add `execution_instructions_es` to the `TaskTemplate` interface
+- Add `execution_instructions_es: template.execution_instructions_es` to the payload in `buildTaskPayloads`
+
+#### 4. Task Loading — `src/hooks/useReviewTasks.ts`
+- Add `execution_instructions_es: row.execution_instructions_es ?? undefined` to the mapping (line 58 area). Already uses `select('*')` so the column is fetched automatically.
+
+#### 5. Types — `src/types/index.ts`
+- Add `execution_instructions_es?: string | null` to `ReviewTask` interface
+- Add same to `TaskTemplate` interface
+
+#### 6. Frontend — `src/components/tasks/TaskDetailPanel.tsx`
+Replace the instructions prop with language-aware selection:
+
 ```typescript
-const canInteractCheckoffs = useMemo(() => {
-  if (task.status === 'in_progress') {
-    return execution.isAssignee || execution.isSystemOwner || execution.isSuperUser;
-  }
-  if (task.status === 'completed') {
-    return execution.isSystemOwner || execution.isSuperUser;
-  }
-  return false;
-}, [task.status, ...]);
+const { i18n } = useTranslation();
+const instructions = i18n.language === 'es' && task.execution_instructions_es
+  ? task.execution_instructions_es
+  : task.execution_instructions;
 ```
 
-This requires exposing `isAssignee`, `isSystemOwner`, `isSuperUser` from `useTaskExecution` hook.
+Pass `instructions` instead of `task.execution_instructions` to `TaskInstructionsSection`. Also update the guard condition (line 217) to check both columns.
 
-#### 3. `useTaskExecution.ts` — Expose role booleans
-Add `isAssignee`, `isSystemOwner`, `isSuperUser` to the return object.
+#### 7. No other changes
+- `TaskInstructionsSection` component: unchanged (receives instructions as prop)
+- Checkoff logic: unchanged (step_index is language-independent)
+- RLS policies: unchanged
+- `instruction_step_count`: unchanged
 
-#### 4. `TaskInstructionsSection.tsx` — Fix disabled logic
-Remove the hardcoded `taskStatus === 'completed'` disable. The parent now controls interactivity correctly via `canInteract`:
-```typescript
-const isDisabled = !canInteract || isToggling;
-```
-(No longer force-disabling on completed status — parent decides.)
-
-#### 5. `useTaskCheckoffs.ts` — Verify uncheck mutation
-Ensure the soft-delete UPDATE includes `updated_by: user.id` (required by schema). Check current code has this field.
-
-### Files Changed
+### Files Modified
 
 | File | Change |
 |------|--------|
-| New migration | Replace UPDATE policy with status-aware rules |
-| `src/hooks/useTaskExecution.ts` | Expose `isAssignee`, `isSystemOwner`, `isSuperUser` |
-| `src/components/tasks/TaskDetailPanel.tsx` | Status-aware `canInteract` logic |
-| `src/components/tasks/TaskInstructionsSection.tsx` | Remove hardcoded completed disable |
+| New migration | ALTER TABLE add columns to both tables |
+| Insert tool (data) | 20 template UPDATEs + review_tasks backfill |
+| `src/lib/taskGeneration.ts` | Add field to interface + payload |
+| `src/hooks/useReviewTasks.ts` | Add field to row mapping |
+| `src/types/index.ts` | Add field to ReviewTask + TaskTemplate |
+| `src/components/tasks/TaskDetailPanel.tsx` | Language-aware instruction selection |
 
