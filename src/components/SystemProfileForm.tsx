@@ -58,6 +58,7 @@ const formSchema = z.object({
   vendor_contact: z.string().trim().max(200).optional().default(''),
   vendor_contract_ref: z.string().trim().max(100).optional().default(''),
   initial_validation_date: z.string().min(1, 'Validation date is required'),
+  last_review_period_end: z.string().optional().default(''),
   review_period_months: z.coerce.number().min(1, 'Must be at least 1 month').max(120, 'Cannot exceed 120 months'),
   completion_window_days: z.coerce.number().min(30, 'Minimum 30 days').max(180, 'Maximum 180 days').default(90),
   system_owner_id: z.string().min(1, 'System Owner is required'),
@@ -166,6 +167,7 @@ export function SystemProfileForm({ open, onOpenChange, onSubmit, editingSystem 
           vendor_contact: editingSystem.vendor_contact,
           vendor_contract_ref: editingSystem.vendor_contract_ref,
           initial_validation_date: editingSystem.initial_validation_date,
+          last_review_period_end: editingSystem.last_review_period_end ?? '',
           review_period_months: editingSystem.review_period_months,
           completion_window_days: editingSystem.completion_window_days,
           system_owner_id: editingSystem.system_owner_id,
@@ -188,6 +190,7 @@ export function SystemProfileForm({ open, onOpenChange, onSubmit, editingSystem 
           vendor_contact: '',
           vendor_contract_ref: '',
           initial_validation_date: '',
+          last_review_period_end: '',
           review_period_months: '' as unknown as number,
           completion_window_days: 90,
           system_owner_id: '',
@@ -236,6 +239,7 @@ export function SystemProfileForm({ open, onOpenChange, onSubmit, editingSystem 
         vendor_contact: editingSystem.vendor_contact,
         vendor_contract_ref: editingSystem.vendor_contract_ref,
         initial_validation_date: editingSystem.initial_validation_date,
+        last_review_period_end: editingSystem.last_review_period_end ?? '',
         review_period_months: editingSystem.review_period_months,
         completion_window_days: editingSystem.completion_window_days,
         system_owner_id: editingSystem.system_owner_id,
@@ -283,9 +287,9 @@ export function SystemProfileForm({ open, onOpenChange, onSubmit, editingSystem 
       it_manager_id: values.it_manager_id && values.it_manager_id !== '__none__' ? values.it_manager_id : undefined,
       business_owner_id: values.business_owner_id && values.business_owner_id !== '__none__' ? values.business_owner_id : undefined,
       initial_validation_date: values.initial_validation_date,
-      last_review_period_end: editingSystem?.last_review_period_end ?? null,
+      last_review_period_end: values.last_review_period_end || null,
       review_period_months: values.review_period_months,
-      next_review_date: calculateNextReviewDate(values.initial_validation_date, values.review_period_months, editingSystem?.last_review_period_end),
+      next_review_date: calculateNextReviewDate(values.initial_validation_date, values.review_period_months, values.last_review_period_end || null),
       completion_window_days: values.completion_window_days,
       approval_status: editingSystem?.approval_status ?? 'draft',
       created_at: editingSystem?.created_at ?? now,
@@ -488,15 +492,21 @@ export function SystemProfileForm({ open, onOpenChange, onSubmit, editingSystem 
                     <FormMessage />
                   </FormItem>
                 )} />
-                <div>
-                  <FormLabel className="text-sm font-medium">{t('systemProfiles.form.lastReviewPeriodEnd')}</FormLabel>
-                  <div className="mt-2 flex h-10 items-center rounded-md border border-input bg-muted/50 px-3 text-sm">
-                    {editingSystem?.last_review_period_end
-                      ? new Date(editingSystem.last_review_period_end).toLocaleDateString()
-                      : t('systemProfiles.form.noPreviousReview')}
-                  </div>
-                  <p className="text-xs text-muted-foreground mt-1">{t('systemProfiles.form.lastReviewPeriodEndHelp')}</p>
-                </div>
+                <FormField control={form.control} name="last_review_period_end" render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>{t('systemProfiles.form.lastReviewPeriodEnd')}</FormLabel>
+                    <FormControl>
+                      <Input
+                        type="date"
+                        {...field}
+                        value={field.value || ''}
+                        placeholder={t('systemProfiles.form.noPreviousReview')}
+                      />
+                    </FormControl>
+                    <p className="text-xs text-muted-foreground">{t('systemProfiles.form.lastReviewPeriodEndHelp')}</p>
+                    <FormMessage />
+                  </FormItem>
+                )} />
                 <FormField control={form.control} name="review_period_months" render={({ field }) => (
                   <FormItem>
                     <FormLabel>{t('systemProfiles.form.reviewPeriodMonths')} *</FormLabel>
