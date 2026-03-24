@@ -154,6 +154,7 @@ export function useSystemProfiles(): UseSystemProfilesReturn {
         validation_date: system.validation_date,
         review_period_months: system.review_period_months,
         next_review_date: system.next_review_date,
+        completion_window_days: system.completion_window_days,
         updated_by: user.id,
       }).eq('id', system.id);
       if (error) throw error;

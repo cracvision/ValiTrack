@@ -105,6 +105,7 @@ export interface ReviewCase {
   review_level: ReviewLevel;
   due_date: string;
   status: ReviewStatus;
+  period_end_date?: string;
   conclusion?: ReviewConclusion;
   conclusion_notes?: string;
   frozen_system_snapshot: Record<string, unknown>;
