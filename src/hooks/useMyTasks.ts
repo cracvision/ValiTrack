@@ -26,7 +26,7 @@ export function useMyTasks() {
       // Get tasks assigned to current user
       const { data: tasks, error } = await supabase
         .from('review_tasks')
-        .select('id, title, task_group, status, due_date, review_case_id')
+        .select('id, title, title_es, task_group, status, due_date, review_case_id')
         .eq('assigned_to', userId)
         .eq('is_deleted', false)
         .in('status', ['pending', 'in_progress'])
