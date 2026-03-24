@@ -236,6 +236,7 @@ export function SystemProfileForm({ open, onOpenChange, onSubmit, editingSystem 
         vendor_contract_ref: editingSystem.vendor_contract_ref,
         validation_date: editingSystem.validation_date,
         review_period_months: editingSystem.review_period_months,
+        completion_window_days: editingSystem.completion_window_days,
         system_owner_id: editingSystem.system_owner_id,
         system_admin_id: editingSystem.system_admin_id,
         qa_id: editingSystem.qa_id,
