@@ -272,6 +272,8 @@
       "period": "Período de Revisión",
       "level": "Nivel de Revisión",
       "dueDate": "Fecha Límite",
+      "completionDue": "Fecha de Completación",
+      "periodEndDate": "Fecha Fin del Período",
       "initiatedBy": "Iniciado Por",
       "created": "Creado",
       "roleAssignments": "Asignación de Roles",
