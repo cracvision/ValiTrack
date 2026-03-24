@@ -1,62 +1,121 @@
 
 
-## 3C-Fix-3: Dual Language Execution Instructions (EN + ES)
+## Iteration 3D: Completion Window + E-Signatures
 
-### Summary
-Add `execution_instructions_es` column to `task_templates` and `review_tasks`. The frontend selects which language to display based on the user's i18n language preference, falling back to English if no Spanish translation exists.
+This is a significant iteration with two distinct parts: (1) adding a completion window concept that separates the review period end from the work deadline, and (2) adding 21 CFR Part 11 e-signatures for critical QA transitions.
 
-### Changes
+---
 
-#### 1. Database Migration
-- Add `execution_instructions_es TEXT` to `task_templates` and `review_tasks`
-- Populate all 20 templates with Spanish translations (the UPDATE statements provided in the ticket)
-- Backfill existing `review_tasks` from their linked templates
-- Check AI_EVAL/APPR templates for any that have instructions needing translation
+### Part 1: Completion Window
 
-#### 2. Data Insert (separate from migration)
-The 20 UPDATE statements for template Spanish text will use the insert tool since they're data updates, not schema changes. The ALTER TABLE for adding columns goes in a migration.
+**Database Changes**
+- Migration: `ALTER TABLE system_profiles ADD COLUMN completion_window_days INTEGER NOT NULL DEFAULT 90`
+- Migration: `ALTER TABLE review_cases ADD COLUMN period_end_date DATE`
+- Data backfill (insert tool): Set `period_end_date` from existing `review_period_end` column, then recalculate `due_date = period_end_date + completion_window_days` for all non-deleted review cases
 
-**Correction**: Per the project's guidelines, UPDATEs use the insert tool, not migrations. So the flow is:
-- **Migration**: `ALTER TABLE` to add the two columns + comments
-- **Insert tool**: All UPDATE statements for populating Spanish text + backfill review_tasks
+**Types (`src/types/index.ts`)**
+- Add `completion_window_days: number` to `SystemProfile`
+- Add `period_end_date?: string` to `ReviewCase`
 
-#### 3. Task Generation — `src/lib/taskGeneration.ts`
-- Add `execution_instructions_es` to the `TaskTemplate` interface
-- Add `execution_instructions_es: template.execution_instructions_es` to the payload in `buildTaskPayloads`
+**System Profile Form (`SystemProfileForm.tsx`)**
+- Add `completion_window_days` to form schema (number, default 90, min 30, max 180)
+- Add number input field in Review Schedule section, between "Review Period" and the role assignments section
+- Label: "Completion Window" / "Ventana de Completación", with help text and "days"/"días" suffix
 
-#### 4. Task Loading — `src/hooks/useReviewTasks.ts`
-- Add `execution_instructions_es: row.execution_instructions_es ?? undefined` to the mapping (line 58 area). Already uses `select('*')` so the column is fetched automatically.
+**System Profile Detail (`SystemProfileDetailDialog.tsx`)**
+- Add "Completion Window: 90 days" field in Review Schedule section, between Review Period and Next Review Date
 
-#### 5. Types — `src/types/index.ts`
-- Add `execution_instructions_es?: string | null` to `ReviewTask` interface
-- Add same to `TaskTemplate` interface
+**System Profile Hooks (`useSystemProfiles.ts`)**
+- Add `completion_window_days` to `rowToSystemProfile`, `addSystem` insert, and `updateSystem` update payloads
 
-#### 6. Frontend — `src/components/tasks/TaskDetailPanel.tsx`
-Replace the instructions prop with language-aware selection:
+**Dashboard Hook (`useDashboardSystems.ts`)**
+- Add `completion_window_days` to the SystemProfile mapping
+- The `computeReviewStatus` function already uses `next_review_date` — this stays as-is since `next_review_date` represents the period end. The real deadline is `due_date` on the review case. Dashboard cards with active review cases already reference the case's `due_date` for countdown. No change needed here since the dashboard computes from system profile dates (period end), and when a case exists, uses the case status directly.
 
-```typescript
-const { i18n } = useTranslation();
-const instructions = i18n.language === 'es' && task.execution_instructions_es
-  ? task.execution_instructions_es
-  : task.execution_instructions;
-```
+**Review Case Creation (`CreateReviewDialog.tsx` + `useReviewCases.ts`)**
+- When selecting a system, auto-calculate: `period_end_date = next_review_date`, `due_date = period_end_date + completion_window_days`
+- Pass `period_end_date` in the insert payload
+- Add `completion_window_days` to frozen snapshot
 
-Pass `instructions` instead of `task.execution_instructions` to `TaskInstructionsSection`. Also update the guard condition (line 217) to check both columns.
+**Review Case Detail (`ReviewCaseDetail.tsx`)**
+- Show `period_end_date` and `due_date` separately: "Period End Date" / "Fecha Fin del Período" and "Completion Due" / "Fecha de Completación"
 
-#### 7. No other changes
-- `TaskInstructionsSection` component: unchanged (receives instructions as prop)
-- Checkoff logic: unchanged (step_index is language-independent)
-- RLS policies: unchanged
-- `instruction_step_count`: unchanged
+**Review Case Hooks (`useReviewCase.ts`, `useReviewCases.ts`)**
+- Map `period_end_date` from row data
 
-### Files Modified
+**i18n keys** — Add completion window labels to both `en/common.json` and `es/common.json`
+
+---
+
+### Part 2: E-Signatures
+
+**No database schema changes** — E-signature records use the existing `audit_log` table with actions `E_SIGNATURE` and `E_SIGNATURE_FAILED`. The `conclusion` column already exists on `review_cases`.
+
+**New Component: `src/components/reviews/ESignatureModal.tsx`**
+- Dialog with password field, mandatory reason (min 10 chars), and optional conclusion radio buttons (for `execution_review → approved` only)
+- Shows action label, review title, signer name/role, and 21 CFR Part 11 disclaimer
+- Displays error on failed password verification without closing
+- Loading state during verification
+
+**New Hook: `src/hooks/useESignature.ts`**
+- `verifyAndSign()` function that:
+  1. Calls `supabase.auth.signInWithPassword()` to verify the password
+  2. On failure: logs `E_SIGNATURE_FAILED` to audit_log, throws error
+  3. On success: logs `E_SIGNATURE` to audit_log with full details (transition, reason, conclusion, signer info)
+  4. Returns success for caller to proceed with transition
+
+**Workflow Config (`src/lib/reviewWorkflow.ts`)**
+- Add `requiresESignature?: boolean` to `TransitionRule` interface
+- Set `requiresESignature: true` on three transitions:
+  - `plan_approval → approved_for_execution`
+  - `execution_review → approved`
+  - `execution_review → rejected`
+
+**Review Action Buttons (`ReviewActionButtons.tsx`)**
+- Add e-signature modal state management
+- When a transition has `requiresESignature`, open `ESignatureModal` instead of executing directly
+- For `execution_review → approved`: the conclusion selector moves INTO the e-signature modal (replacing the current approve dialog for this case)
+- For `execution_review → rejected`: e-signature modal with reason only (no conclusion)
+- On successful signature: execute the existing transition logic, then close modal
+
+**Transition History (`TransitionHistory.tsx`)**
+- For each transition, check if it matches a known e-signature transition pattern
+- Query audit_log for `E_SIGNATURE` entries matching the review case
+- Show lock icon and reason text for e-signed transitions
+- For approved cases, show conclusion badge
+
+**i18n keys** — Add all `esignature.*` keys to both locale files
+
+---
+
+### Files to Modify
 
 | File | Change |
 |------|--------|
-| New migration | ALTER TABLE add columns to both tables |
-| Insert tool (data) | 20 template UPDATEs + review_tasks backfill |
-| `src/lib/taskGeneration.ts` | Add field to interface + payload |
-| `src/hooks/useReviewTasks.ts` | Add field to row mapping |
-| `src/types/index.ts` | Add field to ReviewTask + TaskTemplate |
-| `src/components/tasks/TaskDetailPanel.tsx` | Language-aware instruction selection |
+| New migration | Add `completion_window_days` to system_profiles, `period_end_date` to review_cases |
+| Insert tool (data) | Backfill `period_end_date` and recalculate `due_date` |
+| `src/types/index.ts` | Add fields to SystemProfile and ReviewCase |
+| `src/components/SystemProfileForm.tsx` | Add completion window field |
+| `src/components/SystemProfileDetailDialog.tsx` | Display completion window |
+| `src/hooks/useSystemProfiles.ts` | Map + persist completion_window_days |
+| `src/hooks/useDashboardSystems.ts` | Map completion_window_days |
+| `src/components/reviews/CreateReviewDialog.tsx` | Calculate period_end_date + due_date |
+| `src/hooks/useReviewCases.ts` | Add period_end_date to insert + mapping |
+| `src/hooks/useReviewCase.ts` | Map period_end_date |
+| `src/pages/ReviewCaseDetail.tsx` | Show both dates |
+| `src/lib/reviewWorkflow.ts` | Add requiresESignature flag |
+| `src/components/reviews/ESignatureModal.tsx` | NEW component |
+| `src/hooks/useESignature.ts` | NEW hook |
+| `src/components/reviews/ReviewActionButtons.tsx` | Intercept e-sig transitions |
+| `src/components/reviews/TransitionHistory.tsx` | Show e-signature indicators |
+| `src/locales/en/common.json` | Add all new keys |
+| `src/locales/es/common.json` | Add all new keys |
+| `src/integrations/supabase/types.ts` | Will auto-regenerate |
+
+### What Does NOT Change
+- Review workflow states (same 8)
+- Task generation, execution, phase dependencies
+- RLS policies
+- Sign-off mechanism
+- Non-e-signature transitions work exactly as before
 
