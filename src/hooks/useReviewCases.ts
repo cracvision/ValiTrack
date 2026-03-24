@@ -42,6 +42,7 @@ export function useReviewCases(filters?: { status?: ReviewStatus; systemId?: str
         review_period_end: row.review_period_end,
         review_level: row.review_level,
         due_date: row.due_date,
+        period_end_date: row.period_end_date ?? undefined,
         status: row.status,
         conclusion: row.conclusion ?? undefined,
         conclusion_notes: row.conclusion_notes ?? undefined,
@@ -75,8 +76,10 @@ export function useCreateReviewCase() {
     mutationFn: async (input: CreateReviewCaseInput): Promise<string> => {
       if (!user) throw new Error('Not authenticated');
 
-      const frozen_system_snapshot = { ...input.system };
-
+      const frozen_system_snapshot = {
+        ...input.system,
+        completion_window_days: input.system.completion_window_days ?? 90,
+      };
       const { data, error } = await supabase
         .from('review_cases')
         .insert({
@@ -86,6 +89,7 @@ export function useCreateReviewCase() {
           review_period_end: input.review_period_end,
           review_level: input.review_level,
           due_date: input.due_date,
+          period_end_date: input.review_period_end,
           status: 'draft',
           frozen_system_snapshot,
           initiated_by: user.id,

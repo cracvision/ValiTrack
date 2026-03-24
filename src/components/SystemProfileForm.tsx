@@ -59,6 +59,7 @@ const formSchema = z.object({
   vendor_contract_ref: z.string().trim().max(100).optional().default(''),
   validation_date: z.string().min(1, 'Validation date is required'),
   review_period_months: z.coerce.number().min(1, 'Must be at least 1 month').max(120, 'Cannot exceed 120 months'),
+  completion_window_days: z.coerce.number().min(30, 'Minimum 30 days').max(180, 'Maximum 180 days').default(90),
   system_owner_id: z.string().min(1, 'System Owner is required'),
   system_admin_id: z.string().min(1, 'System Administrator is required'),
   qa_id: z.string().min(1, 'Quality Assurance is required'),
@@ -165,6 +166,7 @@ export function SystemProfileForm({ open, onOpenChange, onSubmit, editingSystem 
           vendor_contract_ref: editingSystem.vendor_contract_ref,
           validation_date: editingSystem.validation_date,
           review_period_months: editingSystem.review_period_months,
+          completion_window_days: editingSystem.completion_window_days,
           system_owner_id: editingSystem.system_owner_id,
           system_admin_id: editingSystem.system_admin_id,
           qa_id: editingSystem.qa_id,
@@ -186,6 +188,7 @@ export function SystemProfileForm({ open, onOpenChange, onSubmit, editingSystem 
           vendor_contract_ref: '',
           validation_date: '',
           review_period_months: '' as unknown as number,
+          completion_window_days: 90,
           system_owner_id: '',
           system_admin_id: '',
           qa_id: '',
@@ -233,6 +236,7 @@ export function SystemProfileForm({ open, onOpenChange, onSubmit, editingSystem 
         vendor_contract_ref: editingSystem.vendor_contract_ref,
         validation_date: editingSystem.validation_date,
         review_period_months: editingSystem.review_period_months,
+        completion_window_days: editingSystem.completion_window_days,
         system_owner_id: editingSystem.system_owner_id,
         system_admin_id: editingSystem.system_admin_id,
         qa_id: editingSystem.qa_id,
@@ -280,6 +284,7 @@ export function SystemProfileForm({ open, onOpenChange, onSubmit, editingSystem 
       validation_date: values.validation_date,
       review_period_months: values.review_period_months,
       next_review_date: calculateNextReviewDate(values.validation_date, values.review_period_months),
+      completion_window_days: values.completion_window_days,
       approval_status: editingSystem?.approval_status ?? 'draft',
       created_at: editingSystem?.created_at ?? now,
       updated_at: now,
@@ -495,6 +500,30 @@ export function SystemProfileForm({ open, onOpenChange, onSubmit, editingSystem 
                     </FormControl>
                     <p className="text-xs text-muted-foreground">
                       {field.value ? t('systemProfiles.form.reviewPeriodHintSet') : t('systemProfiles.form.reviewPeriodHintEmpty')}
+                    </p>
+                    <FormMessage />
+                  </FormItem>
+                )} />
+              </div>
+              <div className="mt-4">
+                <FormField control={form.control} name="completion_window_days" render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>{t('systemProfiles.form.completionWindow')}</FormLabel>
+                    <div className="flex items-center gap-2">
+                      <FormControl>
+                        <Input
+                          type="number"
+                          {...field}
+                          value={field.value || 90}
+                          min={30}
+                          max={180}
+                          className="w-24"
+                        />
+                      </FormControl>
+                      <span className="text-sm text-muted-foreground">{t('systemProfiles.form.completionWindowDays')}</span>
+                    </div>
+                    <p className="text-xs text-muted-foreground">
+                      {t('systemProfiles.form.completionWindowHelp')}
                     </p>
                     <FormMessage />
                   </FormItem>

@@ -273,6 +273,8 @@
       "period": "Review Period",
       "level": "Review Level",
       "dueDate": "Due Date",
+      "completionDue": "Completion Due",
+      "periodEndDate": "Period End Date",
       "initiatedBy": "Initiated By",
       "created": "Created",
       "roleAssignments": "Role Assignments",
@@ -697,6 +699,7 @@
       "reviewSchedule": "Review Schedule",
       "lastValidationDate": "Last Validation Date",
       "reviewPeriod": "Review Period",
+      "completionWindow": "Completion Window",
       "nextReviewDate": "Next Review Date",
       "roleAssignments": "Role Assignments",
       "systemOwner": "System Owner",
@@ -760,7 +763,10 @@
       "createProfile": "Create Profile",
       "selectPlaceholder": "Select {{label}}",
       "loadingUsers": "Loading...",
-      "noUsersForRole": "No users with this role"
+      "noUsersForRole": "No users with this role",
+      "completionWindow": "Completion Window",
+      "completionWindowDays": "days",
+      "completionWindowHelp": "Days after review period ends to complete the review. Standard: 90 days."
     },
     "approval": {
       "status": {
@@ -812,5 +818,28 @@
         "returnReason": "Reason"
       }
     }
+  },
+  "esignature": {
+    "title": "Electronic Signature Required",
+    "description": "This action requires your electronic signature per 21 CFR Part 11. Please re-enter your password to confirm your identity.",
+    "action": "Action",
+    "review": "Review",
+    "signedBy": "Signed by",
+    "password": "Password",
+    "reason": "Reason / Comments",
+    "reasonPlaceholder": "Explain the basis for this decision...",
+    "reasonMinLength": "Reason must be at least 10 characters.",
+    "conclusion": "Conclusion",
+    "conclusionRequired": "A conclusion must be selected for final approval.",
+    "remainsValidated": "Remains Validated",
+    "requiresRemediation": "Requires Remediation",
+    "requiresRevalidation": "Requires Revalidation",
+    "disclaimer": "By signing, you confirm that you have reviewed the relevant documentation and accept responsibility for this decision.",
+    "signAndSubmit": "Sign & Submit",
+    "cancel": "Cancel",
+    "incorrectPassword": "Incorrect password. Please try again.",
+    "verifying": "Verifying...",
+    "signed": "E-Signature verified",
+    "failedAttempt": "Failed e-signature attempt"
   }
 }

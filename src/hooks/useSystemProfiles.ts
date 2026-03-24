@@ -38,6 +38,7 @@ function rowToSystemProfile(row: any): SystemProfile {
     validation_date: row.validation_date,
     review_period_months: row.review_period_months,
     next_review_date: row.next_review_date,
+    completion_window_days: row.completion_window_days ?? 90,
     approval_status: row.approval_status ?? 'draft',
     created_at: row.created_at,
     updated_at: row.updated_at,
@@ -110,6 +111,7 @@ export function useSystemProfiles(): UseSystemProfilesReturn {
         validation_date: system.validation_date,
         review_period_months: system.review_period_months,
         next_review_date: system.next_review_date,
+        completion_window_days: system.completion_window_days,
         approval_status: 'draft',
         created_by: user.id,
       });
@@ -152,6 +154,7 @@ export function useSystemProfiles(): UseSystemProfilesReturn {
         validation_date: system.validation_date,
         review_period_months: system.review_period_months,
         next_review_date: system.next_review_date,
+        completion_window_days: system.completion_window_days,
         updated_by: user.id,
       }).eq('id', system.id);
       if (error) throw error;

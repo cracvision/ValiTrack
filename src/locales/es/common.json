@@ -272,6 +272,8 @@
       "period": "Período de Revisión",
       "level": "Nivel de Revisión",
       "dueDate": "Fecha Límite",
+      "completionDue": "Fecha de Completación",
+      "periodEndDate": "Fecha Fin del Período",
       "initiatedBy": "Iniciado Por",
       "created": "Creado",
       "roleAssignments": "Asignación de Roles",
@@ -696,6 +698,7 @@
       "reviewSchedule": "Calendario de Revisión",
       "lastValidationDate": "Fecha de Última Validación",
       "reviewPeriod": "Período de Revisión",
+      "completionWindow": "Ventana de Completación",
       "nextReviewDate": "Próxima Fecha de Revisión",
       "roleAssignments": "Asignación de Roles",
       "systemOwner": "System Owner",
@@ -759,7 +762,10 @@
       "createProfile": "Crear Perfil",
       "selectPlaceholder": "Seleccionar {{label}}",
       "loadingUsers": "Cargando...",
-      "noUsersForRole": "No hay usuarios con este rol"
+      "noUsersForRole": "No hay usuarios con este rol",
+      "completionWindow": "Ventana de Completación",
+      "completionWindowDays": "días",
+      "completionWindowHelp": "Días después de que termina el período de revisión para completar la revisión. Estándar: 90 días."
     },
     "approval": {
       "status": {
@@ -811,5 +817,28 @@
         "returnReason": "Razón"
       }
     }
+  },
+  "esignature": {
+    "title": "Firma Electrónica Requerida",
+    "description": "Esta acción requiere su firma electrónica conforme a 21 CFR Part 11. Por favor reingrese su contraseña para confirmar su identidad.",
+    "action": "Acción",
+    "review": "Revisión",
+    "signedBy": "Firmado por",
+    "password": "Contraseña",
+    "reason": "Razón / Comentarios",
+    "reasonPlaceholder": "Explique la base de esta decisión...",
+    "reasonMinLength": "La razón debe tener al menos 10 caracteres.",
+    "conclusion": "Conclusión",
+    "conclusionRequired": "Se debe seleccionar una conclusión para la aprobación final.",
+    "remainsValidated": "Permanece Validado",
+    "requiresRemediation": "Requiere Remediación",
+    "requiresRevalidation": "Requiere Revalidación",
+    "disclaimer": "Al firmar, usted confirma que ha revisado la documentación relevante y acepta responsabilidad por esta decisión.",
+    "signAndSubmit": "Firmar y Enviar",
+    "cancel": "Cancelar",
+    "incorrectPassword": "Contraseña incorrecta. Por favor intente de nuevo.",
+    "verifying": "Verificando...",
+    "signed": "Firma electrónica verificada",
+    "failedAttempt": "Intento fallido de firma electrónica"
   }
 }

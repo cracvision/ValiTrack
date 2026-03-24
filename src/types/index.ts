@@ -65,6 +65,7 @@ export interface SystemProfile {
   validation_date: string;
   review_period_months: number;
   next_review_date: string;
+  completion_window_days: number;
   approval_status: ProfileApprovalStatus;
   created_at: string;
   updated_at: string;
@@ -104,6 +105,7 @@ export interface ReviewCase {
   review_level: ReviewLevel;
   due_date: string;
   status: ReviewStatus;
+  period_end_date?: string;
   conclusion?: ReviewConclusion;
   conclusion_notes?: string;
   frozen_system_snapshot: Record<string, unknown>;

@@ -28,6 +28,7 @@ export function useReviewCase(id: string | undefined) {
         review_period_end: data.review_period_end,
         review_level: data.review_level as ReviewCase['review_level'],
         due_date: data.due_date,
+        period_end_date: (data as any).period_end_date ?? undefined,
         status: data.status as ReviewStatus,
         conclusion: (data.conclusion as ReviewConclusion) ?? undefined,
         conclusion_notes: data.conclusion_notes ?? undefined,

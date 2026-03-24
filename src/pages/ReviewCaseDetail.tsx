@@ -142,6 +142,8 @@ export default function ReviewCaseDetail() {
           currentStatus={reviewCase.status}
           canAdvanceSignoff={isSignoffPhase ? signoffData.canAdvance : undefined}
           hasObjections={isSignoffPhase ? signoffData.hasObjections : undefined}
+          reviewTitle={reviewCase.title}
+          systemName={reviewCase.system_name}
         />
       </div>
 
@@ -213,7 +215,13 @@ export default function ReviewCaseDetail() {
                 <span className="font-medium">{levelConfig?.label}</span>
                 <span className="text-muted-foreground text-xs ml-1">({levelConfig?.description})</span>
               </dd>
-              <dt className="text-muted-foreground">{t('reviews.detail.dueDate')}</dt>
+              {reviewCase.period_end_date && (
+                <>
+                  <dt className="text-muted-foreground">{t('reviews.detail.periodEndDate')}</dt>
+                  <dd>{reviewCase.period_end_date}</dd>
+                </>
+              )}
+              <dt className="text-muted-foreground">{t('reviews.detail.completionDue')}</dt>
               <dd>{reviewCase.due_date}</dd>
               <dt className="text-muted-foreground">{t('reviews.detail.initiatedBy')}</dt>
               <dd>{resolveName(reviewCase.initiated_by)}</dd>
