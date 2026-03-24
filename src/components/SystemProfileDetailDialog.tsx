@@ -84,7 +84,6 @@ export function SystemProfileDetailDialog({ system, open, onOpenChange, onEdit, 
     submitDecision,
   } = useProfileSignoffs({ systemProfileId: isInReview ? system?.id : undefined });
 
-  // Fetch transition history
   const { data: transitions = [] } = useQuery({
     queryKey: ['profile-transitions', system?.id],
     queryFn: async (): Promise<ProfileTransition[]> => {
@@ -102,7 +101,6 @@ export function SystemProfileDetailDialog({ system, open, onOpenChange, onEdit, 
     enabled: !!system?.id,
   });
 
-  // Fetch completed signoffs for history timeline
   const { data: completedSignoffs = [] } = useQuery({
     queryKey: ['profile-signoffs-history', system?.id],
     queryFn: async (): Promise<ProfileSignoff[]> => {
@@ -120,14 +118,12 @@ export function SystemProfileDetailDialog({ system, open, onOpenChange, onEdit, 
     enabled: !!system?.id,
   });
 
-  // Resolve all user names for history (transition users + signoff users)
   const allHistoryUserIds = [
     ...transitions.map(t => t.transitioned_by),
     ...completedSignoffs.map(s => s.requested_user_id),
   ].filter(Boolean);
   const { data: historyNames = {} } = useResolveUserNames(allHistoryUserIds);
 
-  // Merge transitions + signoffs into unified timeline
   type TimelineEntry =
     | { type: 'transition'; timestamp: string; data: ProfileTransition }
     | { type: 'signoff'; timestamp: string; data: ProfileSignoff };
@@ -145,12 +141,12 @@ export function SystemProfileDetailDialog({ system, open, onOpenChange, onEdit, 
     })),
   ].sort((a, b) => new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime());
 
-  const ROLE_DISPLAY_LABELS: Record<string, string> = {
-    system_administrator: 'System Administrator',
-    quality_assurance: 'Quality Assurance',
-    business_owner: 'Business Owner',
-    it_manager: 'IT Manager',
-    system_owner: 'System Owner',
+  const ROLE_DISPLAY_KEYS: Record<string, string> = {
+    system_administrator: 'systemProfiles.detail.systemAdministrator',
+    quality_assurance: 'systemProfiles.detail.qualityAssurance',
+    business_owner: 'systemProfiles.detail.businessOwner',
+    it_manager: 'systemProfiles.detail.itManager',
+    system_owner: 'systemProfiles.detail.systemOwner',
   };
 
   if (!system) return null;
@@ -205,7 +201,7 @@ export function SystemProfileDetailDialog({ system, open, onOpenChange, onEdit, 
             }}
           >
             <Pencil className="mr-1.5 h-3.5 w-3.5" />
-            Edit
+            {t('common.edit')}
           </Button>
         )}
 
@@ -216,7 +212,6 @@ export function SystemProfileDetailDialog({ system, open, onOpenChange, onEdit, 
               <ProfileApprovalBadge status={system.approval_status as ProfileApprovalStatus} />
             </div>
 
-            {/* Read-only banners */}
             {system.approval_status === 'in_review' && (
               <Alert className="bg-blue-50 border-blue-200">
                 <AlertTitle className="text-blue-800 text-xs font-medium">{t('systemProfiles.approval.banners.inReviewReadonly')}</AlertTitle>
@@ -228,7 +223,6 @@ export function SystemProfileDetailDialog({ system, open, onOpenChange, onEdit, 
               </Alert>
             )}
 
-            {/* Objection banner */}
             {isInReview && hasObjections && (
               <Alert className="bg-amber-50 border-amber-200">
                 <AlertTriangle className="h-4 w-4 text-amber-700" />
@@ -239,7 +233,6 @@ export function SystemProfileDetailDialog({ system, open, onOpenChange, onEdit, 
               </Alert>
             )}
 
-            {/* Action buttons */}
             {onTransition && (
               <ProfileActionButtons
                 system={system}
@@ -251,7 +244,6 @@ export function SystemProfileDetailDialog({ system, open, onOpenChange, onEdit, 
             )}
           </div>
 
-          {/* Sign-off panel (only in_review) */}
           {isInReview && (
             <>
               <ProfileSignoffPanel
@@ -273,16 +265,16 @@ export function SystemProfileDetailDialog({ system, open, onOpenChange, onEdit, 
 
           {/* System Information */}
           <div>
-            <SectionTitle>System Information</SectionTitle>
+            <SectionTitle>{t('systemProfiles.detail.systemInfo')}</SectionTitle>
             <div className="grid grid-cols-2 gap-x-6 gap-y-3">
-              <FieldValue label="System Name" value={system.name} />
-              <FieldValue label="Identifier" value={system.system_identifier} />
-              <FieldValue label="Environment" value={envLabel} />
-              <FieldValue label="Status" value={system.status} />
+              <FieldValue label={t('systemProfiles.detail.systemName')} value={system.name} />
+              <FieldValue label={t('systemProfiles.detail.identifier')} value={system.system_identifier} />
+              <FieldValue label={t('systemProfiles.detail.environment')} value={envLabel} />
+              <FieldValue label={t('systemProfiles.detail.status')} value={system.status} />
             </div>
             <div className="mt-3 space-y-3">
-              <FieldValue label="Intended Use" value={system.intended_use} />
-              <FieldValue label="Description" value={system.description} />
+              <FieldValue label={t('systemProfiles.detail.intendedUse')} value={system.intended_use} />
+              <FieldValue label={t('systemProfiles.detail.description')} value={system.description} />
             </div>
           </div>
 
@@ -290,12 +282,12 @@ export function SystemProfileDetailDialog({ system, open, onOpenChange, onEdit, 
 
           {/* Classification & Risk */}
           <div>
-            <SectionTitle>Classification &amp; Risk</SectionTitle>
+            <SectionTitle>{t('systemProfiles.detail.classificationRisk')}</SectionTitle>
             <div className="grid grid-cols-2 gap-x-6 gap-y-3">
-              <FieldValue label="GxP Classification" value={gxpLabel} />
-              <FieldValue label="Risk Level" value={system.risk_level} />
-              <FieldValue label="GAMP Category" value={gampLabel} />
-              <FieldValue label="Review Level" value={reviewLevel ? `Level ${reviewLevel}` : null} />
+              <FieldValue label={t('systemProfiles.detail.gxpClassification')} value={gxpLabel} />
+              <FieldValue label={t('systemProfiles.detail.riskLevel')} value={system.risk_level} />
+              <FieldValue label={t('systemProfiles.detail.gampCategory')} value={gampLabel} />
+              <FieldValue label={t('systemProfiles.detail.reviewLevel')} value={reviewLevel ? t('common.level', { level: reviewLevel }) : null} />
             </div>
           </div>
 
@@ -303,11 +295,11 @@ export function SystemProfileDetailDialog({ system, open, onOpenChange, onEdit, 
 
           {/* Vendor Information */}
           <div>
-            <SectionTitle>Vendor Information</SectionTitle>
+            <SectionTitle>{t('systemProfiles.detail.vendorInfo')}</SectionTitle>
             <div className="grid grid-cols-2 gap-x-6 gap-y-3">
-              <FieldValue label="Vendor Name" value={system.vendor_name} />
-              <FieldValue label="Contact" value={system.vendor_contact} />
-              <FieldValue label="Contract Reference" value={system.vendor_contract_ref} />
+              <FieldValue label={t('systemProfiles.detail.vendorName')} value={system.vendor_name} />
+              <FieldValue label={t('systemProfiles.detail.contact')} value={system.vendor_contact} />
+              <FieldValue label={t('systemProfiles.detail.contractRef')} value={system.vendor_contract_ref} />
             </div>
           </div>
 
@@ -315,11 +307,11 @@ export function SystemProfileDetailDialog({ system, open, onOpenChange, onEdit, 
 
           {/* Review Schedule */}
           <div>
-            <SectionTitle>Review Schedule</SectionTitle>
+            <SectionTitle>{t('systemProfiles.detail.reviewSchedule')}</SectionTitle>
             <div className="grid grid-cols-2 gap-x-6 gap-y-3">
-              <FieldValue label="Last Validation Date" value={system.validation_date ? new Date(system.validation_date).toLocaleDateString() : null} />
-              <FieldValue label="Review Period" value={system.review_period_months ? `${system.review_period_months} months` : null} />
-              <FieldValue label="Next Review Date" value={system.next_review_date ? new Date(system.next_review_date).toLocaleDateString() : null} />
+              <FieldValue label={t('systemProfiles.detail.lastValidationDate')} value={system.validation_date ? new Date(system.validation_date).toLocaleDateString() : null} />
+              <FieldValue label={t('systemProfiles.detail.reviewPeriod')} value={system.review_period_months ? t('systemProfiles.detail.reviewPeriodValue', { months: system.review_period_months }) : null} />
+              <FieldValue label={t('systemProfiles.detail.nextReviewDate')} value={system.next_review_date ? new Date(system.next_review_date).toLocaleDateString() : null} />
             </div>
           </div>
 
@@ -327,26 +319,26 @@ export function SystemProfileDetailDialog({ system, open, onOpenChange, onEdit, 
 
           {/* Role Assignments */}
           <div>
-            <SectionTitle>Role Assignments</SectionTitle>
+            <SectionTitle>{t('systemProfiles.detail.roleAssignments')}</SectionTitle>
             <div className="grid grid-cols-2 gap-x-6 gap-y-3">
               <div>
-                <p className="text-xs text-muted-foreground">System Owner</p>
+                <p className="text-xs text-muted-foreground">{t('systemProfiles.detail.systemOwner')}</p>
                 <UserName userId={system.system_owner_id} names={userNames} />
               </div>
               <div>
-                <p className="text-xs text-muted-foreground">System Administrator</p>
+                <p className="text-xs text-muted-foreground">{t('systemProfiles.detail.systemAdministrator')}</p>
                 <UserName userId={system.system_admin_id} names={userNames} />
               </div>
               <div>
-                <p className="text-xs text-muted-foreground">Quality Assurance</p>
+                <p className="text-xs text-muted-foreground">{t('systemProfiles.detail.qualityAssurance')}</p>
                 <UserName userId={system.qa_id} names={userNames} />
               </div>
               <div>
-                <p className="text-xs text-muted-foreground">Business Owner</p>
+                <p className="text-xs text-muted-foreground">{t('systemProfiles.detail.businessOwner')}</p>
                 <UserName userId={system.business_owner_id} names={userNames} />
               </div>
               <div>
-                <p className="text-xs text-muted-foreground">IT Manager</p>
+                <p className="text-xs text-muted-foreground">{t('systemProfiles.detail.itManager')}</p>
                 <UserName userId={system.it_manager_id} names={userNames} />
               </div>
             </div>
@@ -389,7 +381,9 @@ export function SystemProfileDetailDialog({ system, open, onOpenChange, onEdit, 
                     } else {
                       const s = entry.data;
                       const isApproved = s.status === 'approved';
-                      const roleLabel = ROLE_DISPLAY_LABELS[s.requested_role] || s.requested_role;
+                      const roleLabel = ROLE_DISPLAY_KEYS[s.requested_role]
+                        ? t(ROLE_DISPLAY_KEYS[s.requested_role])
+                        : s.requested_role;
                       return (
                         <div key={`so-${s.id}`} className="flex items-start gap-3 text-xs border rounded-md p-2 bg-muted/20">
                           <div className="min-w-0 flex-1">
@@ -423,8 +417,8 @@ export function SystemProfileDetailDialog({ system, open, onOpenChange, onEdit, 
 
           {/* Timestamps */}
           <div className="flex gap-6 text-xs text-muted-foreground">
-            <span>Created: {new Date(system.created_at).toLocaleDateString()}</span>
-            <span>Last updated: {new Date(system.updated_at).toLocaleDateString()}</span>
+            <span>{t('systemProfiles.detail.created')}: {new Date(system.created_at).toLocaleDateString()}</span>
+            <span>{t('systemProfiles.detail.lastUpdated')}: {new Date(system.updated_at).toLocaleDateString()}</span>
           </div>
         </div>
       </SheetContent>
