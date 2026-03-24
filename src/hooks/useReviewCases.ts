@@ -76,8 +76,10 @@ export function useCreateReviewCase() {
     mutationFn: async (input: CreateReviewCaseInput): Promise<string> => {
       if (!user) throw new Error('Not authenticated');
 
-      const frozen_system_snapshot = { ...input.system };
-
+      const frozen_system_snapshot = {
+        ...input.system,
+        completion_window_days: input.system.completion_window_days ?? 90,
+      };
       const { data, error } = await supabase
         .from('review_cases')
         .insert({
