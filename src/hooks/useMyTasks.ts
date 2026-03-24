@@ -5,6 +5,7 @@ import { useAuth } from '@/hooks/useAuth';
 export interface MyTask {
   id: string;
   title: string;
+  title_es?: string | null;
   task_group: string;
   status: string;
   due_date: string;
