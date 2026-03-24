@@ -142,6 +142,8 @@ export default function ReviewCaseDetail() {
           currentStatus={reviewCase.status}
           canAdvanceSignoff={isSignoffPhase ? signoffData.canAdvance : undefined}
           hasObjections={isSignoffPhase ? signoffData.hasObjections : undefined}
+          reviewTitle={reviewCase.title}
+          systemName={reviewCase.system_name}
         />
       </div>
 
