@@ -213,10 +213,15 @@ export function TaskDetailPanel({ task, open, onClose, reviewCaseId, reviewCaseS
           )}
         </div>
 
-        {/* Instructions section */}
-        {task.execution_instructions && task.execution_instructions.trim() !== '' && (
+        {/* Instructions section — language-aware */}
+        {(() => {
+          const { i18n } = useTranslation();
+          const langInstructions = i18n.language === 'es' && task.execution_instructions_es
+            ? task.execution_instructions_es
+            : task.execution_instructions;
+          return langInstructions && langInstructions.trim() !== '' ? (
           <TaskInstructionsSection
-            instructions={task.execution_instructions}
+            instructions={langInstructions}
             taskStatus={task.status}
             instructionStepCount={instructionStepCount}
             canInteract={

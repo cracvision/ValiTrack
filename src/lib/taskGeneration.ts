@@ -88,6 +88,7 @@ export function buildTaskPayloads(
       title: template.title,
       description: template.description,
       execution_instructions: template.execution_instructions,
+      execution_instructions_es: template.execution_instructions_es ?? null,
       execution_phase: template.execution_phase,
       instruction_step_count: template.instruction_step_count ?? 0,
       assigned_to: resolveRoleToUserId(template.default_assignee_role, reviewCase),

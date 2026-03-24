@@ -215,6 +215,7 @@ export interface TaskTemplate {
   sort_order: number;
   is_active: boolean;
   execution_instructions?: string;
+  execution_instructions_es?: string | null;
   instruction_step_count?: number;
 }
 
