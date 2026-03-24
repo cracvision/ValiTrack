@@ -207,6 +207,7 @@ export interface TaskTemplate {
   code: string;
   task_group: TaskGroup;
   title: string;
+  title_es?: string | null;
   description: string;
   default_assignee_role: string;
   default_approver_role: string;

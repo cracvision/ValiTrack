@@ -234,7 +234,9 @@ function TaskRow({ task, onClick, isPhaseBlocked }: { task: ReviewTask; onClick:
       )}
 
       {/* Title */}
-      <span className="truncate flex-1 min-w-0">{task.title}</span>
+      <span className="truncate flex-1 min-w-0">
+        {i18n.language === 'es' && task.title_es ? task.title_es : task.title}
+      </span>
 
       {/* Execution type icon */}
       {task.execution_type === 'ai_assisted' ? (

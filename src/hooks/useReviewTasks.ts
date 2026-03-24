@@ -41,6 +41,7 @@ export function useReviewTasks(reviewCaseId: string | undefined) {
         template_id: row.template_id ?? undefined,
         task_group: row.task_group,
         title: row.title,
+        title_es: row.title_es ?? undefined,
         description: row.description,
         assigned_to: row.assigned_to,
         approved_by_user: row.approved_by_user ?? undefined,

@@ -87,6 +87,7 @@ export function buildTaskPayloads(
       template_id: template.id,
       task_group: template.task_group,
       title: template.title,
+      title_es: template.title_es ?? null,
       description: template.description,
       execution_instructions: template.execution_instructions,
       execution_instructions_es: template.execution_instructions_es ?? null,

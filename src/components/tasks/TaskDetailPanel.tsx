@@ -148,7 +148,9 @@ export function TaskDetailPanel({ task, open, onClose, reviewCaseId, reviewCaseS
               {t(`tasks.status.${task.status}`)}
             </Badge>
           </div>
-          <SheetTitle className="text-lg">{task.title}</SheetTitle>
+          <SheetTitle className="text-lg">
+            {i18n.language === 'es' && task.title_es ? task.title_es : task.title}
+          </SheetTitle>
           <SheetDescription className="sr-only">{t('tasks.detail.title')}</SheetDescription>
         </SheetHeader>
 
