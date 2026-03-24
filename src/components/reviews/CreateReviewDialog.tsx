@@ -75,7 +75,8 @@ export function CreateReviewDialog({ open, onOpenChange }: CreateReviewDialogPro
 
     const year = new Date().getFullYear();
     setTitle(`${t('reviews.create.defaultTitle')} — ${system.name} — ${year}`);
-    setReviewPeriodStart(system.validation_date || '');
+    const anchor = system.last_review_period_end || system.initial_validation_date;
+    setReviewPeriodStart(anchor || '');
     setReviewPeriodEnd(system.next_review_date || '');
 
     // Calculate due_date = period_end_date + completion_window_days

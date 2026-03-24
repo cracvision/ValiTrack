@@ -82,6 +82,17 @@ export function useReviewCaseTransition() {
         updatePayload.completed_at = new Date().toISOString();
       }
 
+      // Fetch the review case data for system profile update on approval
+      let reviewCaseForUpdate: any = null;
+      if (input.toStatus === 'approved') {
+        const { data: rcData } = await supabase
+          .from('review_cases')
+          .select('system_id, period_end_date')
+          .eq('id', input.reviewCaseId)
+          .single();
+        reviewCaseForUpdate = rcData;
+      }
+
       const { error: updateError } = await supabase
         .from('review_cases')
         .update(updatePayload)
@@ -215,6 +226,46 @@ export function useReviewCaseTransition() {
           });
         }
       }
+
+      // Block 3: Auto-advance review cycle on approval
+      if (input.toStatus === 'approved' && reviewCaseForUpdate?.period_end_date) {
+        const periodEndDate = reviewCaseForUpdate.period_end_date;
+        const systemId = reviewCaseForUpdate.system_id;
+
+        // Fetch system profile for review_period_months
+        const { data: sp } = await supabase
+          .from('system_profiles')
+          .select('review_period_months, next_review_date')
+          .eq('id', systemId)
+          .single();
+
+        if (sp) {
+          const newNextReview = new Date(periodEndDate);
+          newNextReview.setMonth(newNextReview.getMonth() + sp.review_period_months);
+          const newNextReviewDate = newNextReview.toISOString().split('T')[0];
+
+          await supabase.from('system_profiles').update({
+            last_review_period_end: periodEndDate,
+            next_review_date: newNextReviewDate,
+            updated_by: user.id,
+          } as any).eq('id', systemId);
+
+          // Audit log
+          await supabase.from('audit_log').insert({
+            user_id: user.id,
+            action: 'REVIEW_CYCLE_ADVANCED',
+            resource_type: 'system_profiles',
+            resource_id: systemId,
+            details: {
+              review_case_id: input.reviewCaseId,
+              previous_next_review_date: sp.next_review_date,
+              new_last_review_period_end: periodEndDate,
+              new_next_review_date: newNextReviewDate,
+              review_period_months: sp.review_period_months,
+            },
+          });
+        }
+      }
     },
     onSuccess: (_, input) => {
       queryClient.invalidateQueries({ queryKey: ['review-case', input.reviewCaseId] });
@@ -223,6 +274,10 @@ export function useReviewCaseTransition() {
       queryClient.invalidateQueries({ queryKey: ['review-signoffs', input.reviewCaseId] });
       queryClient.invalidateQueries({ queryKey: ['review-tasks', input.reviewCaseId] });
       queryClient.invalidateQueries({ queryKey: ['dashboard-systems'] });
+      if (input.toStatus === 'approved') {
+        queryClient.invalidateQueries({ queryKey: ['system-profiles'] });
+        queryClient.invalidateQueries({ queryKey: ['systems-for-review'] });
+      }
     },
   });
 }

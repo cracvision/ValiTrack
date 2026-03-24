@@ -23,7 +23,7 @@ export interface DashboardSystem extends SystemProfile {
 }
 
 function computeReviewStatus(system: SystemProfile): { status: ReviewStatusType; daysUntilDue: number } {
-  if (!system.validation_date || !system.next_review_date) {
+  if (!system.initial_validation_date || !system.next_review_date) {
     return { status: 'no_review', daysUntilDue: 0 };
   }
 
@@ -112,7 +112,8 @@ export function useDashboardSystems() {
         qa_id: row.qa_id ?? '',
         business_owner_id: row.business_owner_id ?? undefined,
         it_manager_id: row.it_manager_id ?? undefined,
-        validation_date: row.validation_date,
+        initial_validation_date: row.initial_validation_date,
+        last_review_period_end: row.last_review_period_end ?? null,
         review_period_months: row.review_period_months,
         next_review_date: row.next_review_date,
         completion_window_days: row.completion_window_days ?? 90,

@@ -62,7 +62,8 @@ export interface SystemProfile {
   qa_id: string;
   business_owner_id?: string;
   it_manager_id?: string;
-  validation_date: string;
+  initial_validation_date: string;
+  last_review_period_end?: string | null;
   review_period_months: number;
   next_review_date: string;
   completion_window_days: number;

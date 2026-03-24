@@ -595,9 +595,11 @@ export type Database = {
           gamp_category: string
           gxp_classification: string
           id: string
+          initial_validation_date: string
           intended_use: string
           is_deleted: boolean
           it_manager_id: string | null
+          last_review_period_end: string | null
           name: string
           next_review_date: string
           owner_id: string
@@ -611,7 +613,6 @@ export type Database = {
           system_owner_id: string
           updated_at: string
           updated_by: string | null
-          validation_date: string
           vendor_contact: string
           vendor_contract_ref: string
           vendor_name: string
@@ -628,9 +629,11 @@ export type Database = {
           gamp_category: string
           gxp_classification: string
           id?: string
+          initial_validation_date: string
           intended_use?: string
           is_deleted?: boolean
           it_manager_id?: string | null
+          last_review_period_end?: string | null
           name: string
           next_review_date: string
           owner_id?: string
@@ -644,7 +647,6 @@ export type Database = {
           system_owner_id?: string
           updated_at?: string
           updated_by?: string | null
-          validation_date: string
           vendor_contact?: string
           vendor_contract_ref?: string
           vendor_name?: string
@@ -661,9 +663,11 @@ export type Database = {
           gamp_category?: string
           gxp_classification?: string
           id?: string
+          initial_validation_date?: string
           intended_use?: string
           is_deleted?: boolean
           it_manager_id?: string | null
+          last_review_period_end?: string | null
           name?: string
           next_review_date?: string
           owner_id?: string
@@ -677,7 +681,6 @@ export type Database = {
           system_owner_id?: string
           updated_at?: string
           updated_by?: string | null
-          validation_date?: string
           vendor_contact?: string
           vendor_contract_ref?: string
           vendor_name?: string
