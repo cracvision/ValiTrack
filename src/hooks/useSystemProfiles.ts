@@ -111,6 +111,7 @@ export function useSystemProfiles(): UseSystemProfilesReturn {
         validation_date: system.validation_date,
         review_period_months: system.review_period_months,
         next_review_date: system.next_review_date,
+        completion_window_days: system.completion_window_days,
         approval_status: 'draft',
         created_by: user.id,
       });
