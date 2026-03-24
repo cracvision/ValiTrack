@@ -814,8 +814,6 @@
     }
   }
 }
-        "submitForReview": "Enviar a revisión",
-        "approve": "Aprobar perfil",
         "returnToDraft": "Devolver a borrador",
         "revise": "Revisar perfil"
       },
