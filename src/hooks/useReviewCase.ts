@@ -82,6 +82,17 @@ export function useReviewCaseTransition() {
         updatePayload.completed_at = new Date().toISOString();
       }
 
+      // Fetch the review case data for system profile update on approval
+      let reviewCaseForUpdate: any = null;
+      if (input.toStatus === 'approved') {
+        const { data: rcData } = await supabase
+          .from('review_cases')
+          .select('system_id, period_end_date')
+          .eq('id', input.reviewCaseId)
+          .single();
+        reviewCaseForUpdate = rcData;
+      }
+
       const { error: updateError } = await supabase
         .from('review_cases')
         .update(updatePayload)
