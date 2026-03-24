@@ -76,8 +76,14 @@ export function CreateReviewDialog({ open, onOpenChange }: CreateReviewDialogPro
     const year = new Date().getFullYear();
     setTitle(`${t('reviews.create.defaultTitle')} — ${system.name} — ${year}`);
     setReviewPeriodStart(system.validation_date || '');
-    setReviewPeriodEnd(new Date().toISOString().split('T')[0]);
-    setDueDate(system.next_review_date || '');
+    setReviewPeriodEnd(system.next_review_date || '');
+
+    // Calculate due_date = period_end_date + completion_window_days
+    const periodEnd = new Date(system.next_review_date);
+    const completionDays = system.completion_window_days ?? 90;
+    periodEnd.setDate(periodEnd.getDate() + completionDays);
+    setDueDate(periodEnd.toISOString().split('T')[0]);
+
     setReviewLevel(calculateReviewLevel(system.risk_level, system.gamp_category));
   };
 

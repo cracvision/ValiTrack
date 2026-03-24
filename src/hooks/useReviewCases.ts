@@ -89,6 +89,7 @@ export function useCreateReviewCase() {
           review_period_end: input.review_period_end,
           review_level: input.review_level,
           due_date: input.due_date,
+          period_end_date: input.review_period_end,
           status: 'draft',
           frozen_system_snapshot,
           initiated_by: user.id,
