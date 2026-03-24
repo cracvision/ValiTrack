@@ -696,6 +696,7 @@
       "reviewSchedule": "Calendario de Revisión",
       "lastValidationDate": "Fecha de Última Validación",
       "reviewPeriod": "Período de Revisión",
+      "completionWindow": "Ventana de Completación",
       "nextReviewDate": "Próxima Fecha de Revisión",
       "roleAssignments": "Asignación de Roles",
       "systemOwner": "System Owner",
