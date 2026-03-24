@@ -697,6 +697,7 @@
       "reviewSchedule": "Review Schedule",
       "lastValidationDate": "Last Validation Date",
       "reviewPeriod": "Review Period",
+      "completionWindow": "Completion Window",
       "nextReviewDate": "Next Review Date",
       "roleAssignments": "Role Assignments",
       "systemOwner": "System Owner",
