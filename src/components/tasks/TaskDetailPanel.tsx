@@ -66,7 +66,7 @@ interface TaskDetailPanelProps {
 }
 
 export function TaskDetailPanel({ task, open, onClose, reviewCaseId, reviewCaseStatus, systemOwnerId }: TaskDetailPanelProps) {
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
   const [highlightSections, setHighlightSections] = useState(false);
 
   // Reset validation highlights when task changes or panel opens/closes
