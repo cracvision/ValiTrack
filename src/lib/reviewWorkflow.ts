@@ -42,6 +42,7 @@ const TRANSITION_MAP: Record<ReviewStatus, TransitionRule[]> = {
       requiredRoles: ['quality_assurance', 'super_user'],
       label: 'Approve plan',
       labelKey: 'reviews.actions.approvePlan',
+      requiresESignature: true,
     },
     {
       to: 'plan_review',
