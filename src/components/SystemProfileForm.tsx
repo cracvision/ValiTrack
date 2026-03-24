@@ -137,8 +137,6 @@ interface SystemProfileFormProps {
 }
 
 export function SystemProfileForm({ open, onOpenChange, onSubmit, editingSystem }: SystemProfileFormProps) {
-  console.log('[FORM] Render — open:', open, 'editingSystem:', editingSystem?.id ?? 'new');
-
   const { t } = useTranslation();
   const { users: systemOwners, loading: loadingOwners } = useRoleUsers('system_owner');
   const { users: systemAdmins, loading: loadingAdmins } = useRoleUsers('system_administrator');
@@ -152,10 +150,8 @@ export function SystemProfileForm({ open, onOpenChange, onSubmit, editingSystem 
   const isInitialMount = useRef(true);
   const isInitialReviewLevel = useRef(true);
 
-  // Persist form data across re-renders caused by focus loss (Snagit, Snipping Tool, etc.)
-  const savedFormDataRef = useRef<FormValues | null>(null);
-  const editingSystemIdRef = useRef<string | null>(null);
-  const sessionActiveRef = useRef(false);
+  // Guard: only reset form once per open session, immune to re-renders
+  const hasInitializedRef = useRef(false);
 
   const form = useForm<FormValues>({
     resolver: zodResolver(formSchema),
@@ -230,72 +226,47 @@ export function SystemProfileForm({ open, onOpenChange, onSubmit, editingSystem 
     }
   }, [watchClassification, watchRisk]);
 
-  // Sync form data to ref on every change to survive re-renders from focus loss
   useEffect(() => {
-    if (!sessionActiveRef.current) return;
-    const subscription = form.watch((values) => {
-      savedFormDataRef.current = values as FormValues;
-    });
-    return () => subscription.unsubscribe();
-  }, [form, open]);
+    if (open && !hasInitializedRef.current) {
+      hasInitializedRef.current = true;
+      isInitialMount.current = true;
+      isInitialReviewLevel.current = true;
+      setFlashPeriod(false);
+      setFlashReviewLevel(false);
 
-  useEffect(() => {
-    if (open) {
-      const currentEditId = editingSystem?.id ?? null;
-      const isSameSession = sessionActiveRef.current && editingSystemIdRef.current === currentEditId;
-
-      // If we have saved data from an interrupted session (Snagit, etc.), restore it
-      if (isSameSession && savedFormDataRef.current) {
-        console.log('[FORM] form.reset() called — trigger:', 'open effect restore interrupted session');
-        form.reset(savedFormDataRef.current);
+      if (editingSystem) {
+        form.reset({
+          name: editingSystem.name,
+          system_identifier: editingSystem.system_identifier,
+          system_environment: editingSystem.system_environment,
+          description: editingSystem.description,
+          intended_use: editingSystem.intended_use,
+          gxp_classification: editingSystem.gxp_classification,
+          risk_level: editingSystem.risk_level,
+          gamp_category: editingSystem.gamp_category,
+          status: editingSystem.status,
+          vendor_name: editingSystem.vendor_name,
+          vendor_contact: editingSystem.vendor_contact,
+          vendor_contract_ref: editingSystem.vendor_contract_ref,
+          initial_validation_date: editingSystem.initial_validation_date,
+          last_review_period_end: editingSystem.last_review_period_end ?? '',
+          review_period_months: editingSystem.review_period_months,
+          completion_window_days: editingSystem.completion_window_days,
+          system_owner_id: editingSystem.system_owner_id,
+          system_admin_id: editingSystem.system_admin_id,
+          qa_id: editingSystem.qa_id,
+          business_owner_id: editingSystem.business_owner_id ?? '',
+          it_manager_id: editingSystem.it_manager_id ?? '',
+        });
       } else {
-        // New dialog open — reset everything
-        isInitialMount.current = true;
-        isInitialReviewLevel.current = true;
-        setFlashPeriod(false);
-        setFlashReviewLevel(false);
-        editingSystemIdRef.current = currentEditId;
-
-        if (editingSystem) {
-          const editData: FormValues = {
-            name: editingSystem.name,
-            system_identifier: editingSystem.system_identifier,
-            system_environment: editingSystem.system_environment,
-            description: editingSystem.description,
-            intended_use: editingSystem.intended_use,
-            gxp_classification: editingSystem.gxp_classification,
-            risk_level: editingSystem.risk_level,
-            gamp_category: editingSystem.gamp_category,
-            status: editingSystem.status,
-            vendor_name: editingSystem.vendor_name,
-            vendor_contact: editingSystem.vendor_contact,
-            vendor_contract_ref: editingSystem.vendor_contract_ref,
-            initial_validation_date: editingSystem.initial_validation_date,
-            last_review_period_end: editingSystem.last_review_period_end ?? '',
-            review_period_months: editingSystem.review_period_months,
-            completion_window_days: editingSystem.completion_window_days,
-            system_owner_id: editingSystem.system_owner_id,
-            system_admin_id: editingSystem.system_admin_id,
-            qa_id: editingSystem.qa_id,
-            business_owner_id: editingSystem.business_owner_id ?? '',
-            it_manager_id: editingSystem.it_manager_id ?? '',
-          };
-          console.log('[FORM] form.reset() called — trigger:', 'open effect load editing system');
-          form.reset(editData);
-          savedFormDataRef.current = editData;
-        } else {
-          console.log('[FORM] form.reset() called — trigger:', 'open effect initialize new system');
-          form.reset();
-          savedFormDataRef.current = null;
-        }
+        form.reset();
       }
-      sessionActiveRef.current = true;
-    } else {
-      // Dialog closed — clear session
-      sessionActiveRef.current = false;
+    }
+    if (!open) {
+      hasInitializedRef.current = false;
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [open]);
+  }, [open, editingSystem]);
 
   const reviewLevelSuggestion = (watchRisk && watchGamp)
     ? suggestReviewLevel(watchRisk as RiskLevel, watchGamp as GampCategory)
@@ -332,10 +303,6 @@ export function SystemProfileForm({ open, onOpenChange, onSubmit, editingSystem 
       created_at: editingSystem?.created_at ?? now,
       updated_at: now,
     };
-    // Clear saved data on successful submit
-    savedFormDataRef.current = null;
-    editingSystemIdRef.current = null;
-    sessionActiveRef.current = false;
     onSubmit(system);
     onOpenChange(false);
     form.reset();
@@ -343,12 +310,6 @@ export function SystemProfileForm({ open, onOpenChange, onSubmit, editingSystem 
 
   return (
     <Dialog open={open} onOpenChange={(newOpen) => {
-      if (!newOpen) {
-        // User clicked Cancel / overlay — clear saved data
-        savedFormDataRef.current = null;
-        editingSystemIdRef.current = null;
-        sessionActiveRef.current = false;
-      }
       onOpenChange(newOpen);
     }}>
       <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
@@ -672,9 +633,6 @@ export function SystemProfileForm({ open, onOpenChange, onSubmit, editingSystem 
 
             <div className="flex justify-end gap-3 pt-2">
               <Button type="button" variant="outline" onClick={() => {
-                savedFormDataRef.current = null;
-                editingSystemIdRef.current = null;
-                sessionActiveRef.current = false;
                 onOpenChange(false);
               }}>
                 {t('systemProfiles.form.cancel')}
