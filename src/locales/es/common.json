@@ -762,7 +762,10 @@
       "createProfile": "Crear Perfil",
       "selectPlaceholder": "Seleccionar {{label}}",
       "loadingUsers": "Cargando...",
-      "noUsersForRole": "No hay usuarios con este rol"
+      "noUsersForRole": "No hay usuarios con este rol",
+      "completionWindow": "Ventana de Completación",
+      "completionWindowDays": "días",
+      "completionWindowHelp": "Días después de que termina el período de revisión para completar la revisión. Estándar: 90 días."
     },
     "approval": {
       "status": {
