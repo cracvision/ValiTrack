@@ -633,9 +633,6 @@ export function SystemProfileForm({ open, onOpenChange, onSubmit, editingSystem 
 
             <div className="flex justify-end gap-3 pt-2">
               <Button type="button" variant="outline" onClick={() => {
-                savedFormDataRef.current = null;
-                editingSystemIdRef.current = null;
-                sessionActiveRef.current = false;
                 onOpenChange(false);
               }}>
                 {t('systemProfiles.form.cancel')}

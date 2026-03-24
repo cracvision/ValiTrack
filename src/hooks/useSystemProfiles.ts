@@ -54,8 +54,6 @@ export function useSystemProfiles(): UseSystemProfilesReturn {
   toastRef.current = toast;
 
   const fetchSystems = useCallback(async () => {
-    console.log('[PROFILES] fetchSystems called');
-
     if (!user) {
       setSystems([]);
       setLoading(false);
