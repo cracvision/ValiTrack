@@ -23,7 +23,7 @@ export interface DashboardSystem extends SystemProfile {
 }
 
 function computeReviewStatus(system: SystemProfile): { status: ReviewStatusType; daysUntilDue: number } {
-  if (!system.validation_date || !system.next_review_date) {
+  if (!system.initial_validation_date || !system.next_review_date) {
     return { status: 'no_review', daysUntilDue: 0 };
   }
 
