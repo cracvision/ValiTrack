@@ -274,6 +274,10 @@ export function useReviewCaseTransition() {
       queryClient.invalidateQueries({ queryKey: ['review-signoffs', input.reviewCaseId] });
       queryClient.invalidateQueries({ queryKey: ['review-tasks', input.reviewCaseId] });
       queryClient.invalidateQueries({ queryKey: ['dashboard-systems'] });
+      if (input.toStatus === 'approved') {
+        queryClient.invalidateQueries({ queryKey: ['system-profiles'] });
+        queryClient.invalidateQueries({ queryKey: ['systems-for-review'] });
+      }
     },
   });
 }
