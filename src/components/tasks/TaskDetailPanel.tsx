@@ -66,7 +66,7 @@ interface TaskDetailPanelProps {
 }
 
 export function TaskDetailPanel({ task, open, onClose, reviewCaseId, reviewCaseStatus, systemOwnerId }: TaskDetailPanelProps) {
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
   const [highlightSections, setHighlightSections] = useState(false);
 
   // Reset validation highlights when task changes or panel opens/closes
@@ -213,10 +213,14 @@ export function TaskDetailPanel({ task, open, onClose, reviewCaseId, reviewCaseS
           )}
         </div>
 
-        {/* Instructions section */}
-        {task.execution_instructions && task.execution_instructions.trim() !== '' && (
+        {/* Instructions section — language-aware */}
+        {(() => {
+          const langInstructions = i18n.language === 'es' && task.execution_instructions_es
+            ? task.execution_instructions_es
+            : task.execution_instructions;
+          return langInstructions && langInstructions.trim() !== '' ? (
           <TaskInstructionsSection
-            instructions={task.execution_instructions}
+            instructions={langInstructions}
             taskStatus={task.status}
             instructionStepCount={instructionStepCount}
             canInteract={
@@ -232,7 +236,8 @@ export function TaskDetailPanel({ task, open, onClose, reviewCaseId, reviewCaseS
             isToggling={checkoffs.toggleCheckoff.isPending}
             highlight={highlightSections && instructionsIncomplete}
           />
-        )}
+          ) : null;
+        })()}
 
         {/* Phase blocked message */}
         {isPhaseBlocked && phaseStatus && (
