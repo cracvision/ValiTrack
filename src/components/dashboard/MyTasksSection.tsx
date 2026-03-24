@@ -14,7 +14,7 @@ const STATUS_STYLES: Record<string, string> = {
 };
 
 export function MyTasksSection() {
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
   const navigate = useNavigate();
   const { data: tasks, isLoading } = useMyTasks();
 
