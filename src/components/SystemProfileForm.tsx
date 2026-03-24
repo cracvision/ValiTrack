@@ -239,6 +239,7 @@ export function SystemProfileForm({ open, onOpenChange, onSubmit, editingSystem 
         vendor_contact: editingSystem.vendor_contact,
         vendor_contract_ref: editingSystem.vendor_contract_ref,
         initial_validation_date: editingSystem.initial_validation_date,
+        last_review_period_end: editingSystem.last_review_period_end ?? '',
         review_period_months: editingSystem.review_period_months,
         completion_window_days: editingSystem.completion_window_days,
         system_owner_id: editingSystem.system_owner_id,
