@@ -65,6 +65,7 @@ export interface SystemProfile {
   validation_date: string;
   review_period_months: number;
   next_review_date: string;
+  completion_window_days: number;
   approval_status: ProfileApprovalStatus;
   created_at: string;
   updated_at: string;
