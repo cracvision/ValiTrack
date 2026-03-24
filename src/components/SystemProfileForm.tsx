@@ -505,6 +505,30 @@ export function SystemProfileForm({ open, onOpenChange, onSubmit, editingSystem 
                   </FormItem>
                 )} />
               </div>
+              <div className="mt-4">
+                <FormField control={form.control} name="completion_window_days" render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>{t('systemProfiles.form.completionWindow')}</FormLabel>
+                    <div className="flex items-center gap-2">
+                      <FormControl>
+                        <Input
+                          type="number"
+                          {...field}
+                          value={field.value || 90}
+                          min={30}
+                          max={180}
+                          className="w-24"
+                        />
+                      </FormControl>
+                      <span className="text-sm text-muted-foreground">{t('systemProfiles.form.completionWindowDays')}</span>
+                    </div>
+                    <p className="text-xs text-muted-foreground">
+                      {t('systemProfiles.form.completionWindowHelp')}
+                    </p>
+                    <FormMessage />
+                  </FormItem>
+                )} />
+              </div>
             </div>
 
             <Separator />

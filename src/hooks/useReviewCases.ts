@@ -42,6 +42,7 @@ export function useReviewCases(filters?: { status?: ReviewStatus; systemId?: str
         review_period_end: row.review_period_end,
         review_level: row.review_level,
         due_date: row.due_date,
+        period_end_date: row.period_end_date ?? undefined,
         status: row.status,
         conclusion: row.conclusion ?? undefined,
         conclusion_notes: row.conclusion_notes ?? undefined,
