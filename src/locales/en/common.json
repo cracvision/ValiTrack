@@ -697,6 +697,8 @@
       "contact": "Contact",
       "contractRef": "Contract Reference",
       "reviewSchedule": "Review Schedule",
+      "initialValidationDate": "Initial Validation Date",
+      "lastReviewedThrough": "Last Reviewed Through",
       "lastValidationDate": "Last Validation Date",
       "reviewPeriod": "Review Period",
       "completionWindow": "Completion Window",
