@@ -750,7 +750,7 @@
       "initialValidationDateHelp": "Fecha en que el sistema fue originalmente validado (IQ/OQ/PQ completado).",
       "lastReviewPeriodEnd": "Último Período Revisado Hasta",
       "noPreviousReview": "Sin revisión previa",
-      "lastReviewPeriodEndHelp": "Se actualiza automáticamente cuando se aprueba una revisión periódica.",
+      "lastReviewPeriodEndHelp": "Ingrese la fecha de fin del último período revisado si este sistema fue revisado antes de ValiTrack. Deje vacío para sistemas que nunca han sido revisados. Este campo se actualiza automáticamente cuando se aprueba una revisión.",
       "lastValidationDate": "Fecha de Última Validación",
       "reviewPeriodMonths": "Período de Revisión (meses)",
       "reviewPeriodAutoCalc": "Auto-calculado",

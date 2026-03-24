@@ -492,15 +492,21 @@ export function SystemProfileForm({ open, onOpenChange, onSubmit, editingSystem 
                     <FormMessage />
                   </FormItem>
                 )} />
-                <div>
-                  <FormLabel className="text-sm font-medium">{t('systemProfiles.form.lastReviewPeriodEnd')}</FormLabel>
-                  <div className="mt-2 flex h-10 items-center rounded-md border border-input bg-muted/50 px-3 text-sm">
-                    {editingSystem?.last_review_period_end
-                      ? new Date(editingSystem.last_review_period_end).toLocaleDateString()
-                      : t('systemProfiles.form.noPreviousReview')}
-                  </div>
-                  <p className="text-xs text-muted-foreground mt-1">{t('systemProfiles.form.lastReviewPeriodEndHelp')}</p>
-                </div>
+                <FormField control={form.control} name="last_review_period_end" render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>{t('systemProfiles.form.lastReviewPeriodEnd')}</FormLabel>
+                    <FormControl>
+                      <Input
+                        type="date"
+                        {...field}
+                        value={field.value || ''}
+                        placeholder={t('systemProfiles.form.noPreviousReview')}
+                      />
+                    </FormControl>
+                    <p className="text-xs text-muted-foreground">{t('systemProfiles.form.lastReviewPeriodEndHelp')}</p>
+                    <FormMessage />
+                  </FormItem>
+                )} />
                 <FormField control={form.control} name="review_period_months" render={({ field }) => (
                   <FormItem>
                     <FormLabel>{t('systemProfiles.form.reviewPeriodMonths')} *</FormLabel>
