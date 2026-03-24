@@ -273,8 +273,8 @@ export function SystemProfileDetailDialog({ system, open, onOpenChange, onEdit, 
               <FieldValue label={t('systemProfiles.detail.status')} value={system.status} />
             </div>
             <div className="mt-3 space-y-3">
-              <FieldValue label={t('systemProfiles.detail.intendedUse')} value={system.intended_use} />
               <FieldValue label={t('systemProfiles.detail.description')} value={system.description} />
+              <FieldValue label={t('systemProfiles.detail.intendedUse')} value={system.intended_use} />
             </div>
           </div>
 
