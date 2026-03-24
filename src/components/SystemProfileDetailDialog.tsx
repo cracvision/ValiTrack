@@ -309,7 +309,8 @@ export function SystemProfileDetailDialog({ system, open, onOpenChange, onEdit, 
           <div>
             <SectionTitle>{t('systemProfiles.detail.reviewSchedule')}</SectionTitle>
             <div className="grid grid-cols-2 gap-x-6 gap-y-3">
-              <FieldValue label={t('systemProfiles.detail.lastValidationDate')} value={system.validation_date ? new Date(system.validation_date).toLocaleDateString() : null} />
+              <FieldValue label={t('systemProfiles.detail.initialValidationDate')} value={system.initial_validation_date ? new Date(system.initial_validation_date).toLocaleDateString() : null} />
+              <FieldValue label={t('systemProfiles.detail.lastReviewedThrough')} value={system.last_review_period_end ? new Date(system.last_review_period_end).toLocaleDateString() : t('systemProfiles.form.noPreviousReview')} />
               <FieldValue label={t('systemProfiles.detail.reviewPeriod')} value={system.review_period_months ? t('systemProfiles.detail.reviewPeriodValue', { months: system.review_period_months }) : null} />
               <FieldValue label={t('systemProfiles.detail.completionWindow')} value={`${system.completion_window_days ?? 90} ${t('systemProfiles.form.completionWindowDays')}`} />
               <FieldValue label={t('systemProfiles.detail.nextReviewDate')} value={system.next_review_date ? new Date(system.next_review_date).toLocaleDateString() : null} />

@@ -268,7 +268,7 @@ export default function ReviewCaseDetail() {
             <dt className="text-muted-foreground">{t('reviews.detail.snapshot.vendor')}</dt>
             <dd>{snapshot.vendor_name || '—'}</dd>
             <dt className="text-muted-foreground">{t('reviews.detail.snapshot.validationDate')}</dt>
-            <dd>{snapshot.validation_date}</dd>
+            <dd>{snapshot.initial_validation_date || snapshot.validation_date}</dd>
             <dt className="text-muted-foreground col-span-2">{t('systemProfiles.detail.description')}</dt>
             <dd className="col-span-2 text-xs">{snapshot.description || '—'}</dd>
           </dl>

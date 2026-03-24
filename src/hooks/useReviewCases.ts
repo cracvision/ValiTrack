@@ -78,6 +78,8 @@ export function useCreateReviewCase() {
 
       const frozen_system_snapshot = {
         ...input.system,
+        initial_validation_date: input.system.initial_validation_date,
+        last_review_period_end: input.system.last_review_period_end ?? null,
         completion_window_days: input.system.completion_window_days ?? 90,
       };
       const { data, error } = await supabase

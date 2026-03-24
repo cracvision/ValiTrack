@@ -480,13 +480,23 @@ export function SystemProfileForm({ open, onOpenChange, onSubmit, editingSystem 
             <div>
               <h3 className="text-sm font-semibold text-foreground mb-3">{t('systemProfiles.form.reviewSchedule')}</h3>
               <div className="grid gap-4 sm:grid-cols-2">
-                <FormField control={form.control} name="validation_date" render={({ field }) => (
+                <FormField control={form.control} name="initial_validation_date" render={({ field }) => (
                   <FormItem>
-                    <FormLabel>{t('systemProfiles.form.lastValidationDate')} *</FormLabel>
+                    <FormLabel>{t('systemProfiles.form.initialValidationDate')} *</FormLabel>
                     <FormControl><Input type="date" {...field} /></FormControl>
+                    <p className="text-xs text-muted-foreground">{t('systemProfiles.form.initialValidationDateHelp')}</p>
                     <FormMessage />
                   </FormItem>
                 )} />
+                <div>
+                  <FormLabel className="text-sm font-medium">{t('systemProfiles.form.lastReviewPeriodEnd')}</FormLabel>
+                  <div className="mt-2 flex h-10 items-center rounded-md border border-input bg-muted/50 px-3 text-sm">
+                    {editingSystem?.last_review_period_end
+                      ? new Date(editingSystem.last_review_period_end).toLocaleDateString()
+                      : t('systemProfiles.form.noPreviousReview')}
+                  </div>
+                  <p className="text-xs text-muted-foreground mt-1">{t('systemProfiles.form.lastReviewPeriodEndHelp')}</p>
+                </div>
                 <FormField control={form.control} name="review_period_months" render={({ field }) => (
                   <FormItem>
                     <FormLabel>{t('systemProfiles.form.reviewPeriodMonths')} *</FormLabel>
