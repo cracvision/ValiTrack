@@ -1,121 +1,97 @@
 
 
-## Iteration 3D: Completion Window + E-Signatures
+## 3D-1: Review Period Date Calculation Fix
 
-This is a significant iteration with two distinct parts: (1) adding a completion window concept that separates the review period end from the work deadline, and (2) adding 21 CFR Part 11 e-signatures for critical QA transitions.
-
----
-
-### Part 1: Completion Window
-
-**Database Changes**
-- Migration: `ALTER TABLE system_profiles ADD COLUMN completion_window_days INTEGER NOT NULL DEFAULT 90`
-- Migration: `ALTER TABLE review_cases ADD COLUMN period_end_date DATE`
-- Data backfill (insert tool): Set `period_end_date` from existing `review_period_end` column, then recalculate `due_date = period_end_date + completion_window_days` for all non-deleted review cases
-
-**Types (`src/types/index.ts`)**
-- Add `completion_window_days: number` to `SystemProfile`
-- Add `period_end_date?: string` to `ReviewCase`
-
-**System Profile Form (`SystemProfileForm.tsx`)**
-- Add `completion_window_days` to form schema (number, default 90, min 30, max 180)
-- Add number input field in Review Schedule section, between "Review Period" and the role assignments section
-- Label: "Completion Window" / "Ventana de Completación", with help text and "days"/"días" suffix
-
-**System Profile Detail (`SystemProfileDetailDialog.tsx`)**
-- Add "Completion Window: 90 days" field in Review Schedule section, between Review Period and Next Review Date
-
-**System Profile Hooks (`useSystemProfiles.ts`)**
-- Add `completion_window_days` to `rowToSystemProfile`, `addSystem` insert, and `updateSystem` update payloads
-
-**Dashboard Hook (`useDashboardSystems.ts`)**
-- Add `completion_window_days` to the SystemProfile mapping
-- The `computeReviewStatus` function already uses `next_review_date` — this stays as-is since `next_review_date` represents the period end. The real deadline is `due_date` on the review case. Dashboard cards with active review cases already reference the case's `due_date` for countdown. No change needed here since the dashboard computes from system profile dates (period end), and when a case exists, uses the case status directly.
-
-**Review Case Creation (`CreateReviewDialog.tsx` + `useReviewCases.ts`)**
-- When selecting a system, auto-calculate: `period_end_date = next_review_date`, `due_date = period_end_date + completion_window_days`
-- Pass `period_end_date` in the insert payload
-- Add `completion_window_days` to frozen snapshot
-
-**Review Case Detail (`ReviewCaseDetail.tsx`)**
-- Show `period_end_date` and `due_date` separately: "Period End Date" / "Fecha Fin del Período" and "Completion Due" / "Fecha de Completación"
-
-**Review Case Hooks (`useReviewCase.ts`, `useReviewCases.ts`)**
-- Map `period_end_date` from row data
-
-**i18n keys** — Add completion window labels to both `en/common.json` and `es/common.json`
+Separates the original validation date from the review period anchor so that next_review_date advances correctly after each completed review cycle.
 
 ---
 
-### Part 2: E-Signatures
+### Database Migration
 
-**No database schema changes** — E-signature records use the existing `audit_log` table with actions `E_SIGNATURE` and `E_SIGNATURE_FAILED`. The `conclusion` column already exists on `review_cases`.
+1. Rename `validation_date` → `initial_validation_date` on `system_profiles`
+2. Add `last_review_period_end DATE` (nullable) to `system_profiles`
+3. No data backfill needed — `last_review_period_end` starts NULL, COALESCE logic produces same results
 
-**New Component: `src/components/reviews/ESignatureModal.tsx`**
-- Dialog with password field, mandatory reason (min 10 chars), and optional conclusion radio buttons (for `execution_review → approved` only)
-- Shows action label, review title, signer name/role, and 21 CFR Part 11 disclaimer
-- Displays error on failed password verification without closing
-- Loading state during verification
+### Types (`src/types/index.ts`)
 
-**New Hook: `src/hooks/useESignature.ts`**
-- `verifyAndSign()` function that:
-  1. Calls `supabase.auth.signInWithPassword()` to verify the password
-  2. On failure: logs `E_SIGNATURE_FAILED` to audit_log, throws error
-  3. On success: logs `E_SIGNATURE` to audit_log with full details (transition, reason, conclusion, signer info)
-  4. Returns success for caller to proceed with transition
+- Rename `validation_date` → `initial_validation_date: string`
+- Add `last_review_period_end?: string | null`
 
-**Workflow Config (`src/lib/reviewWorkflow.ts`)**
-- Add `requiresESignature?: boolean` to `TransitionRule` interface
-- Set `requiresESignature: true` on three transitions:
-  - `plan_approval → approved_for_execution`
-  - `execution_review → approved`
-  - `execution_review → rejected`
+### Hook Updates
 
-**Review Action Buttons (`ReviewActionButtons.tsx`)**
-- Add e-signature modal state management
-- When a transition has `requiresESignature`, open `ESignatureModal` instead of executing directly
-- For `execution_review → approved`: the conclusion selector moves INTO the e-signature modal (replacing the current approve dialog for this case)
-- For `execution_review → rejected`: e-signature modal with reason only (no conclusion)
-- On successful signature: execute the existing transition logic, then close modal
+**`useSystemProfiles.ts`** — Update `rowToSystemProfile` mapping, `addSystem` insert, and `updateSystem` update to use `initial_validation_date` and `last_review_period_end`
 
-**Transition History (`TransitionHistory.tsx`)**
-- For each transition, check if it matches a known e-signature transition pattern
-- Query audit_log for `E_SIGNATURE` entries matching the review case
-- Show lock icon and reason text for e-signed transitions
-- For approved cases, show conclusion badge
+**`useDashboardSystems.ts`** — Rename `validation_date` → `initial_validation_date` in mapping (line 115). Also update `computeReviewStatus` which checks `system.validation_date` (line 26)
 
-**i18n keys** — Add all `esignature.*` keys to both locale files
+**`useReviewCase.ts`** — Add auto-update of system profile on `approved` transition:
+- After setting `completed_at` on the review case, fetch the review case's `period_end_date` and the system profile's `review_period_months`
+- Update `system_profiles` SET `last_review_period_end = period_end_date`, recalculate `next_review_date = period_end_date + review_period_months`
+- Insert `REVIEW_CYCLE_ADVANCED` audit log entry
+- Invalidate `system-profiles` query
 
----
+**`useReviewCases.ts`** — Update frozen snapshot to use `initial_validation_date` instead of `validation_date`; include `last_review_period_end`
 
-### Files to Modify
+### Form (`SystemProfileForm.tsx`)
+
+- Rename schema field `validation_date` → `initial_validation_date` (line 60)
+- Update all form references (~6 places)
+- Update `calculateNextReviewDate` to use COALESCE: `anchor = last_review_period_end || initial_validation_date`
+- Add read-only "Last Reviewed Through" display field below Initial Validation Date (shows date or "No previous review")
+- Label change: "Last Validation Date" → "Initial Validation Date"
+
+### Detail Panel (`SystemProfileDetailDialog.tsx`)
+
+- Rename field reference (line 312)
+- Add "Last Reviewed Through" field in Review Schedule section
+- Label: use new i18n key
+
+### Review Case Creation (`CreateReviewDialog.tsx`)
+
+- Line 78: change `system.validation_date` → use COALESCE anchor: `system.last_review_period_end || system.initial_validation_date`
+- Period start = anchor, period end = next_review_date
+
+### Review Case Detail (`ReviewCaseDetail.tsx`)
+
+- Update frozen snapshot field from `snapshot.validation_date` to `snapshot.initial_validation_date` (line 271)
+- Update label key
+
+### i18n Keys (both `en/common.json` and `es/common.json`)
+
+```
+systemProfiles.form.initialValidationDate / Fecha de Validación Inicial
+systemProfiles.form.initialValidationDateHelp
+systemProfiles.form.lastReviewPeriodEnd / Último Período Revisado Hasta
+systemProfiles.form.noPreviousReview / Sin revisión previa
+systemProfiles.form.lastReviewPeriodEndHelp
+systemProfiles.detail.initialValidationDate / Fecha de Validación Inicial
+systemProfiles.detail.lastReviewedThrough / Último Período Revisado Hasta
+```
+
+### `supabase/types.ts` — Will auto-regenerate after migration
+
+### Files Modified
 
 | File | Change |
 |------|--------|
-| New migration | Add `completion_window_days` to system_profiles, `period_end_date` to review_cases |
-| Insert tool (data) | Backfill `period_end_date` and recalculate `due_date` |
-| `src/types/index.ts` | Add fields to SystemProfile and ReviewCase |
-| `src/components/SystemProfileForm.tsx` | Add completion window field |
-| `src/components/SystemProfileDetailDialog.tsx` | Display completion window |
-| `src/hooks/useSystemProfiles.ts` | Map + persist completion_window_days |
-| `src/hooks/useDashboardSystems.ts` | Map completion_window_days |
-| `src/components/reviews/CreateReviewDialog.tsx` | Calculate period_end_date + due_date |
-| `src/hooks/useReviewCases.ts` | Add period_end_date to insert + mapping |
-| `src/hooks/useReviewCase.ts` | Map period_end_date |
-| `src/pages/ReviewCaseDetail.tsx` | Show both dates |
-| `src/lib/reviewWorkflow.ts` | Add requiresESignature flag |
-| `src/components/reviews/ESignatureModal.tsx` | NEW component |
-| `src/hooks/useESignature.ts` | NEW hook |
-| `src/components/reviews/ReviewActionButtons.tsx` | Intercept e-sig transitions |
-| `src/components/reviews/TransitionHistory.tsx` | Show e-signature indicators |
-| `src/locales/en/common.json` | Add all new keys |
-| `src/locales/es/common.json` | Add all new keys |
-| `src/integrations/supabase/types.ts` | Will auto-regenerate |
+| New migration | Rename column + add column |
+| `src/types/index.ts` | Rename field, add field |
+| `src/hooks/useSystemProfiles.ts` | Rename in 3 places, add field |
+| `src/hooks/useDashboardSystems.ts` | Rename in mapping + computeReviewStatus |
+| `src/hooks/useReviewCase.ts` | Auto-update system profile on approval |
+| `src/hooks/useReviewCases.ts` | Snapshot field rename |
+| `src/components/SystemProfileForm.tsx` | Rename field, COALESCE calc, add read-only display |
+| `src/components/SystemProfileDetailDialog.tsx` | Rename + add Last Reviewed Through |
+| `src/components/reviews/CreateReviewDialog.tsx` | COALESCE anchor for period dates |
+| `src/pages/ReviewCaseDetail.tsx` | Snapshot field rename |
+| `src/locales/en/common.json` | New keys |
+| `src/locales/es/common.json` | New keys |
 
 ### What Does NOT Change
-- Review workflow states (same 8)
-- Task generation, execution, phase dependencies
+
+- `review_period_months` calculation matrix
+- `completion_window_days`
+- E-signatures
+- Review workflow states
+- Task generation
 - RLS policies
-- Sign-off mechanism
-- Non-e-signature transitions work exactly as before
 
