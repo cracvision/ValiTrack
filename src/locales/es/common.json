@@ -814,9 +814,6 @@
     }
   }
 }
-        "approved": "Aprobado"
-      },
-      "actions": {
         "submitForReview": "Enviar a revisión",
         "approve": "Aprobar perfil",
         "returnToDraft": "Devolver a borrador",
