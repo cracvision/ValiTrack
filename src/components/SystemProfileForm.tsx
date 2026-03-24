@@ -187,7 +187,7 @@ export function SystemProfileForm({ open, onOpenChange, onSubmit, editingSystem 
           vendor_name: '',
           vendor_contact: '',
           vendor_contract_ref: '',
-          validation_date: '',
+          initial_validation_date: '',
           review_period_months: '' as unknown as number,
           completion_window_days: 90,
           system_owner_id: '',
