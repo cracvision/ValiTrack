@@ -58,6 +58,7 @@ const formSchema = z.object({
   vendor_contact: z.string().trim().max(200).optional().default(''),
   vendor_contract_ref: z.string().trim().max(100).optional().default(''),
   initial_validation_date: z.string().min(1, 'Validation date is required'),
+  last_review_period_end: z.string().optional().default(''),
   review_period_months: z.coerce.number().min(1, 'Must be at least 1 month').max(120, 'Cannot exceed 120 months'),
   completion_window_days: z.coerce.number().min(30, 'Minimum 30 days').max(180, 'Maximum 180 days').default(90),
   system_owner_id: z.string().min(1, 'System Owner is required'),
