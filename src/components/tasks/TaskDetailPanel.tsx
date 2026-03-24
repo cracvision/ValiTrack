@@ -215,7 +215,6 @@ export function TaskDetailPanel({ task, open, onClose, reviewCaseId, reviewCaseS
 
         {/* Instructions section — language-aware */}
         {(() => {
-          const { i18n } = useTranslation();
           const langInstructions = i18n.language === 'es' && task.execution_instructions_es
             ? task.execution_instructions_es
             : task.execution_instructions;
@@ -237,7 +236,8 @@ export function TaskDetailPanel({ task, open, onClose, reviewCaseId, reviewCaseS
             isToggling={checkoffs.toggleCheckoff.isPending}
             highlight={highlightSections && instructionsIncomplete}
           />
-        )}
+          ) : null;
+        })()}
 
         {/* Phase blocked message */}
         {isPhaseBlocked && phaseStatus && (
