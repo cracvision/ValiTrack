@@ -85,6 +85,7 @@ const TRANSITION_MAP: Record<ReviewStatus, TransitionRule[]> = {
       label: 'Approve review',
       labelKey: 'reviews.actions.approveReview',
       requiresConclusion: true,
+      requiresESignature: true,
     },
     {
       to: 'rejected',
@@ -92,6 +93,7 @@ const TRANSITION_MAP: Record<ReviewStatus, TransitionRule[]> = {
       label: 'Reject',
       labelKey: 'reviews.actions.reject',
       requiresReason: true,
+      requiresESignature: true,
     },
     {
       to: 'in_progress',
