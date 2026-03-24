@@ -45,7 +45,9 @@ export function MyTasksSection() {
             >
               <div className="flex items-center justify-between gap-4">
                 <div className="min-w-0 flex-1">
-                  <p className="text-sm font-medium text-foreground truncate">{task.title}</p>
+                  <p className="text-sm font-medium text-foreground truncate">
+                    {i18n.language === 'es' && task.title_es ? task.title_es : task.title}
+                  </p>
                   <p className="text-xs text-muted-foreground truncate">
                     {task.system_name} — {task.review_case_title}
                   </p>

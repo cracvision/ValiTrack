@@ -195,7 +195,7 @@ export function ReviewTasksPanel({ reviewCaseId, reviewLevel, reviewCaseStatus, 
 }
 
 function TaskRow({ task, onClick, isPhaseBlocked }: { task: ReviewTask; onClick: () => void; isPhaseBlocked: boolean }) {
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
   const isCompleted = task.status === 'completed';
 
   return (

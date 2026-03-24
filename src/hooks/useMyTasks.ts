@@ -70,6 +70,7 @@ export function useMyTasks() {
         return {
           id: t.id,
           title: t.title,
+          title_es: t.title_es ?? undefined,
           task_group: t.task_group,
           status: t.status,
           due_date: t.due_date,
