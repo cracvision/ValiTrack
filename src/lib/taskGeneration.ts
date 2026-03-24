@@ -5,6 +5,7 @@ interface TaskTemplate {
   code: string;
   task_group: string;
   title: string;
+  title_es?: string | null;
   description: string;
   execution_instructions: string;
   default_assignee_role: string;
