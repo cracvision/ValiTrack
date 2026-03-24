@@ -24,7 +24,14 @@
   },
   "dashboard": {
     "title": "Panel",
-    "subtitle": "Gestión de revisiones periódicas de sistemas computarizados",
+    "subtitle": {
+      "super_user": "Vista general de la plataforma y salud del sistema",
+      "system_owner": "Tus sistemas y revisiones pendientes",
+      "quality_assurance": "Estado de cumplimiento y aprobaciones pendientes",
+      "system_administrator": "Tus tareas técnicas y estado del sistema",
+      "business_owner": "Sistemas de procesos de negocio bajo revisión",
+      "it_manager": "Gobernanza de IT y supervisión de infraestructura"
+    },
     "welcome": "Bienvenido a ValiTrack",
     "welcomeDesc": "Comienza registrando tu primer sistema computarizado. Una vez registrado, podrás rastrear el estado de validación, programar revisiones periódicas y gestionar la documentación de cumplimiento.",
     "registerFirst": "Registrar Primer Sistema",
@@ -49,14 +56,6 @@
       "morning": "Buenos días, {{name}}",
       "afternoon": "Buenas tardes, {{name}}",
       "evening": "Buenas noches, {{name}}"
-    },
-    "subtitle": {
-      "super_user": "Vista general de la plataforma y salud del sistema",
-      "system_owner": "Tus sistemas y revisiones pendientes",
-      "quality_assurance": "Estado de cumplimiento y aprobaciones pendientes",
-      "system_administrator": "Tus tareas técnicas y estado del sistema",
-      "business_owner": "Sistemas de procesos de negocio bajo revisión",
-      "it_manager": "Gobernanza de IT y supervisión de infraestructura"
     },
     "mySystems": {
       "title": "Mis sistemas",
@@ -799,49 +798,6 @@
       "banners": {
         "inReviewReadonly": "Este perfil está actualmente en revisión. Devuélvalo a Borrador para hacer cambios.",
         "approvedReadonly": "Este perfil está aprobado. Para hacer cambios, use 'Revisar perfil' para devolverlo a Borrador.",
-        "pendingApproval": "Perfil pendiente de aprobación",
-        "underReview": "Perfil en revisión",
-        "onlyApprovedAvailable": "Solo sistemas con perfiles aprobados están disponibles.",
-        "systemsPendingApproval": "{{count}} sistema(s) están pendientes de aprobación."
-      },
-      "filters": {
-        "allApproval": "Toda Aprobación"
-      },
-      "transitions": {
-        "title": "Historial de Aprobación",
-        "returnReason": "Razón"
-      }
-    }
-  }
-}
-        "returnToDraft": "Devolver a borrador",
-        "revise": "Revisar perfil"
-      },
-      "signoffs": {
-        "title": "Firmas de Revisión del Perfil",
-        "description": "Todos los revisores asignados deben completar su revisión antes de que este perfil pueda ser aprobado.",
-        "yourSignoff": "Se requiere tu firma",
-        "commentsLabel": "Comentarios",
-        "commentsOptional": "Comentarios (opcional)",
-        "commentsPlaceholder": "Agrega comentarios sobre tu revisión...",
-        "objectionCommentsPlaceholder": "Describe tus objeciones y qué necesita ser corregido...",
-        "objectionCommentsRequired": "Debes proveer detalles sobre tus objeciones",
-        "noObjectionsButton": "Sin objeciones",
-        "raiseObjectionsButton": "Presentar objeciones",
-        "approved": "Revisado — Sin objeciones",
-        "objected": "Revisado — Objeciones registradas",
-        "pending": "Pendiente",
-        "progress": "{{completed}} de {{total}} revisiones completadas",
-        "allApproved": "Todas las revisiones completadas — sin objeciones",
-        "objectionsRaised": "Se han presentado objeciones",
-        "objectionsDescription": "Uno o más revisores han presentado objeciones. El System Owner debe atender los comentarios y devolver este perfil a borrador para correcciones.",
-        "blockedPending": "Todas las firmas de revisión deben completarse primero",
-        "blockedObjections": "Las objeciones deben resolverse antes de aprobar",
-        "missingReviewers": "Todos los revisores requeridos (SA, QA, Business Owner) deben estar asignados antes de enviar a revisión."
-      },
-      "banners": {
-        "inReviewReadonly": "Este perfil está actualmente en revisión. Devuélvelo a Borrador para hacer cambios.",
-        "approvedReadonly": "Este perfil está aprobado. Para hacer cambios, usa 'Revisar perfil' para devolverlo a Borrador.",
         "pendingApproval": "Perfil pendiente de aprobación",
         "underReview": "Perfil en revisión",
         "onlyApprovedAvailable": "Solo sistemas con perfiles aprobados están disponibles.",
