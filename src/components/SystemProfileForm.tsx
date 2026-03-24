@@ -150,6 +150,11 @@ export function SystemProfileForm({ open, onOpenChange, onSubmit, editingSystem 
   const isInitialMount = useRef(true);
   const isInitialReviewLevel = useRef(true);
 
+  // Persist form data across re-renders caused by focus loss (Snagit, Snipping Tool, etc.)
+  const savedFormDataRef = useRef<FormValues | null>(null);
+  const editingSystemIdRef = useRef<string | null>(null);
+  const sessionActiveRef = useRef(false);
+
   const form = useForm<FormValues>({
     resolver: zodResolver(formSchema),
     defaultValues: editingSystem
