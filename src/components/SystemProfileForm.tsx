@@ -72,8 +72,9 @@ const formSchema = z.object({
 
 type FormValues = z.infer<typeof formSchema>;
 
-function calculateNextReviewDate(validationDate: string, periodMonths: number): string {
-  const date = new Date(validationDate);
+function calculateNextReviewDate(initialValidationDate: string, periodMonths: number, lastReviewPeriodEnd?: string | null): string {
+  const anchor = lastReviewPeriodEnd || initialValidationDate;
+  const date = new Date(anchor);
   date.setMonth(date.getMonth() + periodMonths);
   return date.toISOString().split('T')[0];
 }
