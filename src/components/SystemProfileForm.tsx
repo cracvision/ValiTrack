@@ -137,6 +137,8 @@ interface SystemProfileFormProps {
 }
 
 export function SystemProfileForm({ open, onOpenChange, onSubmit, editingSystem }: SystemProfileFormProps) {
+  console.log('[FORM] Render — open:', open, 'editingSystem:', editingSystem?.id ?? 'new');
+
   const { t } = useTranslation();
   const { users: systemOwners, loading: loadingOwners } = useRoleUsers('system_owner');
   const { users: systemAdmins, loading: loadingAdmins } = useRoleUsers('system_administrator');
@@ -244,6 +246,7 @@ export function SystemProfileForm({ open, onOpenChange, onSubmit, editingSystem 
 
       // If we have saved data from an interrupted session (Snagit, etc.), restore it
       if (isSameSession && savedFormDataRef.current) {
+        console.log('[FORM] form.reset() called — trigger:', 'open effect restore interrupted session');
         form.reset(savedFormDataRef.current);
       } else {
         // New dialog open — reset everything
@@ -277,9 +280,11 @@ export function SystemProfileForm({ open, onOpenChange, onSubmit, editingSystem 
             business_owner_id: editingSystem.business_owner_id ?? '',
             it_manager_id: editingSystem.it_manager_id ?? '',
           };
+          console.log('[FORM] form.reset() called — trigger:', 'open effect load editing system');
           form.reset(editData);
           savedFormDataRef.current = editData;
         } else {
+          console.log('[FORM] form.reset() called — trigger:', 'open effect initialize new system');
           form.reset();
           savedFormDataRef.current = null;
         }

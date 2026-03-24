@@ -67,6 +67,8 @@ export default function SystemProfiles() {
   const [filterApproval, setFilterApproval] = useState<string>('all');
   const [viewingSystem, setViewingSystem] = useState<SystemProfile | null>(null);
 
+  console.log('[PAGE] SystemProfiles render — formOpen:', formOpen);
+
   const filtered = systems.filter((s) => {
     if (filterEnvironment !== 'all' && s.system_environment !== filterEnvironment) return false;
     if (filterStatus !== 'all' && s.status !== filterStatus) return false;
