@@ -48,6 +48,42 @@ function FieldValue({ label, value }: { label: string; value?: string | null }) 
   );
 }
 
+function CompletionDueDateField({ nextReviewDate, completionWindowDays, t }: {
+  nextReviewDate?: string | null;
+  completionWindowDays?: number | null;
+  t: (key: string) => string;
+}) {
+  if (!nextReviewDate || completionWindowDays == null) {
+    return (
+      <div>
+        <p className="text-xs text-muted-foreground">{t('systemProfiles.detail.completionDueDate')}</p>
+        <p className="text-sm text-muted-foreground">—</p>
+      </div>
+    );
+  }
+
+  const dueDate = addDays(new Date(nextReviewDate), completionWindowDays);
+  const daysRemaining = differenceInDays(dueDate, new Date());
+
+  let valueClass = 'text-sm font-medium text-foreground';
+  let labelClass = 'text-xs text-muted-foreground';
+
+  if (daysRemaining <= 30) {
+    valueClass = 'text-sm font-medium text-destructive';
+    labelClass = 'text-xs text-destructive';
+  } else if (daysRemaining <= 90) {
+    valueClass = 'text-sm font-medium text-orange-600';
+    labelClass = 'text-xs text-orange-600';
+  }
+
+  return (
+    <div>
+      <p className={labelClass}>{t('systemProfiles.detail.completionDueDate')}</p>
+      <p className={valueClass}>{dueDate.toLocaleDateString()}</p>
+    </div>
+  );
+}
+
 function SectionTitle({ children }: { children: React.ReactNode }) {
   return <h3 className="text-sm font-semibold text-foreground mb-3">{children}</h3>;
 }
