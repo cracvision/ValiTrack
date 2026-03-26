@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { Navigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { useAuth } from '@/hooks/useAuth';
-import { Loader2, Lock, Eye, EyeOff, Mail } from 'lucide-react';
+import { Loader2, Lock, Eye, EyeOff, Mail, Globe } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -12,7 +12,7 @@ import { useToast } from '@/hooks/use-toast';
 const LOGO_URL = `${import.meta.env.VITE_SUPABASE_URL}/storage/v1/object/public/images/ValiTrack_Logo.png?v=2`;
 
 export default function Auth() {
-  const { t } = useTranslation('auth');
+  const { t, i18n } = useTranslation('auth');
   const { user, profile, loading, signIn } = useAuth();
   const { toast } = useToast();
   const [email, setEmail] = useState('');
@@ -50,8 +50,22 @@ export default function Auth() {
     }
   };
 
+  const toggleLanguage = () => {
+    i18n.changeLanguage(i18n.language === 'es' ? 'en' : 'es');
+  };
+
   return (
-    <div className="flex min-h-screen items-center justify-center bg-muted/30 px-4">
+    <div className="relative flex min-h-screen items-center justify-center bg-muted/30 px-4">
+      <Button
+        type="button"
+        variant="ghost"
+        size="sm"
+        className="absolute top-4 right-4 gap-1.5 text-muted-foreground"
+        onClick={toggleLanguage}
+      >
+        <Globe className="h-4 w-4" />
+        {i18n.language === 'es' ? 'EN' : 'ES'}
+      </Button>
       <Card className="w-full max-w-md">
         <CardHeader className="text-center">
           <div className="mx-auto mb-4">
