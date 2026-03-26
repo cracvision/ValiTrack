@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { ChevronRight, Clock, CalendarDays, AlertTriangle, Info, ShieldCheck } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
 import { cn } from '@/lib/utils';
-import { ReviewStatusIndicator, useLocalizedCountdown } from './ReviewStatusIndicator';
+import { useLocalizedCountdown } from './ReviewStatusIndicator';
 import { ReviewPhaseStepper } from './ReviewPhaseStepper';
 import { SystemAuditFeed } from './SystemAuditFeed';
 import { TimelineMessageBlock, useTimelineNextAction } from './TimelineMessageBlock';
@@ -255,13 +255,6 @@ export function SystemCard({ system }: SystemCardProps) {
         </Badge>
       </div>
 
-      {/* Status row */}
-      <div className="border-t border-b border-border py-1">
-        <ReviewStatusIndicator
-          status={system.reviewStatus}
-          daysUntilDue={system.daysUntilDue}
-        />
-      </div>
 
       {/* Phase stepper */}
       {showStepper && system.actualReviewStatus && (
