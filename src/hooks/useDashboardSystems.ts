@@ -116,7 +116,7 @@ export function useDashboardSystems() {
         last_review_period_end: row.last_review_period_end ?? null,
         review_period_months: row.review_period_months,
         next_review_date: row.next_review_date,
-        completion_window_days: row.completion_window_days ?? 90,
+        completion_window_days: row.completion_window_days,
         approval_status: row.approval_status ?? 'draft',
         created_at: row.created_at,
         updated_at: row.updated_at,
