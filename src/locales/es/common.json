@@ -702,6 +702,7 @@
       "reviewPeriod": "Período de Revisión",
       "completionWindow": "Ventana de Completación",
       "nextReviewDate": "Próxima Fecha de Revisión",
+      "completionDueDate": "Fecha Límite de Completación",
       "roleAssignments": "Asignación de Roles",
       "systemOwner": "System Owner",
       "systemAdministrator": "Administrador del Sistema",
