@@ -50,8 +50,22 @@ export default function Auth() {
     }
   };
 
+  const toggleLanguage = () => {
+    i18n.changeLanguage(i18n.language === 'es' ? 'en' : 'es');
+  };
+
   return (
-    <div className="flex min-h-screen items-center justify-center bg-muted/30 px-4">
+    <div className="relative flex min-h-screen items-center justify-center bg-muted/30 px-4">
+      <Button
+        type="button"
+        variant="ghost"
+        size="sm"
+        className="absolute top-4 right-4 gap-1.5 text-muted-foreground"
+        onClick={toggleLanguage}
+      >
+        <Globe className="h-4 w-4" />
+        {i18n.language === 'es' ? 'EN' : 'ES'}
+      </Button>
       <Card className="w-full max-w-md">
         <CardHeader className="text-center">
           <div className="mx-auto mb-4">
