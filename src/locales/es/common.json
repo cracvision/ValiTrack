@@ -103,6 +103,14 @@
       "approaching": "Planificar e iniciar revisión — dentro de {{days}} días",
       "overdue": "Iniciar revisión periódica de inmediato",
       "no_review": "Sin historial de revisión periódica. Programar primera revisión.",
+      "scenarioA_one": "Planificar e iniciar revisión — dentro de {{daysUntilPeriodEnd}} día",
+      "scenarioA_other": "Planificar e iniciar revisión — dentro de {{daysUntilPeriodEnd}} días",
+      "scenarioB_one": "Ejecutar revisión periódica — queda {{daysUntilDueDate}} día",
+      "scenarioB_other": "Ejecutar revisión periódica — quedan {{daysUntilDueDate}} días",
+      "scenarioC_one": "Completar y aprobar revisión — queda {{daysUntilDueDate}} día",
+      "scenarioC_other": "Completar y aprobar revisión — quedan {{daysUntilDueDate}} días",
+      "scenarioD_one": "Acción inmediata requerida — {{daysOverdue}} día de retraso",
+      "scenarioD_other": "Acción inmediata requerida — {{daysOverdue}} días de retraso",
       "phase": {
         "draft": "Revisión creada — enviar plan a revisión",
         "plan_review": "Plan en revisión — esperando comentarios",
@@ -119,6 +127,22 @@
         "rejected": "Revisión rechazada — se requieren correcciones",
         "in_preparation": "Revisión en preparación — {{days}} días hasta vencimiento",
         "under_review": "Esperando aprobación de QA"
+      }
+    },
+    "systemCard": {
+      "timeline": {
+        "periodLabel_one": "{{count}} mes",
+        "periodLabel_other": "{{count}} meses",
+        "scenarioA_one": "El periodo de {{periodLabel}} a ser evaluado para este Periodic Review será alcanzado dentro de {{daysUntilPeriodEnd}} día. Una vez alcanzado, tendrá {{completionWindowDays}} días para completar y aprobar la revisión.",
+        "scenarioA_other": "El periodo de {{periodLabel}} a ser evaluado para este Periodic Review será alcanzado dentro de {{daysUntilPeriodEnd}} días. Una vez alcanzado, tendrá {{completionWindowDays}} días para completar y aprobar la revisión.",
+        "scenarioBCD": "El periodo de {{periodLabel}} a ser evaluado fue alcanzado el {{nextReviewDate}}. Quedan {{daysRemaining}} días para completar y aprobar la revisión (fecha límite: {{completionDueDate}}).",
+        "scenarioBCD_one": "El periodo de {{periodLabel}} a ser evaluado fue alcanzado el {{nextReviewDate}}. Queda {{daysRemaining}} día para completar y aprobar la revisión (fecha límite: {{completionDueDate}}).",
+        "scenarioBCD_today": "El periodo de {{periodLabel}} a ser evaluado fue alcanzado hoy. Quedan {{daysRemaining}} días para completar y aprobar la revisión (fecha límite: {{completionDueDate}}).",
+        "scenarioBCD_zero": "El periodo de {{periodLabel}} a ser evaluado fue alcanzado el {{nextReviewDate}}. Hoy es el último día para completar y aprobar la revisión (fecha límite: {{completionDueDate}}).",
+        "scenarioBCD_zero_today": "El periodo de {{periodLabel}} a ser evaluado fue alcanzado hoy. Hoy es el último día para completar y aprobar la revisión (fecha límite: {{completionDueDate}}).",
+        "scenarioD": "El periodo de {{periodLabel}} a ser evaluado fue alcanzado el {{nextReviewDate}}. La fecha límite para completar la revisión ({{completionDueDate}}) ha sido excedida por {{daysOverdue}} días.",
+        "scenarioD_one": "El periodo de {{periodLabel}} a ser evaluado fue alcanzado el {{nextReviewDate}}. La fecha límite para completar la revisión ({{completionDueDate}}) ha sido excedida por {{daysOverdue}} día.",
+        "scenarioD_today": "El periodo de {{periodLabel}} a ser evaluado fue alcanzado hoy. La fecha límite para completar la revisión ({{completionDueDate}}) ha sido excedida por {{daysOverdue}} días."
       }
     },
     "phases": {

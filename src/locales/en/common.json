@@ -104,6 +104,14 @@
       "approaching": "Plan and initiate review — within {{days}} days",
       "overdue": "Initiate periodic review immediately",
       "no_review": "No periodic review history. Schedule first review.",
+      "scenarioA_one": "Plan and initiate review — within {{daysUntilPeriodEnd}} day",
+      "scenarioA_other": "Plan and initiate review — within {{daysUntilPeriodEnd}} days",
+      "scenarioB_one": "Execute periodic review — {{daysUntilDueDate}} day remaining",
+      "scenarioB_other": "Execute periodic review — {{daysUntilDueDate}} days remaining",
+      "scenarioC_one": "Complete and approve review — {{daysUntilDueDate}} day remaining",
+      "scenarioC_other": "Complete and approve review — {{daysUntilDueDate}} days remaining",
+      "scenarioD_one": "Immediate action required — {{daysOverdue}} day overdue",
+      "scenarioD_other": "Immediate action required — {{daysOverdue}} days overdue",
       "phase": {
         "draft": "Review created — submit plan for review",
         "plan_review": "Plan under review — awaiting feedback",
@@ -120,6 +128,22 @@
         "rejected": "Review rejected — revisions needed",
         "in_preparation": "Review in preparation — {{days}} days until due",
         "under_review": "Awaiting QA approval"
+      }
+    },
+    "systemCard": {
+      "timeline": {
+        "periodLabel_one": "{{count}} month",
+        "periodLabel_other": "{{count}} months",
+        "scenarioA_one": "The {{periodLabel}} evaluation period for this Periodic Review will be reached in {{daysUntilPeriodEnd}} day. Once reached, you will have {{completionWindowDays}} days to complete and approve the review.",
+        "scenarioA_other": "The {{periodLabel}} evaluation period for this Periodic Review will be reached in {{daysUntilPeriodEnd}} days. Once reached, you will have {{completionWindowDays}} days to complete and approve the review.",
+        "scenarioBCD": "The {{periodLabel}} evaluation period was reached on {{nextReviewDate}}. {{daysRemaining}} days remain to complete and approve the review (deadline: {{completionDueDate}}).",
+        "scenarioBCD_one": "The {{periodLabel}} evaluation period was reached on {{nextReviewDate}}. {{daysRemaining}} day remains to complete and approve the review (deadline: {{completionDueDate}}).",
+        "scenarioBCD_today": "The {{periodLabel}} evaluation period was reached today. {{daysRemaining}} days remain to complete and approve the review (deadline: {{completionDueDate}}).",
+        "scenarioBCD_zero": "The {{periodLabel}} evaluation period was reached on {{nextReviewDate}}. This is the last day to complete and approve the review (deadline: {{completionDueDate}}).",
+        "scenarioBCD_zero_today": "The {{periodLabel}} evaluation period was reached today. This is the last day to complete and approve the review (deadline: {{completionDueDate}}).",
+        "scenarioD": "The {{periodLabel}} evaluation period was reached on {{nextReviewDate}}. The deadline to complete the review ({{completionDueDate}}) has been exceeded by {{daysOverdue}} days.",
+        "scenarioD_one": "The {{periodLabel}} evaluation period was reached on {{nextReviewDate}}. The deadline to complete the review ({{completionDueDate}}) has been exceeded by {{daysOverdue}} day.",
+        "scenarioD_today": "The {{periodLabel}} evaluation period was reached today. The deadline to complete the review ({{completionDueDate}}) has been exceeded by {{daysOverdue}} days."
       }
     },
     "phases": {
