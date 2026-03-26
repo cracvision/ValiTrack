@@ -42,6 +42,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
   const isMounted = useRef(true);
   const signingOutRef = useRef(false);
+  const profileLoadedRef = useRef(false);
 
   const safeSetState = useCallback((updater: AuthState | ((prev: AuthState) => AuthState)) => {
     if (isMounted.current) {
