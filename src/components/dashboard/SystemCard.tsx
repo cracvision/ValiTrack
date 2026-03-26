@@ -6,6 +6,7 @@ import { cn } from '@/lib/utils';
 import { ReviewStatusIndicator, useLocalizedCountdown } from './ReviewStatusIndicator';
 import { ReviewPhaseStepper } from './ReviewPhaseStepper';
 import { SystemAuditFeed } from './SystemAuditFeed';
+import { TimelineMessageBlock, useTimelineNextAction } from './TimelineMessageBlock';
 import { GXP_SHORT_LABELS, ENVIRONMENT_SHORT_LABELS, GAMP_SHORT_LABELS } from '@/lib/gxpClassifications';
 import type { DashboardSystem } from '@/hooks/useDashboardSystems';
 import type { GxPClassification, SystemEnvironment, GampCategory } from '@/types';
@@ -131,7 +132,53 @@ function NextActionBar({ system }: { system: DashboardSystem }) {
     );
   }
 
-  // Fallback: no active case or approved
+  // Fallback: no active case or approved — use scenario-based action
+  const timelineAction = useTimelineNextAction(system);
+
+  if (timelineAction) {
+    // Determine icon and styling based on scenario
+    const scenarioKey = timelineAction.key;
+    let Icon = Clock;
+    let bg = 'bg-muted/50';
+    let textClass = 'text-muted-foreground';
+
+    if (scenarioKey.includes('scenarioD')) {
+      Icon = AlertTriangle;
+      bg = 'bg-red-50';
+      textClass = 'text-destructive font-semibold';
+    } else if (scenarioKey.includes('scenarioC')) {
+      Icon = AlertTriangle;
+      bg = 'bg-red-50';
+      textClass = 'text-destructive';
+    } else if (scenarioKey.includes('scenarioB')) {
+      Icon = CalendarDays;
+      bg = 'bg-orange-50';
+      textClass = 'text-orange-800';
+    } else if (scenarioKey.includes('scenarioA')) {
+      // Check if within 90 days of due date
+      const daysUntilPeriodEnd = timelineAction.params.daysUntilPeriodEnd ?? 999;
+      if (daysUntilPeriodEnd <= 90) {
+        Icon = CalendarDays;
+        bg = 'bg-orange-50';
+        textClass = 'text-orange-800';
+      } else {
+        Icon = Clock;
+        bg = 'bg-muted/50';
+        textClass = 'text-muted-foreground';
+      }
+    }
+
+    return (
+      <div className={cn('flex items-center gap-2 rounded px-3 py-2 mt-2', bg)}>
+        <Icon className={cn('h-4 w-4 shrink-0', textClass)} strokeWidth={1.75} />
+        <span className={cn('text-xs', textClass)}>
+          {String(t(timelineAction.key, timelineAction.params))}
+        </span>
+      </div>
+    );
+  }
+
+  // Ultimate fallback (no_review, or scenario E — distant dates)
   const configs: Record<string, { icon: typeof Clock; bg: string; text: string; msg: string }> = {
     compliant: {
       icon: Clock,
