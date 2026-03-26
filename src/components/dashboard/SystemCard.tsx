@@ -268,6 +268,9 @@ export function SystemCard({ system }: SystemCardProps) {
         <ReviewPhaseStepper currentPhase={system.actualReviewStatus} />
       )}
 
+      {/* Timeline message block — only for cards without active review cases */}
+      <TimelineMessageBlock system={system} />
+
       {/* Next action bar */}
       <NextActionBar system={system} />
 
