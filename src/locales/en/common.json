@@ -703,6 +703,7 @@
       "reviewPeriod": "Review Period",
       "completionWindow": "Completion Window",
       "nextReviewDate": "Next Review Date",
+      "completionDueDate": "Completion Due Date",
       "roleAssignments": "Role Assignments",
       "systemOwner": "System Owner",
       "systemAdministrator": "System Administrator",

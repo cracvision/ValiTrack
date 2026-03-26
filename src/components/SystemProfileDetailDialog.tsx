@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Pencil, AlertTriangle, ChevronDown, ChevronRight } from 'lucide-react';
+import { addDays, differenceInDays } from 'date-fns';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Separator } from '@/components/ui/separator';
@@ -43,6 +44,42 @@ function FieldValue({ label, value }: { label: string; value?: string | null }) 
       ) : (
         <p className="text-sm text-muted-foreground">—</p>
       )}
+    </div>
+  );
+}
+
+function CompletionDueDateField({ nextReviewDate, completionWindowDays, t }: {
+  nextReviewDate?: string | null;
+  completionWindowDays?: number | null;
+  t: (key: string) => string;
+}) {
+  if (!nextReviewDate || completionWindowDays == null) {
+    return (
+      <div>
+        <p className="text-xs text-muted-foreground">{t('systemProfiles.detail.completionDueDate')}</p>
+        <p className="text-sm text-muted-foreground">—</p>
+      </div>
+    );
+  }
+
+  const dueDate = addDays(new Date(nextReviewDate), completionWindowDays);
+  const daysRemaining = differenceInDays(dueDate, new Date());
+
+  let valueClass = 'text-sm font-medium text-foreground';
+  let labelClass = 'text-xs text-muted-foreground';
+
+  if (daysRemaining <= 30) {
+    valueClass = 'text-sm font-medium text-destructive';
+    labelClass = 'text-xs text-destructive';
+  } else if (daysRemaining <= 90) {
+    valueClass = 'text-sm font-medium text-orange-600';
+    labelClass = 'text-xs text-orange-600';
+  }
+
+  return (
+    <div>
+      <p className={labelClass}>{t('systemProfiles.detail.completionDueDate')}</p>
+      <p className={valueClass}>{dueDate.toLocaleDateString()}</p>
     </div>
   );
 }
@@ -314,6 +351,11 @@ export function SystemProfileDetailDialog({ system, open, onOpenChange, onEdit, 
               <FieldValue label={t('systemProfiles.detail.reviewPeriod')} value={system.review_period_months ? t('systemProfiles.detail.reviewPeriodValue', { months: system.review_period_months }) : null} />
               <FieldValue label={t('systemProfiles.detail.completionWindow')} value={`${system.completion_window_days ?? 90} ${t('systemProfiles.form.completionWindowDays')}`} />
               <FieldValue label={t('systemProfiles.detail.nextReviewDate')} value={system.next_review_date ? new Date(system.next_review_date).toLocaleDateString() : null} />
+              <CompletionDueDateField
+                nextReviewDate={system.next_review_date}
+                completionWindowDays={system.completion_window_days}
+                t={t}
+              />
             </div>
           </div>
 
