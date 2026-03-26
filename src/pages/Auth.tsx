@@ -12,7 +12,7 @@ import { useToast } from '@/hooks/use-toast';
 const LOGO_URL = `${import.meta.env.VITE_SUPABASE_URL}/storage/v1/object/public/images/ValiTrack_Logo.png?v=2`;
 
 export default function Auth() {
-  const { t } = useTranslation('auth');
+  const { t, i18n } = useTranslation('auth');
   const { user, profile, loading, signIn } = useAuth();
   const { toast } = useToast();
   const [email, setEmail] = useState('');
