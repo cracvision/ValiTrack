@@ -95,3 +95,27 @@ systemProfiles.detail.lastReviewedThrough / Último Período Revisado Hasta
 - Task generation
 - RLS policies
 
+---
+
+## DB-OPT-1: Database Query Optimization ✅ COMPLETED
+
+### Problem
+Each window focus event triggered 4-7 redundant DB queries via onAuthStateChange('SIGNED_IN') cascade.
+
+### Fix 1: AuthContext profileLoadedRef ✅
+- Added `profileLoadedRef` to skip `fetchProfileAndRoles` when profile/roles already loaded
+- Reset on SIGNED_OUT only
+- Eliminates 3 queries per focus event
+
+### Fix 2: useSystemProfiles → TanStack Query ✅
+- Replaced useState/useEffect with useQuery (queryKey: ['system-profiles', user?.id])
+- Inherits global staleTime (2min) and refetchOnWindowFocus: false
+- Mutations use queryClient.invalidateQueries instead of manual refetch
+- Same public interface preserved
+
+### Impact
+| Scenario | Before | After |
+|----------|--------|-------|
+| Window focus | 4-7 queries | 0 |
+| Navigation | 1 query | 0 (cache) |
+| Login | 4 queries | 4 (unchanged, necessary) |

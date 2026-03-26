@@ -42,6 +42,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
   const isMounted = useRef(true);
   const signingOutRef = useRef(false);
+  const profileLoadedRef = useRef(false);
 
   const safeSetState = useCallback((updater: AuthState | ((prev: AuthState) => AuthState)) => {
     if (isMounted.current) {
@@ -74,6 +75,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         roles: (rolesRes.data as AppRole[]) ?? [],
         loading: false,
       }));
+      profileLoadedRef.current = true;
     } catch {
       // If fetch fails during signout, just ignore
       if (!signingOutRef.current && isMounted.current) {
@@ -93,13 +95,14 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         if (event === 'SIGNED_OUT') {
           // Synchronous, atomic state clear
           safeSetState({ ...EMPTY_STATE });
+          profileLoadedRef.current = false;
           i18n.changeLanguage('es');
           return;
         }
 
         safeSetState((prev) => ({ ...prev, user: session?.user ?? null, session }));
 
-        if (session?.user && !signingOutRef.current) {
+        if (session?.user && !signingOutRef.current && !profileLoadedRef.current) {
           setTimeout(() => fetchProfileAndRoles(session.user.id), 0);
         }
       }
