@@ -255,13 +255,6 @@ export function SystemCard({ system }: SystemCardProps) {
         </Badge>
       </div>
 
-      {/* Status row */}
-      <div className="border-t border-b border-border py-1">
-        <ReviewStatusIndicator
-          status={system.reviewStatus}
-          daysUntilDue={system.daysUntilDue}
-        />
-      </div>
 
       {/* Phase stepper */}
       {showStepper && system.actualReviewStatus && (
