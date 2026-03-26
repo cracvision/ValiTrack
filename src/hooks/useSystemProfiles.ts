@@ -1,4 +1,5 @@
-import { useState, useEffect, useCallback, useRef } from 'react';
+import { useCallback, useRef } from 'react';
+import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/hooks/useAuth';
 import { toast } from '@/hooks/use-toast';
@@ -46,45 +47,32 @@ function rowToSystemProfile(row: any): SystemProfile {
   };
 }
 
+async function fetchSystemProfiles(): Promise<SystemProfile[]> {
+  const { data, error } = await supabase
+    .from('system_profiles')
+    .select('*')
+    .eq('is_deleted', false)
+    .order('created_at', { ascending: false });
+
+  if (error) throw error;
+  return (data ?? []).map(rowToSystemProfile);
+}
+
 export function useSystemProfiles(): UseSystemProfilesReturn {
   const { user } = useAuth();
-  const [systems, setSystems] = useState<SystemProfile[]>([]);
-  const [loading, setLoading] = useState(true);
+  const queryClient = useQueryClient();
   const toastRef = useRef(toast);
   toastRef.current = toast;
 
-  const fetchSystems = useCallback(async () => {
-    if (!user) {
-      setSystems([]);
-      setLoading(false);
-      return;
-    }
+  const { data: systems = [], isLoading } = useQuery({
+    queryKey: ['system-profiles', user?.id],
+    queryFn: fetchSystemProfiles,
+    enabled: !!user,
+  });
 
-    try {
-      setLoading(true);
-      const { data, error } = await supabase
-        .from('system_profiles')
-        .select('*')
-        .eq('is_deleted', false)
-        .order('created_at', { ascending: false });
-
-      if (error) throw error;
-      setSystems((data ?? []).map(rowToSystemProfile));
-    } catch (err: any) {
-      console.error('Failed to fetch system profiles:', err);
-      toastRef.current({
-        title: 'Error loading systems',
-        description: err.message ?? 'Could not load system profiles.',
-        variant: 'destructive',
-      });
-    } finally {
-      setLoading(false);
-    }
-  }, [user]);
-
-  useEffect(() => {
-    fetchSystems();
-  }, [fetchSystems]);
+  const invalidate = useCallback(() => {
+    queryClient.invalidateQueries({ queryKey: ['system-profiles'] });
+  }, [queryClient]);
 
   const addSystem = useCallback(async (system: SystemProfile): Promise<boolean> => {
     if (!user) return false;
@@ -118,7 +106,7 @@ export function useSystemProfiles(): UseSystemProfilesReturn {
         created_by: user.id,
       });
       if (error) throw error;
-      await fetchSystems();
+      invalidate();
       return true;
     } catch (err: any) {
       console.error('Failed to create system profile:', err);
@@ -129,7 +117,7 @@ export function useSystemProfiles(): UseSystemProfilesReturn {
       });
       return false;
     }
-  }, [user, fetchSystems]);
+  }, [user, invalidate]);
 
   const updateSystem = useCallback(async (system: SystemProfile): Promise<boolean> => {
     if (!user) return false;
@@ -161,7 +149,7 @@ export function useSystemProfiles(): UseSystemProfilesReturn {
         updated_by: user.id,
       }).eq('id', system.id);
       if (error) throw error;
-      await fetchSystems();
+      invalidate();
       return true;
     } catch (err: any) {
       console.error('Failed to update system profile:', err);
@@ -172,7 +160,7 @@ export function useSystemProfiles(): UseSystemProfilesReturn {
       });
       return false;
     }
-  }, [user, fetchSystems]);
+  }, [user, invalidate]);
 
   const deleteSystem = useCallback(async (id: string): Promise<boolean> => {
     if (!user) return false;
@@ -183,7 +171,7 @@ export function useSystemProfiles(): UseSystemProfilesReturn {
         deleted_by: user.id,
       }).eq('id', id);
       if (error) throw error;
-      await fetchSystems();
+      invalidate();
       return true;
     } catch (err: any) {
       console.error('Failed to delete system profile:', err);
@@ -194,7 +182,7 @@ export function useSystemProfiles(): UseSystemProfilesReturn {
       });
       return false;
     }
-  }, [user, fetchSystems]);
+  }, [user, invalidate]);
 
   const transitionApprovalStatus = useCallback(async (
     profileId: string,
@@ -250,7 +238,6 @@ export function useSystemProfiles(): UseSystemProfilesReturn {
 
       // 4. If transitioning to 'in_review': create sign-off requests
       if (toStatus === 'in_review') {
-        // First reset any existing signoffs to pending
         await supabase
           .from('profile_signoffs')
           .update({
@@ -262,7 +249,6 @@ export function useSystemProfiles(): UseSystemProfilesReturn {
           .eq('system_profile_id', profileId)
           .eq('is_deleted', false);
 
-        // Get the profile to read role assignments
         const profile = systems.find(s => s.id === profileId);
         if (profile) {
           const signoffRoles = [
@@ -303,7 +289,7 @@ export function useSystemProfiles(): UseSystemProfilesReturn {
           .eq('is_deleted', false);
       }
 
-      await fetchSystems();
+      invalidate();
       return true;
     } catch (err: any) {
       console.error('Failed to transition approval status:', err);
@@ -314,7 +300,7 @@ export function useSystemProfiles(): UseSystemProfilesReturn {
       });
       return false;
     }
-  }, [user, fetchSystems, systems]);
+  }, [user, invalidate, systems]);
 
-  return { systems, loading, addSystem, updateSystem, deleteSystem, transitionApprovalStatus, refetch: fetchSystems };
+  return { systems, loading: isLoading, addSystem, updateSystem, deleteSystem, transitionApprovalStatus, refetch: invalidate };
 }
