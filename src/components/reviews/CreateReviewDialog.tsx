@@ -135,7 +135,10 @@ export function CreateReviewDialog({ open, onOpenChange }: CreateReviewDialogPro
       resetForm();
       navigate(`/reviews/${id}`);
     } catch (err: any) {
-      toast({ title: t('common.error'), description: err.message, variant: 'destructive' });
+      const msg = err.message === 'DUPLICATE_ACTIVE_REVIEW'
+        ? t('reviews.createGuard.duplicateError')
+        : err.message;
+      toast({ title: t('common.error'), description: msg, variant: 'destructive' });
     }
   };
 
