@@ -237,6 +237,8 @@ export function SystemProfileForm({ open, onOpenChange, onSubmit, editingSystem 
       isInitialReviewLevel.current = true;
       setFlashPeriod(false);
       setFlashReviewLevel(false);
+      setIdentifierError(null);
+      setIdentifierChecking(false);
 
       if (editingSystem) {
         form.reset({
