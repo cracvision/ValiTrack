@@ -10,6 +10,7 @@ import { useReviewCase } from '@/hooks/useReviewCase';
 import { useReviewTransitions } from '@/hooks/useReviewTransitions';
 import { useResolveUserNames } from '@/hooks/useResolveUserNames';
 import { useReviewSignoffs } from '@/hooks/useReviewSignoffs';
+import { useAuth } from '@/hooks/useAuth';
 import { ReviewStatusBadge } from '@/components/reviews/ReviewStatusBadge';
 import { ReviewWorkflowStepper } from '@/components/reviews/ReviewWorkflowStepper';
 import { ReviewActionButtons } from '@/components/reviews/ReviewActionButtons';
