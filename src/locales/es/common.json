@@ -771,6 +771,8 @@
       "lastUpdated": "Última actualización",
       "reviewPeriodValue": "{{months}} meses"
     },
+    "identifierDuplicate": "Este identificador ya está en uso por otro sistema ({{systemName}}). Cada sistema debe tener un identificador único.",
+    "identifierDuplicateError": "No se pudo guardar el perfil del sistema. Ya existe un sistema con este identificador.",
     "form": {
       "editTitle": "Editar Perfil de Sistema",
       "newTitle": "Nuevo Perfil de Sistema",

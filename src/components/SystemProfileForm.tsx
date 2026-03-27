@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
 import { zodResolver } from '@hookform/resolvers/zod';
@@ -29,6 +29,7 @@ import {
   SelectValue,
 } from '@/components/ui/select';
 import { Separator } from '@/components/ui/separator';
+import { supabase } from '@/integrations/supabase/client';
 import { useRoleUsers, type RoleUser } from '@/hooks/useRoleUsers';
 import {
   GXP_OPTIONS,
@@ -147,6 +148,9 @@ export function SystemProfileForm({ open, onOpenChange, onSubmit, editingSystem 
   const [autoValue, setAutoValue] = useState<number | null>(null);
   const [flashPeriod, setFlashPeriod] = useState(false);
   const [flashReviewLevel, setFlashReviewLevel] = useState(false);
+  const [identifierError, setIdentifierError] = useState<string | null>(null);
+  const [identifierChecking, setIdentifierChecking] = useState(false);
+  const identifierTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const isInitialMount = useRef(true);
   const isInitialReviewLevel = useRef(true);
 
@@ -233,6 +237,8 @@ export function SystemProfileForm({ open, onOpenChange, onSubmit, editingSystem 
       isInitialReviewLevel.current = true;
       setFlashPeriod(false);
       setFlashReviewLevel(false);
+      setIdentifierError(null);
+      setIdentifierChecking(false);
 
       if (editingSystem) {
         form.reset({
@@ -267,6 +273,37 @@ export function SystemProfileForm({ open, onOpenChange, onSubmit, editingSystem 
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [open, editingSystem]);
+
+  const checkIdentifierDuplicate = useCallback((value: string) => {
+    if (identifierTimerRef.current) clearTimeout(identifierTimerRef.current);
+    if (!value.trim()) {
+      setIdentifierError(null);
+      return;
+    }
+    setIdentifierChecking(true);
+    identifierTimerRef.current = setTimeout(async () => {
+      try {
+        let query = supabase
+          .from('system_profiles')
+          .select('id, name')
+          .ilike('system_identifier', value.trim())
+          .eq('is_deleted', false);
+        if (editingSystem?.id) {
+          query = query.neq('id', editingSystem.id);
+        }
+        const { data } = await query.limit(1);
+        if (data && data.length > 0) {
+          setIdentifierError(t('systemProfiles.identifierDuplicate', { systemName: data[0].name }));
+        } else {
+          setIdentifierError(null);
+        }
+      } catch {
+        setIdentifierError(null);
+      } finally {
+        setIdentifierChecking(false);
+      }
+    }, 500);
+  }, [editingSystem?.id, t]);
 
   const reviewLevelSuggestion = (watchRisk && watchGamp)
     ? suggestReviewLevel(watchRisk as RiskLevel, watchGamp as GampCategory)
@@ -335,7 +372,20 @@ export function SystemProfileForm({ open, onOpenChange, onSubmit, editingSystem 
                 <FormField control={form.control} name="system_identifier" render={({ field }) => (
                   <FormItem>
                     <FormLabel>{t('systemProfiles.form.systemIdentifier')} *</FormLabel>
-                    <FormControl><Input placeholder={t('systemProfiles.form.systemIdentifierPlaceholder')} {...field} /></FormControl>
+                    <FormControl>
+                      <Input
+                        placeholder={t('systemProfiles.form.systemIdentifierPlaceholder')}
+                        {...field}
+                        onChange={(e) => {
+                          field.onChange(e);
+                          checkIdentifierDuplicate(e.target.value);
+                        }}
+                        className={identifierError ? 'border-destructive text-destructive' : ''}
+                      />
+                    </FormControl>
+                    {identifierError && (
+                      <p className="text-sm text-destructive">{identifierError}</p>
+                    )}
                     <FormMessage />
                   </FormItem>
                 )} />
@@ -637,7 +687,7 @@ export function SystemProfileForm({ open, onOpenChange, onSubmit, editingSystem 
               }}>
                 {t('systemProfiles.form.cancel')}
               </Button>
-              <Button type="submit">
+              <Button type="submit" disabled={!!identifierError || identifierChecking}>
                 {editingSystem ? t('systemProfiles.form.updateProfile') : t('systemProfiles.form.createProfile')}
               </Button>
             </div>
