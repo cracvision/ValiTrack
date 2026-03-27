@@ -28,6 +28,8 @@ export default function ReviewCaseDetail() {
   const { t } = useTranslation();
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
+  const { user, roles } = useAuth();
+  const [editOpen, setEditOpen] = useState(false);
 
   const { data: reviewCase, isLoading } = useReviewCase(id);
   const { data: transitions = [] } = useReviewTransitions(id);
