@@ -33,9 +33,7 @@ export function DeleteReviewDraftDialog({ open, onOpenChange, reviewCase }: Dele
   const [reason, setReason] = useState('');
   const [isDeleting, setIsDeleting] = useState(false);
 
-  const { data: userNames = {} } = useResolveUserNames(
-    [reviewCase.initiated_by, user?.id].filter(Boolean) as string[]
-  );
+
 
   const reviewYear = new Date(reviewCase.review_period_end).getFullYear();
   const reviewName = `${reviewCase.title} — ${reviewCase.system_name} — ${reviewYear}`;
