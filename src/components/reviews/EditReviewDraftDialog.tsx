@@ -211,7 +211,7 @@ export function EditReviewDraftDialog({ open, onOpenChange, reviewCase }: EditRe
       <DialogContent className="sm:max-w-lg max-h-[90vh] overflow-y-auto">
         <DialogHeader>
           <DialogTitle>{t('reviews.editModal.title')}</DialogTitle>
-          <DialogDescription>{t('reviews.editModal.title')}</DialogDescription>
+          <DialogDescription>{reviewCase.system_name} — {new Date(reviewCase.review_period_end).getFullYear()}</DialogDescription>
         </DialogHeader>
 
         <div className="space-y-5">
