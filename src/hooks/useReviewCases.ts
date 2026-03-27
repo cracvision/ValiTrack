@@ -118,7 +118,12 @@ export function useCreateReviewCase() {
         .select('id')
         .single();
 
-      if (error) throw error;
+      if (error) {
+        if (error.code === '23505') {
+          throw new Error('DUPLICATE_ACTIVE_REVIEW');
+        }
+        throw error;
+      }
 
       // Insert initial transition
       const { error: transError } = await supabase
