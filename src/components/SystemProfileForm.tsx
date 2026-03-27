@@ -371,19 +371,19 @@ export function SystemProfileForm({ open, onOpenChange, onSubmit, editingSystem 
                 )} />
               </div>
               <div className="mt-4">
-                <FormField control={form.control} name="intended_use" render={({ field }) => (
+                <FormField control={form.control} name="description" render={({ field }) => (
                   <FormItem>
-                    <FormLabel>{t('systemProfiles.form.intendedUse')} *</FormLabel>
-                    <FormControl><Textarea placeholder={t('systemProfiles.form.intendedUsePlaceholder')} rows={3} {...field} /></FormControl>
+                    <FormLabel>{t('systemProfiles.form.description')}</FormLabel>
+                    <FormControl><Textarea placeholder={t('systemProfiles.form.descriptionPlaceholder')} rows={2} {...field} /></FormControl>
                     <FormMessage />
                   </FormItem>
                 )} />
               </div>
               <div className="mt-4">
-                <FormField control={form.control} name="description" render={({ field }) => (
+                <FormField control={form.control} name="intended_use" render={({ field }) => (
                   <FormItem>
-                    <FormLabel>{t('systemProfiles.form.description')}</FormLabel>
-                    <FormControl><Textarea placeholder={t('systemProfiles.form.descriptionPlaceholder')} rows={2} {...field} /></FormControl>
+                    <FormLabel>{t('systemProfiles.form.intendedUse')} *</FormLabel>
+                    <FormControl><Textarea placeholder={t('systemProfiles.form.intendedUsePlaceholder')} rows={3} {...field} /></FormControl>
                     <FormMessage />
                   </FormItem>
                 )} />
