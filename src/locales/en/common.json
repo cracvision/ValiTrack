@@ -283,7 +283,20 @@
       "beginReview": "Begin review",
       "returnToPreparation": "Return to preparation",
       "approve": "Approve",
-      "editDraft": "Edit Draft"
+      "editDraft": "Edit Draft",
+      "deleteDraft": "Delete Draft"
+    },
+    "deleteModal": {
+      "title": "Delete Review Draft?",
+      "description": "This will permanently remove this review case from the active list. This action cannot be undone. The record will be retained in the database for audit purposes.",
+      "confirmTarget": "You are about to delete: {{reviewName}}",
+      "reasonLabel": "Reason for deletion *",
+      "reasonPlaceholder": "Explain why this review case is being deleted...",
+      "reasonMinLength": "Reason must be at least 10 characters.",
+      "cancel": "Cancel",
+      "delete": "Delete",
+      "deleteSuccess": "Review case deleted successfully.",
+      "deleteError": "Could not delete this review case. It may have been updated by another user."
     },
     "editModal": {
       "title": "Edit Review Plan",

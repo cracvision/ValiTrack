@@ -2,8 +2,9 @@ import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useParams, useNavigate } from 'react-router-dom';
 import { useQuery } from '@tanstack/react-query';
-import { ArrowLeft, AlertTriangle, Info, ShieldCheck, Pencil } from 'lucide-react';
+import { ArrowLeft, AlertTriangle, Info, ShieldCheck, Pencil, Trash2 } from 'lucide-react';
 import { ReviewTasksPanel } from '@/components/reviews/ReviewTasksPanel';
+import { DeleteReviewDraftDialog } from '@/components/reviews/DeleteReviewDraftDialog';
 import { EditReviewDraftDialog } from '@/components/reviews/EditReviewDraftDialog';
 import { supabase } from '@/integrations/supabase/client';
 import { useReviewCase } from '@/hooks/useReviewCase';
@@ -30,6 +31,7 @@ export default function ReviewCaseDetail() {
   const navigate = useNavigate();
   const { user, roles } = useAuth();
   const [editOpen, setEditOpen] = useState(false);
+  const [deleteOpen, setDeleteOpen] = useState(false);
 
   const { data: reviewCase, isLoading } = useReviewCase(id);
   const { data: transitions = [] } = useReviewTransitions(id);
@@ -143,6 +145,19 @@ export default function ReviewCaseDetail() {
           </div>
         </div>
         <div className="flex items-center gap-2">
+          {reviewCase.status === 'draft' && (
+            user?.id === reviewCase.system_owner_id || roles.includes('super_user')
+          ) && (
+            <Button
+              variant="outline"
+              size="sm"
+              className="border-destructive text-destructive hover:bg-destructive/10"
+              onClick={() => setDeleteOpen(true)}
+            >
+              <Trash2 className="h-3.5 w-3.5 mr-1" />
+              {t('reviews.actions.deleteDraft')}
+            </Button>
+          )}
           {reviewCase.status === 'draft' && (
             user?.id === reviewCase.system_owner_id || roles.includes('super_user')
           ) && (
@@ -340,6 +355,15 @@ export default function ReviewCaseDetail() {
         <EditReviewDraftDialog
           open={editOpen}
           onOpenChange={setEditOpen}
+          reviewCase={reviewCase}
+        />
+      )}
+
+      {/* Delete Draft Dialog */}
+      {reviewCase.status === 'draft' && (
+        <DeleteReviewDraftDialog
+          open={deleteOpen}
+          onOpenChange={setDeleteOpen}
           reviewCase={reviewCase}
         />
       )}

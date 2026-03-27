@@ -282,7 +282,20 @@
       "beginReview": "Comenzar revisión",
       "returnToPreparation": "Volver a preparación",
       "approve": "Aprobar",
-      "editDraft": "Editar Borrador"
+      "editDraft": "Editar Borrador",
+      "deleteDraft": "Eliminar Borrador"
+    },
+    "deleteModal": {
+      "title": "¿Eliminar Borrador de Revisión?",
+      "description": "Esto eliminará permanentemente este caso de revisión de la lista activa. Esta acción no se puede deshacer. El registro se conservará en la base de datos para propósitos de auditoría.",
+      "confirmTarget": "Está a punto de eliminar: {{reviewName}}",
+      "reasonLabel": "Razón de eliminación *",
+      "reasonPlaceholder": "Explique por qué se elimina este caso de revisión...",
+      "reasonMinLength": "La razón debe tener al menos 10 caracteres.",
+      "cancel": "Cancelar",
+      "delete": "Eliminar",
+      "deleteSuccess": "Caso de revisión eliminado exitosamente.",
+      "deleteError": "No se pudo eliminar este caso de revisión. Puede haber sido actualizado por otro usuario."
     },
     "editModal": {
       "title": "Editar Plan de Revisión",
