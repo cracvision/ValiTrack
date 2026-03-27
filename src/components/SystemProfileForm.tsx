@@ -370,7 +370,20 @@ export function SystemProfileForm({ open, onOpenChange, onSubmit, editingSystem 
                 <FormField control={form.control} name="system_identifier" render={({ field }) => (
                   <FormItem>
                     <FormLabel>{t('systemProfiles.form.systemIdentifier')} *</FormLabel>
-                    <FormControl><Input placeholder={t('systemProfiles.form.systemIdentifierPlaceholder')} {...field} /></FormControl>
+                    <FormControl>
+                      <Input
+                        placeholder={t('systemProfiles.form.systemIdentifierPlaceholder')}
+                        {...field}
+                        onChange={(e) => {
+                          field.onChange(e);
+                          checkIdentifierDuplicate(e.target.value);
+                        }}
+                        className={identifierError ? 'border-destructive text-destructive' : ''}
+                      />
+                    </FormControl>
+                    {identifierError && (
+                      <p className="text-sm text-destructive">{identifierError}</p>
+                    )}
                     <FormMessage />
                   </FormItem>
                 )} />
@@ -672,7 +685,7 @@ export function SystemProfileForm({ open, onOpenChange, onSubmit, editingSystem 
               }}>
                 {t('systemProfiles.form.cancel')}
               </Button>
-              <Button type="submit">
+              <Button type="submit" disabled={!!identifierError || identifierChecking}>
                 {editingSystem ? t('systemProfiles.form.updateProfile') : t('systemProfiles.form.createProfile')}
               </Button>
             </div>
