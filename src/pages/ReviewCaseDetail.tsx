@@ -358,6 +358,15 @@ export default function ReviewCaseDetail() {
           reviewCase={reviewCase}
         />
       )}
+
+      {/* Delete Draft Dialog */}
+      {reviewCase.status === 'draft' && (
+        <DeleteReviewDraftDialog
+          open={deleteOpen}
+          onOpenChange={setDeleteOpen}
+          reviewCase={reviewCase}
+        />
+      )}
     </div>
   );
 }
