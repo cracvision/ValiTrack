@@ -334,6 +334,15 @@ export default function ReviewCaseDetail() {
 
       {/* Transition history */}
       <TransitionHistory transitions={transitions} />
+
+      {/* Edit Draft Dialog */}
+      {reviewCase.status === 'draft' && (
+        <EditReviewDraftDialog
+          open={editOpen}
+          onOpenChange={setEditOpen}
+          reviewCase={reviewCase}
+        />
+      )}
     </div>
   );
 }
