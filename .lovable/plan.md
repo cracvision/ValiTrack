@@ -1,60 +1,89 @@
 
+Diagnóstico
 
-## Plan: Delete Review Case in Draft State
+Do I know what the issue is? Yes.
 
-### Summary
-Add a "Delete Draft" button with confirmation dialog to soft-delete review cases in draft status. Includes mandatory reason, audit logging, and navigation back to list.
+Tras revisar el código, las políticas RLS activas y el estado real del registro `f2993fa0-ca71-46e1-a272-bf5bc5afee95`, la causa más probable ya no es la falta de `.select()` ni la política `WITH CHECK` que agregamos. El problema restante está en cómo el frontend decide si el soft-delete “funcionó”.
 
-### Files to Create
+Hoy `DeleteReviewDraftDialog` hace esto:
+1. `update(...).eq('id', ...).eq('status', 'draft').select('id')`
+2. Si `!data || data.length === 0`, muestra error
 
-**1. `src/components/reviews/DeleteReviewDraftDialog.tsx`**
+Eso es frágil para un soft-delete con RLS, porque en cuanto `is_deleted` pasa a `true`, la política SELECT de `review_cases` deja de mostrar esa fila (`is_deleted = false`). En esa situación, el update puede quedar ambiguo desde el cliente: la respuesta puede venir vacía aunque la operación sea válida, y el componente la interpreta como fallo. Además, aunque el ajuste de RLS era necesario, el flujo sigue sin tener una confirmación transaccional y fiable.
 
-AlertDialog component with:
-- Props: `open`, `onOpenChange`, `reviewCase`
-- State: `reason` (string), `isDeleting` (boolean)
-- Shows review case title + system name + year for confirmation
-- Textarea for mandatory reason (min 10 chars), with inline validation message
-- "Delete" button disabled until reason >= 10 chars
-- On confirm:
-  1. Soft-delete: `supabase.from('review_cases').update({ is_deleted: true, deleted_at: new Date().toISOString(), deleted_by: user.id, updated_at: new Date().toISOString(), updated_by: user.id }).eq('id', reviewCase.id).eq('status', 'draft')`
-  2. Check returned data — if no rows matched, show error toast (race condition: someone advanced the status)
-  3. Audit log: insert `REVIEW_CASE_DELETED` with system_name, system_id, review_period, review_level, reason, user context
-  4. Success toast, invalidate `review-cases` + `review-case` + `dashboard-systems` queries, navigate to `/reviews`
-- Do NOT touch `frozen_system_snapshot` or cascade to related records
+Plan de corrección
 
-### Files to Modify
+1. Mover la eliminación a una función SQL de backend dedicada
+- Crear una migración con una función `soft_delete_review_case(...)` en `public`.
+- La función debe:
+  - validar `auth.uid()`
+  - verificar que el caso exista, siga en `draft`, no esté borrado y que el usuario sea `system_owner_id` o `super_user`
+  - ejecutar el soft-delete
+  - insertar el `audit_log` en la misma transacción
+  - devolver un resultado explícito, por ejemplo: `deleted`, `forbidden`, `not_draft`, `not_found`
 
-**2. `src/pages/ReviewCaseDetail.tsx`**
-- Import `Trash2` icon and `DeleteReviewDraftDialog`
-- Add state: `const [deleteOpen, setDeleteOpen] = useState(false)`
-- In the header buttons area (line ~145-155), add Delete Draft button to the LEFT of Edit Draft:
-  - Same visibility condition as Edit Draft: `status === 'draft' && (user.id === system_owner_id || super_user)`
-  - `variant="outline"` with destructive styling (`className="border-destructive text-destructive hover:bg-destructive/10"`)
-  - `Trash2` icon + `t('reviews.actions.deleteDraft')`
-- Render `<DeleteReviewDraftDialog>` at bottom of component
+2. Actualizar el frontend para usar la función
+- Modificar `src/components/reviews/DeleteReviewDraftDialog.tsx`
+- Reemplazar el `update(...).select('id')` por `supabase.rpc(...)`
+- Mantener exactamente el mismo diálogo, validación y mensajes visibles al usuario
+- Cambiar solo la lógica de éxito/error:
+  - `deleted` => toast éxito + invalidate queries + navigate
+  - cualquier otro estado => toast error actual + cerrar diálogo + refrescar estado
 
-**3. `src/locales/en/common.json`**
-- Add `reviews.actions.deleteDraft` and `reviews.deleteModal.*` keys as specified
+3. Mantener el RLS actual de UPDATE
+- No quitar la corrección previa de la policy `Assigned users can update review cases`
+- Esa corrección sigue siendo válida para otros updates de draft, especialmente Edit Draft
+- La nueva función evita depender de la representación devuelta por PostgREST para el caso específico de soft-delete
 
-**4. `src/locales/es/common.json`**
-- Same structure with Spanish translations
+4. Preservar comportamiento funcional actual
+- No cambiar textos, layout ni condiciones de visibilidad del botón
+- No tocar la lista de review cases, porque ya filtra `is_deleted = false`
+- No hacer cascade delete de relaciones
+- No usar localStorage
 
-### Impact Assessment
-- **RLS**: No changes needed — existing UPDATE policy on `review_cases` allows SO, QA, and super_user to update; `.eq('status', 'draft')` guards draft-only
-- **List filtering**: Already has `.eq('is_deleted', false)` — no changes needed
-- **Audit trail**: New `REVIEW_CASE_DELETED` action with full context
-- **Cascade**: None — only the review_case record is soft-deleted
-- **Snapshot**: Immutable, not touched
-- **Migration**: None required
-- **i18n**: All strings in both EN and ES
+Archivos a modificar
 
-### Technical Details
+1. `supabase/migrations/<new_timestamp>_soft_delete_review_case.sql`
+- Crear función `public.soft_delete_review_case(p_review_case_id uuid, p_reason text)`
+- `SECURITY DEFINER`
+- `SET search_path = public`
+- Debe actualizar `review_cases` y escribir en `audit_log` de forma atómica
 
-Button order in header (left to right):
-```text
-[Delete Draft]  [Edit Draft]  [Submit for review]
- destructive     outline        primary
-```
+2. `src/components/reviews/DeleteReviewDraftDialog.tsx`
+- Sustituir la lógica actual basada en `update(...).select('id')`
+- Consumir el resultado estructurado de la RPC
+- Mantener toasts y navegación tal como están definidos hoy
 
-The `.eq('status', 'draft')` safety net ensures that if another user advances the review case between the page load and the delete click, the update matches zero rows. We detect this by checking `data` length and show the error toast.
+Impacto evaluado
 
+- RLS / visibilidad por rol:
+  - Sigue limitado a System Owner y Super User
+  - No se expone información nueva
+  - La función validará permisos explícitamente en backend
+- Componentes afectados:
+  - Solo `DeleteReviewDraftDialog`
+  - `ReviewCaseDetail`, `useReviewCases` y `useReviewCase` no requieren cambios funcionales
+- Audit trail / compliance:
+  - Mejora clara: delete + audit quedan en una sola transacción
+  - Más defendible ante auditoría GxP
+- i18n:
+  - Sin cambios
+- TypeScript:
+  - No requiere cambios de tipos de dominio; solo tipado local del resultado RPC si se desea
+
+Verificación después de implementar
+
+1. Borrar un draft como System Owner:
+- debe desaparecer de la lista
+- debe navegar a `/reviews`
+- debe registrarse `REVIEW_CASE_DELETED`
+
+2. Intentar borrar un caso que ya no esté en `draft`:
+- debe mostrar el mismo error actual
+
+3. Intentar borrar con usuario no autorizado:
+- el botón no debe aparecer; si se fuerza la llamada, backend debe rechazarla
+
+4. Verificar en red:
+- ya no dependeremos de un `PATCH review_cases` ambiguo
+- se verá una llamada RPC con resultado explícito de éxito o fallo
