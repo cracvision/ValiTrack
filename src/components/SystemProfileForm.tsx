@@ -148,6 +148,9 @@ export function SystemProfileForm({ open, onOpenChange, onSubmit, editingSystem 
   const [autoValue, setAutoValue] = useState<number | null>(null);
   const [flashPeriod, setFlashPeriod] = useState(false);
   const [flashReviewLevel, setFlashReviewLevel] = useState(false);
+  const [identifierError, setIdentifierError] = useState<string | null>(null);
+  const [identifierChecking, setIdentifierChecking] = useState(false);
+  const identifierTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const isInitialMount = useRef(true);
   const isInitialReviewLevel = useRef(true);
 
