@@ -1062,6 +1062,10 @@ export type Database = {
           id: string
         }[]
       }
+      soft_delete_review_case: {
+        Args: { p_reason: string; p_review_case_id: string }
+        Returns: string
+      }
       user_has_assigned_tasks: {
         Args: { _review_case_id: string; _user_id: string }
         Returns: boolean
