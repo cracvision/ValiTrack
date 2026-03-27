@@ -772,6 +772,8 @@
       "lastUpdated": "Last updated",
       "reviewPeriodValue": "{{months}} months"
     },
+    "identifierDuplicate": "This identifier is already in use by another system ({{systemName}}). Each system must have a unique identifier.",
+    "identifierDuplicateError": "Could not save system profile. A system with this identifier already exists.",
     "form": {
       "editTitle": "Edit System Profile",
       "newTitle": "New System Profile",

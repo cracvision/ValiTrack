@@ -105,14 +105,20 @@ export function useSystemProfiles(): UseSystemProfilesReturn {
         approval_status: 'draft',
         created_by: user.id,
       });
-      if (error) throw error;
+      if (error) {
+        if (error.code === '23505' && error.message?.includes('idx_unique_system_identifier')) {
+          throw new Error('DUPLICATE_IDENTIFIER');
+        }
+        throw error;
+      }
       invalidate();
       return true;
     } catch (err: any) {
       console.error('Failed to create system profile:', err);
+      const isDuplicate = err.message === 'DUPLICATE_IDENTIFIER' || (err.code === '23505' && err.message?.includes('idx_unique_system_identifier'));
       toastRef.current({
-        title: 'Error creating system',
-        description: err.message ?? 'Could not save the system profile.',
+        title: isDuplicate ? 'Duplicate identifier' : 'Error creating system',
+        description: isDuplicate ? 'DUPLICATE_IDENTIFIER' : (err.message ?? 'Could not save the system profile.'),
         variant: 'destructive',
       });
       return false;
@@ -148,14 +154,20 @@ export function useSystemProfiles(): UseSystemProfilesReturn {
         completion_window_days: system.completion_window_days,
         updated_by: user.id,
       }).eq('id', system.id);
-      if (error) throw error;
+      if (error) {
+        if (error.code === '23505' && error.message?.includes('idx_unique_system_identifier')) {
+          throw new Error('DUPLICATE_IDENTIFIER');
+        }
+        throw error;
+      }
       invalidate();
       return true;
     } catch (err: any) {
       console.error('Failed to update system profile:', err);
+      const isDuplicate = err.message === 'DUPLICATE_IDENTIFIER' || (err.code === '23505' && err.message?.includes('idx_unique_system_identifier'));
       toastRef.current({
-        title: 'Error updating system',
-        description: err.message ?? 'Could not update the system profile.',
+        title: isDuplicate ? 'Duplicate identifier' : 'Error updating system',
+        description: isDuplicate ? 'DUPLICATE_IDENTIFIER' : (err.message ?? 'Could not update the system profile.'),
         variant: 'destructive',
       });
       return false;
