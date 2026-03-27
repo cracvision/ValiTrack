@@ -282,7 +282,24 @@
       "startPreparation": "Start preparation",
       "beginReview": "Begin review",
       "returnToPreparation": "Return to preparation",
-      "approve": "Approve"
+      "approve": "Approve",
+      "editDraft": "Edit Draft"
+    },
+    "editModal": {
+      "title": "Edit Review Plan",
+      "reviewPeriodSection": "Review Period",
+      "periodStartDate": "Period Start Date",
+      "periodEndDate": "Period End Date",
+      "completionDueAuto": "Auto-calculated: Period End Date + {{days}} days",
+      "reviewLevel": "Review Level",
+      "reviewLevelHelper": "Suggested: Level {{level}} based on system risk and GAMP category. Changing this will affect the number of tasks generated.",
+      "roleAssignmentsSection": "Role Assignments",
+      "separationOfDuties": "System Owner and QA Approver must be different users to ensure separation of duties.",
+      "saveChanges": "Save Changes",
+      "cancel": "Cancel",
+      "reviewLevelChanged": "Review level changed to Level {{level}}. Task count will be recalculated when the plan is approved for execution.",
+      "editSuccess": "Review plan updated successfully.",
+      "editError": "Failed to update review plan."
     },
     "banners": {
       "planApprovalTitle": "Awaiting QA Approval",
