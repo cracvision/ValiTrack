@@ -249,6 +249,10 @@
       "success": "Caso de revisión creado",
       "sodError": "El System Owner y QA no pueden ser la misma persona. Actualiza las asignaciones de roles del perfil de sistema antes de crear una revisión."
     },
+    "createGuard": {
+      "activeExists": "Ya existe un caso de revisión activo para este sistema (Estado: {{status}}). Solo se puede crear una nueva revisión después de que la actual sea aprobada.",
+      "duplicateError": "No se pudo crear el caso de revisión. Ya existe una revisión activa para este sistema."
+    },
     "actions": {
       "submitForReview": "Enviar a revisión",
       "submitForApproval": "Enviar a aprobación",

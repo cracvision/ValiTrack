@@ -76,6 +76,19 @@ export function useCreateReviewCase() {
     mutationFn: async (input: CreateReviewCaseInput): Promise<string> => {
       if (!user) throw new Error('Not authenticated');
 
+      // Pre-insert duplicate guard
+      const { count, error: checkError } = await supabase
+        .from('review_cases')
+        .select('*', { count: 'exact', head: true })
+        .eq('system_id', input.system.id)
+        .eq('is_deleted', false)
+        .neq('status', 'approved');
+
+      if (checkError) throw checkError;
+      if ((count ?? 0) > 0) {
+        throw new Error('DUPLICATE_ACTIVE_REVIEW');
+      }
+
       const frozen_system_snapshot = {
         ...input.system,
         initial_validation_date: input.system.initial_validation_date,
