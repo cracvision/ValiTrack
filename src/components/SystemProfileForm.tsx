@@ -272,6 +272,37 @@ export function SystemProfileForm({ open, onOpenChange, onSubmit, editingSystem 
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [open, editingSystem]);
 
+  const checkIdentifierDuplicate = useCallback((value: string) => {
+    if (identifierTimerRef.current) clearTimeout(identifierTimerRef.current);
+    if (!value.trim()) {
+      setIdentifierError(null);
+      return;
+    }
+    setIdentifierChecking(true);
+    identifierTimerRef.current = setTimeout(async () => {
+      try {
+        let query = supabase
+          .from('system_profiles')
+          .select('id, name')
+          .ilike('system_identifier', value.trim())
+          .eq('is_deleted', false);
+        if (editingSystem?.id) {
+          query = query.neq('id', editingSystem.id);
+        }
+        const { data } = await query.limit(1);
+        if (data && data.length > 0) {
+          setIdentifierError(t('systemProfiles.identifierDuplicate', { systemName: data[0].name }));
+        } else {
+          setIdentifierError(null);
+        }
+      } catch {
+        setIdentifierError(null);
+      } finally {
+        setIdentifierChecking(false);
+      }
+    }, 500);
+  }, [editingSystem?.id, t]);
+
   const reviewLevelSuggestion = (watchRisk && watchGamp)
     ? suggestReviewLevel(watchRisk as RiskLevel, watchGamp as GampCategory)
     : null;
