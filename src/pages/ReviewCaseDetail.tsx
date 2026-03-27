@@ -142,14 +142,24 @@ export default function ReviewCaseDetail() {
             )}
           </div>
         </div>
-        <ReviewActionButtons
-          reviewCaseId={reviewCase.id}
-          currentStatus={reviewCase.status}
-          canAdvanceSignoff={isSignoffPhase ? signoffData.canAdvance : undefined}
-          hasObjections={isSignoffPhase ? signoffData.hasObjections : undefined}
-          reviewTitle={reviewCase.title}
-          systemName={reviewCase.system_name}
-        />
+        <div className="flex items-center gap-2">
+          {reviewCase.status === 'draft' && (
+            user?.id === reviewCase.system_owner_id || roles.includes('super_user')
+          ) && (
+            <Button variant="outline" size="sm" onClick={() => setEditOpen(true)}>
+              <Pencil className="h-3.5 w-3.5 mr-1" />
+              {t('reviews.actions.editDraft')}
+            </Button>
+          )}
+          <ReviewActionButtons
+            reviewCaseId={reviewCase.id}
+            currentStatus={reviewCase.status}
+            canAdvanceSignoff={isSignoffPhase ? signoffData.canAdvance : undefined}
+            hasObjections={isSignoffPhase ? signoffData.hasObjections : undefined}
+            reviewTitle={reviewCase.title}
+            systemName={reviewCase.system_name}
+          />
+        </div>
       </div>
 
       {/* Rejection alert banner */}
