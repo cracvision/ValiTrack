@@ -58,13 +58,35 @@ export function CreateReviewDialog({ open, onOpenChange }: CreateReviewDialogPro
     enabled: open && !!user,
   });
 
+  // Fetch active (non-approved, non-deleted) review cases to block duplicates
+  const { data: activeReviewCases = [] } = useQuery({
+    queryKey: ['active-review-cases-guard'],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from('review_cases')
+        .select('system_id, status')
+        .eq('is_deleted', false)
+        .neq('status', 'approved');
+
+      if (error) throw error;
+      return data || [];
+    },
+    enabled: open && !!user,
+  });
+
+  const activeSystemIds = new Set(activeReviewCases.map(rc => rc.system_id));
+
   // Filter to approved profiles only, then apply role-based visibility
   const approvedSystems = systems.filter(s => s.approval_status === 'approved');
   const pendingCount = systems.length - approvedSystems.length;
 
-  const availableSystems = isSuperUser
+  const roleFilteredSystems = isSuperUser
     ? approvedSystems
     : approvedSystems.filter(s => s.system_owner_id === user?.id);
+
+  // Exclude systems that already have an active review case
+  const availableSystems = roleFilteredSystems.filter(s => !activeSystemIds.has(s.id));
+  const blockedByActiveCount = roleFilteredSystems.length - availableSystems.length;
 
   const selectedSystem = availableSystems.find(s => s.id === selectedSystemId);
 
@@ -113,7 +135,10 @@ export function CreateReviewDialog({ open, onOpenChange }: CreateReviewDialogPro
       resetForm();
       navigate(`/reviews/${id}`);
     } catch (err: any) {
-      toast({ title: t('common.error'), description: err.message, variant: 'destructive' });
+      const msg = err.message === 'DUPLICATE_ACTIVE_REVIEW'
+        ? t('reviews.createGuard.duplicateError')
+        : err.message;
+      toast({ title: t('common.error'), description: msg, variant: 'destructive' });
     }
   };
 

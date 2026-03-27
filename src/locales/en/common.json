@@ -250,6 +250,10 @@
       "success": "Review case created",
       "sodError": "System Owner and QA cannot be the same person. Update the system profile role assignments before creating a review."
     },
+    "createGuard": {
+      "activeExists": "An active review case already exists for this system (Status: {{status}}). A new review can only be created after the current one is approved.",
+      "duplicateError": "Could not create review case. An active review already exists for this system."
+    },
     "actions": {
       "submitForReview": "Submit for review",
       "submitForApproval": "Submit for approval",
