@@ -281,7 +281,24 @@
       "startPreparation": "Iniciar preparación",
       "beginReview": "Comenzar revisión",
       "returnToPreparation": "Volver a preparación",
-      "approve": "Aprobar"
+      "approve": "Aprobar",
+      "editDraft": "Editar Borrador"
+    },
+    "editModal": {
+      "title": "Editar Plan de Revisión",
+      "reviewPeriodSection": "Periodo de Revisión",
+      "periodStartDate": "Fecha de Inicio del Periodo",
+      "periodEndDate": "Fecha de Fin del Periodo",
+      "completionDueAuto": "Auto-calculado: Fecha de Fin del Periodo + {{days}} días",
+      "reviewLevel": "Nivel de Revisión",
+      "reviewLevelHelper": "Sugerido: Nivel {{level}} basado en riesgo del sistema y categoría GAMP. Cambiar esto afectará la cantidad de tareas generadas.",
+      "roleAssignmentsSection": "Asignación de Roles",
+      "separationOfDuties": "El System Owner y el Aprobador de QA deben ser usuarios diferentes para asegurar la separación de funciones.",
+      "saveChanges": "Guardar Cambios",
+      "cancel": "Cancelar",
+      "reviewLevelChanged": "Nivel de revisión cambiado a Nivel {{level}}. La cantidad de tareas se recalculará cuando el plan sea aprobado para ejecución.",
+      "editSuccess": "Plan de revisión actualizado exitosamente.",
+      "editError": "Error al actualizar el plan de revisión."
     },
     "banners": {
       "planApprovalTitle": "Esperando aprobación de QA",

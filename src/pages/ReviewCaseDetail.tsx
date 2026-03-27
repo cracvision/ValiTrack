@@ -1,13 +1,16 @@
+import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useParams, useNavigate } from 'react-router-dom';
 import { useQuery } from '@tanstack/react-query';
-import { ArrowLeft, AlertTriangle, Info, ShieldCheck } from 'lucide-react';
+import { ArrowLeft, AlertTriangle, Info, ShieldCheck, Pencil } from 'lucide-react';
 import { ReviewTasksPanel } from '@/components/reviews/ReviewTasksPanel';
+import { EditReviewDraftDialog } from '@/components/reviews/EditReviewDraftDialog';
 import { supabase } from '@/integrations/supabase/client';
 import { useReviewCase } from '@/hooks/useReviewCase';
 import { useReviewTransitions } from '@/hooks/useReviewTransitions';
 import { useResolveUserNames } from '@/hooks/useResolveUserNames';
 import { useReviewSignoffs } from '@/hooks/useReviewSignoffs';
+import { useAuth } from '@/hooks/useAuth';
 import { ReviewStatusBadge } from '@/components/reviews/ReviewStatusBadge';
 import { ReviewWorkflowStepper } from '@/components/reviews/ReviewWorkflowStepper';
 import { ReviewActionButtons } from '@/components/reviews/ReviewActionButtons';
@@ -25,6 +28,8 @@ export default function ReviewCaseDetail() {
   const { t } = useTranslation();
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
+  const { user, roles } = useAuth();
+  const [editOpen, setEditOpen] = useState(false);
 
   const { data: reviewCase, isLoading } = useReviewCase(id);
   const { data: transitions = [] } = useReviewTransitions(id);
@@ -137,14 +142,24 @@ export default function ReviewCaseDetail() {
             )}
           </div>
         </div>
-        <ReviewActionButtons
-          reviewCaseId={reviewCase.id}
-          currentStatus={reviewCase.status}
-          canAdvanceSignoff={isSignoffPhase ? signoffData.canAdvance : undefined}
-          hasObjections={isSignoffPhase ? signoffData.hasObjections : undefined}
-          reviewTitle={reviewCase.title}
-          systemName={reviewCase.system_name}
-        />
+        <div className="flex items-center gap-2">
+          {reviewCase.status === 'draft' && (
+            user?.id === reviewCase.system_owner_id || roles.includes('super_user')
+          ) && (
+            <Button variant="outline" size="sm" onClick={() => setEditOpen(true)}>
+              <Pencil className="h-3.5 w-3.5 mr-1" />
+              {t('reviews.actions.editDraft')}
+            </Button>
+          )}
+          <ReviewActionButtons
+            reviewCaseId={reviewCase.id}
+            currentStatus={reviewCase.status}
+            canAdvanceSignoff={isSignoffPhase ? signoffData.canAdvance : undefined}
+            hasObjections={isSignoffPhase ? signoffData.hasObjections : undefined}
+            reviewTitle={reviewCase.title}
+            systemName={reviewCase.system_name}
+          />
+        </div>
       </div>
 
       {/* Rejection alert banner */}
@@ -319,6 +334,15 @@ export default function ReviewCaseDetail() {
 
       {/* Transition history */}
       <TransitionHistory transitions={transitions} />
+
+      {/* Edit Draft Dialog */}
+      {reviewCase.status === 'draft' && (
+        <EditReviewDraftDialog
+          open={editOpen}
+          onOpenChange={setEditOpen}
+          reviewCase={reviewCase}
+        />
+      )}
     </div>
   );
 }
