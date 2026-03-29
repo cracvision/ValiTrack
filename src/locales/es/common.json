@@ -916,7 +916,12 @@
     "descriptions": {
       "approvePlan": "Aprobar el plan de revisión para {{systemName}} ({{systemId}}). Esto avanzará el caso a ejecución.",
       "approveReview": "Aprobar la revisión periódica para {{systemName}} ({{systemId}}). Esta es la aprobación final y cerrará la revisión.",
-      "rejectReview": "Rechazar la revisión periódica para {{systemName}} ({{systemId}}). La revisión será devuelta para correcciones."
+      "rejectReview": "Rechazar la revisión periódica para {{systemName}} ({{systemId}}). La revisión será devuelta para correcciones.",
+      "reviewSignoffApprove": "Está confirmando que ha revisado la {{phase}} para {{systemName}} y no tiene objeciones.",
+      "reviewSignoffObject": "Está presentando objeciones a la {{phase}} para {{systemName}}. Sus objeciones bloquearán el avance hasta que sean atendidas.",
+      "profileSignoffApprove": "Está confirmando que ha revisado el Perfil de Sistema para {{systemName}} ({{systemId}}) y no tiene objeciones.",
+      "profileSignoffObject": "Está presentando objeciones al Perfil de Sistema para {{systemName}} ({{systemId}}). Sus objeciones bloquearán la aprobación hasta que sean atendidas.",
+      "approveProfile": "Está aprobando formalmente el Perfil de Sistema para {{systemName}} ({{systemId}}). Esto habilitará el sistema para revisiones periódicas."
     },
     "disclaimer": "Al firmar, usted confirma que ha revisado la documentación relevante y acepta responsabilidad por esta decisión.",
     "signAndSubmit": "Firmar y Enviar",

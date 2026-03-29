@@ -917,7 +917,12 @@
     "descriptions": {
       "approvePlan": "Approve the review plan for {{systemName}} ({{systemId}}). This will advance the case to execution.",
       "approveReview": "Approve the periodic review for {{systemName}} ({{systemId}}). This is the final approval and will close the review.",
-      "rejectReview": "Reject the periodic review for {{systemName}} ({{systemId}}). The review will be returned for corrections."
+      "rejectReview": "Reject the periodic review for {{systemName}} ({{systemId}}). The review will be returned for corrections.",
+      "reviewSignoffApprove": "You are confirming that you have reviewed the {{phase}} for {{systemName}} and have no objections.",
+      "reviewSignoffObject": "You are raising objections to the {{phase}} for {{systemName}}. Your objections will block further advancement until addressed.",
+      "profileSignoffApprove": "You are confirming that you have reviewed the System Profile for {{systemName}} ({{systemId}}) and have no objections.",
+      "profileSignoffObject": "You are raising objections to the System Profile for {{systemName}} ({{systemId}}). Your objections will block approval until addressed.",
+      "approveProfile": "You are formally approving the System Profile for {{systemName}} ({{systemId}}). This will make the system available for periodic reviews."
     },
     "disclaimer": "By signing, you confirm that you have reviewed the relevant documentation and accept responsibility for this decision.",
     "signAndSubmit": "Sign & Submit",
