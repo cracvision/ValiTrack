@@ -175,6 +175,7 @@
         "PROFILE_SIGNOFF_OBJECTED": "Objected to profile sign-off",
         "PROFILE_SUBMITTED_FOR_REVIEW": "Submitted profile for review",
         "REVIEW_CASE_DELETED": "Deleted a review case",
+        "REVIEW_CASE_CANCELLED": "Cancelled a review case",
         "SIGNOFF_APPROVED": "Approved sign-off",
         "TASK_COMPLETED": "Completed a task",
         "TASK_REASSIGNED": "Reassigned a task",
