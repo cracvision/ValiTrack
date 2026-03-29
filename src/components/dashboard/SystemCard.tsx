@@ -15,22 +15,22 @@ const classificationColor: Record<string, string> = {
   GMP: 'bg-destructive/10 text-destructive border-destructive/20',
   GLP: 'bg-destructive/10 text-destructive border-destructive/20',
   GCP: 'bg-destructive/10 text-destructive border-destructive/20',
-  GDP: 'bg-orange-100 text-orange-700 border-orange-200',
+  GDP: 'bg-orange-100 text-orange-700 border-orange-200 dark:bg-orange-950 dark:text-orange-300 dark:border-orange-800',
   GVP: 'bg-destructive/10 text-destructive border-destructive/20',
-  NON_GXP_CRITICAL: 'bg-orange-100 text-orange-700 border-orange-200',
+  NON_GXP_CRITICAL: 'bg-orange-100 text-orange-700 border-orange-200 dark:bg-orange-950 dark:text-orange-300 dark:border-orange-800',
   NON_GXP_STANDARD: 'bg-muted text-muted-foreground border-border',
 };
 
 const riskColor: Record<string, string> = {
   High: 'bg-destructive/10 text-destructive border-destructive/20',
-  Medium: 'bg-orange-100 text-orange-700 border-orange-200',
-  Low: 'bg-green-100 text-green-700 border-green-200',
+  Medium: 'bg-orange-100 text-orange-700 border-orange-200 dark:bg-orange-950 dark:text-orange-300 dark:border-orange-800',
+  Low: 'bg-green-100 text-green-700 border-green-200 dark:bg-green-950 dark:text-green-300 dark:border-green-800',
 };
 
 const gampColor: Record<string, string> = {
-  '1': 'bg-green-100 text-green-700 border-green-200',
+  '1': 'bg-green-100 text-green-700 border-green-200 dark:bg-green-950 dark:text-green-300 dark:border-green-800',
   '3': 'bg-muted text-muted-foreground border-border',
-  '4': 'bg-orange-100 text-orange-700 border-orange-200',
+  '4': 'bg-orange-100 text-orange-700 border-orange-200 dark:bg-orange-950 dark:text-orange-300 dark:border-orange-800',
   '5': 'bg-destructive/10 text-destructive border-destructive/20',
 };
 
@@ -56,64 +56,64 @@ function NextActionBar({ system }: { system: DashboardSystem }) {
       plan_review: (() => {
         const ss = system.signoffSummary;
         if (ss && ss.has_objections) {
-          return { icon: AlertTriangle, bg: 'bg-amber-50', text: 'text-amber-800', msgKey: 'dashboard.nextAction.phase.plan_review_objections' };
+          return { icon: AlertTriangle, bg: 'bg-amber-50 dark:bg-amber-950', text: 'text-amber-800 dark:text-amber-300', msgKey: 'dashboard.nextAction.phase.plan_review_objections' };
         }
         if (ss && ss.total_completed === ss.total_required && ss.total_required > 0) {
-          return { icon: ShieldCheck, bg: 'bg-green-50', text: 'text-green-800', msgKey: 'dashboard.nextAction.phase.plan_review_ready' };
+          return { icon: ShieldCheck, bg: 'bg-green-50 dark:bg-green-950', text: 'text-green-800 dark:text-green-300', msgKey: 'dashboard.nextAction.phase.plan_review_ready' };
         }
         if (ss && ss.total_required > 0) {
-          return { icon: Clock, bg: 'bg-blue-50', text: 'text-blue-800', msgKey: 'dashboard.nextAction.phase.plan_review_pending', msgParams: { completed: ss.total_completed, total: ss.total_required } };
+          return { icon: Clock, bg: 'bg-blue-50 dark:bg-blue-950', text: 'text-blue-800 dark:text-blue-300', msgKey: 'dashboard.nextAction.phase.plan_review_pending', msgParams: { completed: ss.total_completed, total: ss.total_required } };
         }
-        return { icon: Clock, bg: 'bg-blue-50', text: 'text-blue-800', msgKey: 'dashboard.nextAction.phase.plan_review' };
+        return { icon: Clock, bg: 'bg-blue-50 dark:bg-blue-950', text: 'text-blue-800 dark:text-blue-300', msgKey: 'dashboard.nextAction.phase.plan_review' };
       })(),
       plan_approval: {
         icon: ShieldCheck,
-        bg: 'bg-purple-50',
-        text: 'text-purple-800',
+        bg: 'bg-purple-50 dark:bg-purple-950',
+        text: 'text-purple-800 dark:text-purple-300',
         msgKey: 'dashboard.nextAction.phase.plan_approval',
       },
       approved_for_execution: {
         icon: ShieldCheck,
-        bg: 'bg-teal-50',
-        text: 'text-teal-800',
+        bg: 'bg-teal-50 dark:bg-teal-950',
+        text: 'text-teal-800 dark:text-teal-300',
         msgKey: 'dashboard.nextAction.phase.approved_for_execution',
       },
       in_progress: {
         icon: Clock,
-        bg: 'bg-amber-50',
-        text: 'text-amber-800',
+        bg: 'bg-amber-50 dark:bg-amber-950',
+        text: 'text-amber-800 dark:text-amber-300',
         msgKey: 'dashboard.nextAction.phase.in_progress',
       },
       execution_review: (() => {
         const ss = system.signoffSummary;
         if (ss && ss.has_objections) {
-          return { icon: AlertTriangle, bg: 'bg-amber-50', text: 'text-amber-800', msgKey: 'dashboard.nextAction.phase.execution_review_objections' };
+          return { icon: AlertTriangle, bg: 'bg-amber-50 dark:bg-amber-950', text: 'text-amber-800 dark:text-amber-300', msgKey: 'dashboard.nextAction.phase.execution_review_objections' };
         }
         if (ss && ss.total_completed === ss.total_required && ss.total_required > 0) {
-          return { icon: ShieldCheck, bg: 'bg-green-50', text: 'text-green-800', msgKey: 'dashboard.nextAction.phase.execution_review_ready' };
+          return { icon: ShieldCheck, bg: 'bg-green-50 dark:bg-green-950', text: 'text-green-800 dark:text-green-300', msgKey: 'dashboard.nextAction.phase.execution_review_ready' };
         }
         if (ss && ss.total_required > 0) {
-          return { icon: Clock, bg: 'bg-orange-50', text: 'text-orange-800', msgKey: 'dashboard.nextAction.phase.execution_review_pending', msgParams: { completed: ss.total_completed, total: ss.total_required } };
+          return { icon: Clock, bg: 'bg-orange-50 dark:bg-orange-950', text: 'text-orange-800 dark:text-orange-300', msgKey: 'dashboard.nextAction.phase.execution_review_pending', msgParams: { completed: ss.total_completed, total: ss.total_required } };
         }
-        return { icon: Clock, bg: 'bg-orange-50', text: 'text-orange-800', msgKey: 'dashboard.nextAction.phase.execution_review' };
+        return { icon: Clock, bg: 'bg-orange-50 dark:bg-orange-950', text: 'text-orange-800 dark:text-orange-300', msgKey: 'dashboard.nextAction.phase.execution_review' };
       })(),
       rejected: {
         icon: AlertTriangle,
-        bg: 'bg-red-50',
-        text: 'text-red-800',
+        bg: 'bg-red-50 dark:bg-red-950',
+        text: 'text-red-800 dark:text-red-300',
         msgKey: 'dashboard.nextAction.phase.rejected',
       },
       // Backwards compat for old states
       in_preparation: {
         icon: Clock,
-        bg: 'bg-blue-50',
-        text: 'text-blue-800',
+        bg: 'bg-blue-50 dark:bg-blue-950',
+        text: 'text-blue-800 dark:text-blue-300',
         msgKey: 'dashboard.nextAction.phase.plan_review',
       },
       under_review: {
         icon: Clock,
-        bg: 'bg-amber-50',
-        text: 'text-amber-800',
+        bg: 'bg-amber-50 dark:bg-amber-950',
+        text: 'text-amber-800 dark:text-amber-300',
         msgKey: 'dashboard.nextAction.phase.execution_review',
       },
     };
@@ -144,23 +144,22 @@ function NextActionBar({ system }: { system: DashboardSystem }) {
 
     if (scenarioKey.includes('scenarioD')) {
       Icon = AlertTriangle;
-      bg = 'bg-red-50';
+      bg = 'bg-red-50 dark:bg-red-950';
       textClass = 'text-destructive font-semibold';
     } else if (scenarioKey.includes('scenarioC')) {
       Icon = AlertTriangle;
-      bg = 'bg-red-50';
+      bg = 'bg-red-50 dark:bg-red-950';
       textClass = 'text-destructive';
     } else if (scenarioKey.includes('scenarioB')) {
       Icon = CalendarDays;
-      bg = 'bg-orange-50';
-      textClass = 'text-orange-800';
+      bg = 'bg-orange-50 dark:bg-orange-950';
+      textClass = 'text-orange-800 dark:text-orange-300';
     } else if (scenarioKey.includes('scenarioA')) {
-      // Check if within 90 days of due date
       const daysUntilPeriodEnd = timelineAction.params.daysUntilPeriodEnd ?? 999;
       if (daysUntilPeriodEnd <= 90) {
         Icon = CalendarDays;
-        bg = 'bg-orange-50';
-        textClass = 'text-orange-800';
+        bg = 'bg-orange-50 dark:bg-orange-950';
+        textClass = 'text-orange-800 dark:text-orange-300';
       } else {
         Icon = Clock;
         bg = 'bg-muted/50';
@@ -188,14 +187,14 @@ function NextActionBar({ system }: { system: DashboardSystem }) {
     },
     approaching: {
       icon: CalendarDays,
-      bg: 'bg-amber-50',
-      text: 'text-amber-800',
+      bg: 'bg-amber-50 dark:bg-amber-950',
+      text: 'text-amber-800 dark:text-amber-300',
       msg: t('dashboard.nextAction.approaching', { days: daysUntilDue }),
     },
     overdue: {
       icon: AlertTriangle,
-      bg: 'bg-red-50',
-      text: 'text-red-800',
+      bg: 'bg-red-50 dark:bg-red-950',
+      text: 'text-red-800 dark:text-red-300',
       msg: t('dashboard.nextAction.overdue'),
     },
     no_review: {
