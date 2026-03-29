@@ -274,21 +274,21 @@ export function SystemProfileDetailDialog({ system, open, onOpenChange, onEdit, 
             </div>
 
             {system.approval_status === 'in_review' && (
-              <Alert className="bg-blue-50 border-blue-200">
-                <AlertTitle className="text-blue-800 text-xs font-medium">{t('systemProfiles.approval.banners.inReviewReadonly')}</AlertTitle>
+              <Alert className="bg-blue-50 dark:bg-neutral-800 border-blue-200 dark:border-neutral-700">
+                <AlertTitle className="text-blue-800 dark:text-blue-300 text-xs font-medium">{t('systemProfiles.approval.banners.inReviewReadonly')}</AlertTitle>
               </Alert>
             )}
             {system.approval_status === 'approved' && (
-              <Alert className="bg-green-50 border-green-200">
-                <AlertTitle className="text-green-800 text-xs font-medium">{t('systemProfiles.approval.banners.approvedReadonly')}</AlertTitle>
+              <Alert className="bg-green-50 dark:bg-neutral-800 border-green-200 dark:border-neutral-700">
+                <AlertTitle className="text-green-800 dark:text-green-300 text-xs font-medium">{t('systemProfiles.approval.banners.approvedReadonly')}</AlertTitle>
               </Alert>
             )}
 
             {isInReview && hasObjections && (
-              <Alert className="bg-amber-50 border-amber-200">
-                <AlertTriangle className="h-4 w-4 text-amber-700" />
-                <AlertTitle className="text-amber-800">{t('systemProfiles.approval.signoffs.objectionsRaised')}</AlertTitle>
-                <AlertDescription className="text-amber-700">
+              <Alert className="bg-amber-50 dark:bg-neutral-800 border-amber-200 dark:border-neutral-700">
+                <AlertTriangle className="h-4 w-4 text-amber-700 dark:text-amber-400" />
+                <AlertTitle className="text-amber-800 dark:text-amber-300">{t('systemProfiles.approval.signoffs.objectionsRaised')}</AlertTitle>
+                <AlertDescription className="text-amber-700 dark:text-amber-400">
                   {t('systemProfiles.approval.signoffs.objectionsDescription')}
                 </AlertDescription>
               </Alert>
@@ -472,7 +472,7 @@ export function SystemProfileDetailDialog({ system, open, onOpenChange, onEdit, 
                             <div className="flex items-center gap-1.5 flex-wrap">
                               <span className="font-medium text-foreground">{historyNames[s.requested_user_id] || '—'}</span>
                               <span className="text-muted-foreground">({roleLabel})</span>
-                              <span className={isApproved ? 'text-green-700' : 'text-destructive'}>
+                              <span className={isApproved ? 'text-green-700 dark:text-green-400' : 'text-destructive'}>
                                 {isApproved
                                   ? t('systemProfiles.approval.signoffs.approved')
                                   : t('systemProfiles.approval.signoffs.objected')}

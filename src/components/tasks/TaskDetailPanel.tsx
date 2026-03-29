@@ -32,19 +32,19 @@ import type { ReviewTask, TaskGroup } from '@/types';
 
 const STATUS_BADGE: Record<string, string> = {
   pending: 'bg-muted text-muted-foreground',
-  in_progress: 'bg-blue-100 text-blue-800 border-blue-200',
-  completed: 'bg-emerald-100 text-emerald-800 border-emerald-200',
+  in_progress: 'bg-blue-100 text-blue-800 border-blue-200 dark:bg-neutral-800 dark:text-blue-400 dark:border-neutral-700',
+  completed: 'bg-emerald-100 text-emerald-800 border-emerald-200 dark:bg-neutral-800 dark:text-emerald-400 dark:border-neutral-700',
 };
 
 const GROUP_COLORS: Record<string, string> = {
-  INIT: 'bg-slate-100 text-slate-700',
-  ITSM: 'bg-orange-100 text-orange-700',
-  QMS: 'bg-purple-100 text-purple-700',
-  SEC: 'bg-red-100 text-red-700',
-  INFRA: 'bg-cyan-100 text-cyan-700',
-  DOC: 'bg-indigo-100 text-indigo-700',
-  AI_EVAL: 'bg-amber-100 text-amber-700',
-  APPR: 'bg-green-100 text-green-700',
+  INIT: 'bg-slate-100 text-slate-700 dark:bg-neutral-800 dark:text-slate-400',
+  ITSM: 'bg-orange-100 text-orange-700 dark:bg-neutral-800 dark:text-orange-400',
+  QMS: 'bg-purple-100 text-purple-700 dark:bg-neutral-800 dark:text-purple-400',
+  SEC: 'bg-red-100 text-red-700 dark:bg-neutral-800 dark:text-red-400',
+  INFRA: 'bg-cyan-100 text-cyan-700 dark:bg-neutral-800 dark:text-cyan-400',
+  DOC: 'bg-indigo-100 text-indigo-700 dark:bg-neutral-800 dark:text-indigo-400',
+  AI_EVAL: 'bg-amber-100 text-amber-700 dark:bg-neutral-800 dark:text-amber-400',
+  APPR: 'bg-green-100 text-green-700 dark:bg-neutral-800 dark:text-green-400',
 };
 
 const EVIDENCE_GROUPS: TaskGroup[] = ['INIT', 'ITSM', 'QMS', 'SEC', 'INFRA', 'DOC'];
@@ -156,9 +156,9 @@ export function TaskDetailPanel({ task, open, onClose, reviewCaseId, reviewCaseS
 
         {/* Read-only info banner for non-authorized users */}
         {execution.isReadOnly && (
-          <Alert className="mb-4 bg-blue-50 border-blue-200">
-            <Info className="h-4 w-4 text-blue-700" />
-            <AlertDescription className="text-blue-700 text-xs">
+          <Alert className="mb-4 bg-blue-50 dark:bg-neutral-800 border-blue-200 dark:border-neutral-700">
+            <Info className="h-4 w-4 text-blue-700 dark:text-blue-400" />
+            <AlertDescription className="text-blue-700 dark:text-blue-400 text-xs">
               {t('tasks.actions.readOnlyMessage', { assignee: assigneeName })}
             </AlertDescription>
           </Alert>
