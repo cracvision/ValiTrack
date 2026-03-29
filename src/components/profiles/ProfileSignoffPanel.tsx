@@ -9,6 +9,8 @@ import { Progress } from '@/components/ui/progress';
 import { useResolveUserNames } from '@/hooks/useResolveUserNames';
 import { toast } from '@/hooks/use-toast';
 import { cn } from '@/lib/utils';
+import { ESignatureModal } from '@/components/reviews/ESignatureModal';
+import type { ESignatureResult } from '@/components/reviews/ESignatureModal';
 import type { ProfileSignoff } from '@/types';
 
 interface ProfileSignoffPanelProps {
@@ -21,6 +23,9 @@ interface ProfileSignoffPanelProps {
   hasObjections: boolean;
   onSubmitDecision: (args: { decision: 'approved' | 'objected'; comments: string }) => Promise<void>;
   isPending: boolean;
+  systemProfileId?: string;
+  systemName?: string;
+  systemIdentifier?: string;
 }
 
 export function ProfileSignoffPanel({
@@ -33,29 +38,58 @@ export function ProfileSignoffPanel({
   hasObjections,
   onSubmitDecision,
   isPending,
+  systemProfileId,
+  systemName,
+  systemIdentifier,
 }: ProfileSignoffPanelProps) {
   const { t } = useTranslation();
   const [comments, setComments] = useState('');
   const [commentsError, setCommentsError] = useState(false);
+
+  // E-signature state
+  const [eSignModal, setESignModal] = useState<{
+    open: boolean;
+    decision: 'approved' | 'objected' | null;
+    comments: string;
+  }>({ open: false, decision: null, comments: '' });
 
   const userIds = signoffs.map(s => s.requested_user_id);
   const { data: userNames = {} } = useResolveUserNames(userIds);
 
   const progressPercent = totalCount > 0 ? (completedCount / totalCount) * 100 : 0;
 
-  const handleDecision = async (decision: 'approved' | 'objected') => {
+  const handleDecision = (decision: 'approved' | 'objected') => {
     if (decision === 'objected' && !comments.trim()) {
       setCommentsError(true);
       return;
     }
     setCommentsError(false);
+
+    // Open e-signature modal
+    setESignModal({
+      open: true,
+      decision,
+      comments: comments,
+    });
+  };
+
+  const handleESignSuccess = async (_result: ESignatureResult) => {
+    const { decision, comments: savedComments } = eSignModal;
+    setESignModal({ open: false, decision: null, comments: '' });
+
+    if (!decision) return;
+
     try {
-      await onSubmitDecision({ decision, comments });
+      await onSubmitDecision({ decision, comments: savedComments });
       setComments('');
       toast({ title: t('reviews.actions.transitionSuccess') });
     } catch (err: any) {
       toast({ title: t('common.error'), description: err.message, variant: 'destructive' });
     }
+  };
+
+  const handleESignClose = () => {
+    setESignModal({ open: false, decision: null, comments: '' });
   };
 
   if (isLoading) return null;
@@ -175,6 +209,40 @@ export function ProfileSignoffPanel({
             {t('systemProfiles.approval.signoffs.objectionsDescription')}
           </AlertDescription>
         </Alert>
+      )}
+
+      {/* E-Signature Modal */}
+      {mySignoff && systemProfileId && (
+        <ESignatureModal
+          open={eSignModal.open}
+          onClose={handleESignClose}
+          onSuccess={handleESignSuccess}
+          actionTitle={
+            eSignModal.decision === 'approved'
+              ? t('systemProfiles.approval.signoffs.noObjectionsButton')
+              : t('systemProfiles.approval.signoffs.raiseObjectionsButton')
+          }
+          actionDescription={
+            eSignModal.decision === 'approved'
+              ? t('esignature.descriptions.profileSignoffApprove', {
+                  systemName: systemName || '',
+                  systemId: systemIdentifier || '',
+                })
+              : t('esignature.descriptions.profileSignoffObject', {
+                  systemName: systemName || '',
+                  systemId: systemIdentifier || '',
+                })
+          }
+          transitionLabel={`profile_signoff:in_review:${eSignModal.decision}`}
+          resourceId={mySignoff.id}
+          resourceType="profile_signoff"
+          additionalAuditDetails={{
+            system_profile_id: systemProfileId,
+            decision: eSignModal.decision,
+          }}
+          showConclusionSelector={false}
+          showReasonField={false}
+        />
       )}
     </div>
   );

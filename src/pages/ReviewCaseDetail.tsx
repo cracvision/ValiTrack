@@ -318,6 +318,9 @@ export default function ReviewCaseDetail() {
           hasObjections={signoffData.hasObjections}
           onSubmitDecision={async (args) => { await signoffData.submitDecision.mutateAsync(args); }}
           isPending={signoffData.submitDecision.isPending}
+          reviewCaseId={reviewCase.id}
+          reviewCaseStatus={reviewCase.status}
+          systemName={reviewCase.system_name}
         />
       )}
 

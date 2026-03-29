@@ -9,6 +9,8 @@ import { Progress } from '@/components/ui/progress';
 import { useResolveUserNames } from '@/hooks/useResolveUserNames';
 import { toast } from '@/hooks/use-toast';
 import { cn } from '@/lib/utils';
+import { ESignatureModal } from '@/components/reviews/ESignatureModal';
+import type { ESignatureResult } from '@/components/reviews/ESignatureModal';
 import type { ReviewSignoff } from '@/types';
 
 interface ReviewSignoffPanelProps {
@@ -21,6 +23,9 @@ interface ReviewSignoffPanelProps {
   hasObjections: boolean;
   onSubmitDecision: (args: { decision: 'approved' | 'objected'; comments: string }) => Promise<void>;
   isPending: boolean;
+  reviewCaseId?: string;
+  reviewCaseStatus?: string;
+  systemName?: string;
 }
 
 export function ReviewSignoffPanel({
@@ -33,30 +38,63 @@ export function ReviewSignoffPanel({
   hasObjections,
   onSubmitDecision,
   isPending,
+  reviewCaseId,
+  reviewCaseStatus,
+  systemName,
 }: ReviewSignoffPanelProps) {
   const { t } = useTranslation();
   const [comments, setComments] = useState('');
   const [commentsError, setCommentsError] = useState(false);
+
+  // E-signature state
+  const [eSignModal, setESignModal] = useState<{
+    open: boolean;
+    decision: 'approved' | 'objected' | null;
+    comments: string;
+  }>({ open: false, decision: null, comments: '' });
 
   const userIds = signoffs.map(s => s.requested_user_id);
   const { data: userNames = {} } = useResolveUserNames(userIds);
 
   const progressPercent = totalCount > 0 ? (completedCount / totalCount) * 100 : 0;
 
-  const handleDecision = async (decision: 'approved' | 'objected') => {
+  const handleDecision = (decision: 'approved' | 'objected') => {
     if (decision === 'objected' && !comments.trim()) {
       setCommentsError(true);
       return;
     }
     setCommentsError(false);
+
+    // Open e-signature modal instead of direct submit
+    setESignModal({
+      open: true,
+      decision,
+      comments: comments,
+    });
+  };
+
+  const handleESignSuccess = async (_result: ESignatureResult) => {
+    const { decision, comments: savedComments } = eSignModal;
+    setESignModal({ open: false, decision: null, comments: '' });
+
+    if (!decision) return;
+
     try {
-      await onSubmitDecision({ decision, comments });
+      await onSubmitDecision({ decision, comments: savedComments });
       setComments('');
       toast({ title: t('reviews.actions.transitionSuccess') });
     } catch (err: any) {
       toast({ title: t('common.error'), description: err.message, variant: 'destructive' });
     }
   };
+
+  const handleESignClose = () => {
+    setESignModal({ open: false, decision: null, comments: '' });
+  };
+
+  const phaseLabel = reviewCaseStatus === 'plan_review'
+    ? t('reviewCases.status.plan_review', { defaultValue: t('reviews.status.plan_review') })
+    : t('reviewCases.status.execution_review', { defaultValue: t('reviews.status.execution_review') });
 
   if (isLoading) return null;
   if (signoffs.length === 0) return null;
@@ -202,6 +240,41 @@ export function ReviewSignoffPanel({
             {t('reviews.signoffs.objectionsDescription')}
           </AlertDescription>
         </Alert>
+      )}
+
+      {/* E-Signature Modal */}
+      {mySignoff && reviewCaseId && (
+        <ESignatureModal
+          open={eSignModal.open}
+          onClose={handleESignClose}
+          onSuccess={handleESignSuccess}
+          actionTitle={
+            eSignModal.decision === 'approved'
+              ? t('reviews.signoffs.noObjectionsButton')
+              : t('reviews.signoffs.raiseObjectionsButton')
+          }
+          actionDescription={
+            eSignModal.decision === 'approved'
+              ? t('esignature.descriptions.reviewSignoffApprove', {
+                  phase: phaseLabel,
+                  systemName: systemName || '',
+                })
+              : t('esignature.descriptions.reviewSignoffObject', {
+                  phase: phaseLabel,
+                  systemName: systemName || '',
+                })
+          }
+          transitionLabel={`review_signoff:${reviewCaseStatus}:${eSignModal.decision}`}
+          resourceId={mySignoff.id}
+          resourceType="review_signoff"
+          additionalAuditDetails={{
+            review_case_id: reviewCaseId,
+            phase: reviewCaseStatus,
+            decision: eSignModal.decision,
+          }}
+          showConclusionSelector={false}
+          showReasonField={false}
+        />
       )}
     </div>
   );

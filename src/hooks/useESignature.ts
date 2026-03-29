@@ -7,8 +7,10 @@ interface VerifyAndSignParams {
   conclusion?: string;
   comment?: string;
   transition: string;
-  reviewCaseId: string;
+  resourceId: string;
+  resourceType: string;
   systemName: string;
+  additionalDetails?: Record<string, unknown>;
 }
 
 export function useESignature() {
@@ -20,8 +22,10 @@ export function useESignature() {
     conclusion,
     comment,
     transition,
-    reviewCaseId,
+    resourceId,
+    resourceType,
     systemName,
+    additionalDetails,
   }: VerifyAndSignParams) => {
     if (!user || !profile) throw new Error('Not authenticated');
 
@@ -36,12 +40,13 @@ export function useESignature() {
       await supabase.from('audit_log').insert({
         user_id: user.id,
         action: 'E_SIGNATURE_FAILED',
-        resource_type: 'review_case',
-        resource_id: reviewCaseId,
+        resource_type: resourceType,
+        resource_id: resourceId,
         details: {
           transition,
           reason: 'Password verification failed',
           signer_email: user.email,
+          ...additionalDetails,
         },
       });
       throw new Error('incorrect_password');
@@ -53,11 +58,10 @@ export function useESignature() {
     await supabase.from('audit_log').insert({
       user_id: user.id,
       action: 'E_SIGNATURE',
-      resource_type: 'review_case',
-      resource_id: reviewCaseId,
+      resource_type: resourceType,
+      resource_id: resourceId,
       details: {
         transition,
-        review_case_id: reviewCaseId,
         system_name: systemName,
         verified_at: new Date().toISOString(),
         reason,
@@ -66,6 +70,7 @@ export function useESignature() {
         signer_name: profile.full_name,
         signer_role: signerRole,
         signer_email: user.email,
+        ...additionalDetails,
       },
     });
 

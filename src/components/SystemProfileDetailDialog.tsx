@@ -283,7 +283,7 @@ export function SystemProfileDetailDialog({ system, open, onOpenChange, onEdit, 
 
           {isInReview && (
             <>
-              <ProfileSignoffPanel
+            <ProfileSignoffPanel
                 signoffs={signoffs}
                 isLoading={signoffsLoading}
                 canSignOff={canSignOff}
@@ -295,6 +295,9 @@ export function SystemProfileDetailDialog({ system, open, onOpenChange, onEdit, 
                   await submitDecision.mutateAsync(args);
                 }}
                 isPending={submitDecision.isPending}
+                systemProfileId={system.id}
+                systemName={system.name}
+                systemIdentifier={system.system_identifier}
               />
               <Separator />
             </>

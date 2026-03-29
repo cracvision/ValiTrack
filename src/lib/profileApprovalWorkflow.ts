@@ -6,6 +6,7 @@ export interface ProfileTransitionRule {
   label: string;
   labelKey: string;
   requiresReason?: boolean;
+  requiresESignature?: boolean;
 }
 
 export const PROFILE_TRANSITION_MAP: Record<ProfileApprovalStatus, ProfileTransitionRule[]> = {
@@ -23,6 +24,7 @@ export const PROFILE_TRANSITION_MAP: Record<ProfileApprovalStatus, ProfileTransi
       requiredRoles: ['system_owner', 'super_user'],
       label: 'Approve profile',
       labelKey: 'systemProfiles.approval.actions.approve',
+      requiresESignature: true,
     },
     {
       to: 'draft',

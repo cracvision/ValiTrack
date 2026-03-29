@@ -241,7 +241,9 @@ export function ReviewActionButtons({
         actionTitle={pendingRule ? t(pendingRule.labelKey, { defaultValue: pendingRule.label }) : ''}
         actionDescription={pendingRule ? getESignatureDescription(pendingRule) : ''}
         transitionLabel={pendingRule ? `${currentStatus}_to_${pendingRule.to}` : ''}
-        reviewCaseId={reviewCaseId}
+        resourceId={reviewCaseId}
+        resourceType="review_case"
+        additionalAuditDetails={{ review_case_id: reviewCaseId }}
         showConclusionSelector={pendingRule?.requiresConclusion === true}
         showReasonField={pendingRule?.to === 'rejected'}
       />

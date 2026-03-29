@@ -25,7 +25,9 @@ interface ESignatureModalProps {
   actionTitle: string;
   actionDescription: string;
   transitionLabel: string;
-  reviewCaseId: string;
+  resourceId: string;
+  resourceType: string;
+  additionalAuditDetails?: Record<string, unknown>;
   showConclusionSelector?: boolean;
   showReasonField?: boolean;
 }
@@ -37,7 +39,9 @@ export function ESignatureModal({
   actionTitle,
   actionDescription,
   transitionLabel,
-  reviewCaseId,
+  resourceId,
+  resourceType,
+  additionalAuditDetails,
   showConclusionSelector = false,
   showReasonField = false,
 }: ESignatureModalProps) {
@@ -94,15 +98,15 @@ export function ESignatureModal({
     await supabase.from('audit_log').insert({
       user_id: user.id,
       action,
-      resource_type: 'review_case',
-      resource_id: reviewCaseId,
+      resource_type: resourceType,
+      resource_id: resourceId,
       details: {
         transition: transitionLabel,
-        review_case_id: reviewCaseId,
         signer_name: profile?.full_name || '',
         signer_role: signerRoleLabel,
         signer_email: user.email,
         verified_at: new Date().toISOString(),
+        ...additionalAuditDetails,
         ...extraDetails,
       },
     });
