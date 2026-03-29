@@ -12,9 +12,9 @@ const classificationColor: Record<string, string> = {
   GMP: 'bg-destructive/10 text-destructive',
   GLP: 'bg-destructive/10 text-destructive',
   GCP: 'bg-destructive/10 text-destructive',
-  GDP: 'bg-orange-100 text-orange-700',
+  GDP: 'bg-orange-100 text-orange-700 dark:bg-orange-950 dark:text-orange-300',
   GVP: 'bg-destructive/10 text-destructive',
-  NON_GXP_CRITICAL: 'bg-orange-100 text-orange-700',
+  NON_GXP_CRITICAL: 'bg-orange-100 text-orange-700 dark:bg-orange-950 dark:text-orange-300',
   NON_GXP_STANDARD: 'bg-muted text-muted-foreground',
 };
 
