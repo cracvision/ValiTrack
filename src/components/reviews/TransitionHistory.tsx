@@ -4,6 +4,7 @@ import { Lock } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { ReviewStatusBadge } from './ReviewStatusBadge';
 import { getRelativeTime } from '@/lib/relativeTime';
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
 import type { ReviewCaseTransition } from '@/types';
 
 interface TransitionHistoryProps {
@@ -30,7 +31,7 @@ export function TransitionHistory({ transitions }: TransitionHistoryProps) {
       const { data, error } = await supabase
         .from('audit_log')
         .select('*')
-        .eq('resource_type', 'review_cases')
+        .eq('resource_type', 'review_case')
         .eq('resource_id', reviewCaseId)
         .eq('action', 'E_SIGNATURE')
         .order('created_at', { ascending: false });
@@ -57,45 +58,61 @@ export function TransitionHistory({ transitions }: TransitionHistoryProps) {
   };
 
   return (
-    <div className="space-y-3">
-      <h3 className="text-sm font-semibold text-foreground">{t('reviews.detail.statusHistory')}</h3>
-      <div className="border rounded-lg divide-y divide-border">
-        {transitions.map(tr => {
-          const eSig = getESignForTransition(tr);
-          return (
-            <div key={tr.id} className="px-4 py-3 space-y-1">
-              <div className="flex items-center justify-between">
-                <div className="flex items-center gap-2">
-                  {eSig && <Lock className="h-3.5 w-3.5 text-primary" />}
-                  <span className="text-sm font-medium text-foreground">
-                    {tr.transitioned_by_name || 'System'}
+    <TooltipProvider>
+      <div className="space-y-3">
+        <h3 className="text-sm font-semibold text-foreground">{t('reviews.detail.statusHistory')}</h3>
+        <div className="border rounded-lg divide-y divide-border">
+          {transitions.map(tr => {
+            const eSig = getESignForTransition(tr);
+            return (
+              <div key={tr.id} className="px-4 py-3 space-y-1">
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-2">
+                    {eSig && (
+                      <Tooltip>
+                        <TooltipTrigger asChild>
+                          <Lock className="h-3.5 w-3.5 text-primary" />
+                        </TooltipTrigger>
+                        <TooltipContent>{t('esignature.eSigned')}</TooltipContent>
+                      </Tooltip>
+                    )}
+                    <span className="text-sm font-medium text-foreground">
+                      {tr.transitioned_by_name || 'System'}
+                    </span>
+                    {tr.from_status && (
+                      <>
+                        <ReviewStatusBadge status={tr.from_status} />
+                        <span className="text-muted-foreground text-xs">→</span>
+                      </>
+                    )}
+                    <ReviewStatusBadge status={tr.to_status} />
+                  </div>
+                  <span className="text-xs text-muted-foreground">
+                    {getRelativeTime(tr.created_at)}
                   </span>
-                  {tr.from_status && (
-                    <>
-                      <ReviewStatusBadge status={tr.from_status} />
-                      <span className="text-muted-foreground text-xs">→</span>
-                    </>
-                  )}
-                  <ReviewStatusBadge status={tr.to_status} />
                 </div>
-                <span className="text-xs text-muted-foreground">
-                  {getRelativeTime(tr.created_at)}
-                </span>
+                {eSig && (
+                  <div className="pl-5 space-y-0.5">
+                    <p className="text-xs text-primary/80">
+                      🔐 {t('esignature.signed')} · "{eSig.reason}"
+                    </p>
+                    {eSig.comment && (
+                      <p className="text-xs text-muted-foreground italic">
+                        {eSig.comment}
+                      </p>
+                    )}
+                  </div>
+                )}
+                {!eSig && tr.reason && (
+                  <p className="text-xs text-muted-foreground italic pl-1">
+                    {tr.reason}
+                  </p>
+                )}
               </div>
-              {eSig && (
-                <p className="text-xs text-primary/80 pl-5">
-                  🔐 {t('esignature.signed')} · "{eSig.reason}"
-                </p>
-              )}
-              {!eSig && tr.reason && (
-                <p className="text-xs text-muted-foreground italic pl-1">
-                  {tr.reason}
-                </p>
-              )}
-            </div>
-          );
-        })}
+            );
+          })}
+        </div>
       </div>
-    </div>
+    </TooltipProvider>
   );
 }

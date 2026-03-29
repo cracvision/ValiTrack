@@ -5,6 +5,7 @@ interface VerifyAndSignParams {
   password: string;
   reason: string;
   conclusion?: string;
+  comment?: string;
   transition: string;
   reviewCaseId: string;
   systemName: string;
@@ -17,6 +18,7 @@ export function useESignature() {
     password,
     reason,
     conclusion,
+    comment,
     transition,
     reviewCaseId,
     systemName,
@@ -34,7 +36,7 @@ export function useESignature() {
       await supabase.from('audit_log').insert({
         user_id: user.id,
         action: 'E_SIGNATURE_FAILED',
-        resource_type: 'review_cases',
+        resource_type: 'review_case',
         resource_id: reviewCaseId,
         details: {
           transition,
@@ -51,7 +53,7 @@ export function useESignature() {
     await supabase.from('audit_log').insert({
       user_id: user.id,
       action: 'E_SIGNATURE',
-      resource_type: 'review_cases',
+      resource_type: 'review_case',
       resource_id: reviewCaseId,
       details: {
         transition,
@@ -59,6 +61,7 @@ export function useESignature() {
         system_name: systemName,
         verified_at: new Date().toISOString(),
         reason,
+        comment: comment || null,
         conclusion: conclusion || null,
         signer_name: profile.full_name,
         signer_role: signerRole,
