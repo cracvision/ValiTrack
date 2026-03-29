@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Pencil, AlertTriangle, ChevronDown, ChevronRight } from 'lucide-react';
+import { Pencil, AlertTriangle, ChevronDown, ChevronRight, Lock } from 'lucide-react';
 import { addDays, differenceInDays } from 'date-fns';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
@@ -134,6 +134,29 @@ export function SystemProfileDetailDialog({ system, open, onOpenChange, onEdit, 
         .limit(20);
       if (error) throw error;
       return (data || []) as unknown as ProfileTransition[];
+    },
+    enabled: !!system?.id,
+  });
+
+  // Fetch e-signature audit entries for this system profile
+  const { data: profileESignatures = [] } = useQuery({
+    queryKey: ['e-signatures-profile', system?.id],
+    queryFn: async () => {
+      if (!system?.id) return [];
+      const { data, error } = await supabase
+        .from('audit_log')
+        .select('*')
+        .eq('action', 'E_SIGNATURE')
+        .in('resource_type', ['system_profile', 'profile_signoff'])
+        .order('created_at', { ascending: false });
+      if (error) return [];
+      // Filter to entries related to this profile
+      return (data || []).filter((entry: any) => {
+        if (entry.resource_type === 'system_profile' && entry.resource_id === system.id) return true;
+        const details = entry.details as Record<string, any> | null;
+        if (entry.resource_type === 'profile_signoff' && details?.system_profile_id === system.id) return true;
+        return false;
+      });
     },
     enabled: !!system?.id,
   });
