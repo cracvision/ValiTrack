@@ -16,7 +16,7 @@ import type { ReviewStatus, ReviewLevel } from '@/types';
 
 const STATUSES: ReviewStatus[] = [
   'draft', 'plan_review', 'plan_approval', 'approved_for_execution',
-  'in_progress', 'execution_review', 'approved', 'rejected',
+  'in_progress', 'execution_review', 'approved', 'rejected', 'cancelled',
 ];
 
 export default function ReviewCases() {
@@ -104,7 +104,7 @@ export default function ReviewCases() {
             </TableHeader>
             <TableBody>
               {reviewCases.map(rc => {
-                const isOverdue = new Date(rc.due_date) < new Date() && !['approved', 'rejected'].includes(rc.status);
+                const isOverdue = new Date(rc.due_date) < new Date() && !['approved', 'rejected', 'cancelled'].includes(rc.status);
                 const levelConfig = REVIEW_LEVEL_CONFIG[rc.review_level as ReviewLevel];
                 return (
                   <TableRow

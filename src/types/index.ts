@@ -7,7 +7,7 @@ export type RiskLevel = 'High' | 'Medium' | 'Low';
 export type SystemStatus = 'Active' | 'Retired' | 'Under Validation';
 export type ProfileApprovalStatus = 'draft' | 'in_review' | 'approved';
 
-export type ReviewStatus = 'draft' | 'plan_review' | 'plan_approval' | 'approved_for_execution' | 'in_progress' | 'execution_review' | 'approved' | 'rejected';
+export type ReviewStatus = 'draft' | 'plan_review' | 'plan_approval' | 'approved_for_execution' | 'in_progress' | 'execution_review' | 'approved' | 'rejected' | 'cancelled';
 export type ReviewLevel = '1' | '2' | '3';
 export type ReviewConclusion = 'remains_validated' | 'requires_remediation' | 'requires_revalidation';
 export type TaskGroup = 'INIT' | 'ITSM' | 'QMS' | 'SEC' | 'INFRA' | 'DOC' | 'AI_EVAL' | 'APPR';
@@ -117,6 +117,9 @@ export interface ReviewCase {
   business_owner_id: string;
   it_manager_id?: string;
   completed_at?: string;
+  cancelled_at?: string;
+  cancelled_by?: string;
+  cancellation_reason?: string;
   created_at: string;
   created_by: string;
   updated_at: string;

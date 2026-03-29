@@ -45,7 +45,7 @@ function NextActionBar({ system }: { system: DashboardSystem }) {
   const localizedCountdown = useLocalizedCountdown(reviewStatus, daysUntilDue);
 
   // Active review case — phase-specific messages
-  if (actualReviewStatus && !['approved'].includes(actualReviewStatus)) {
+  if (actualReviewStatus && !['approved', 'cancelled'].includes(actualReviewStatus)) {
     const phaseConfigs: Record<string, { icon: typeof Clock; bg: string; text: string; msgKey: string; msgParams?: Record<string, any> }> = {
       draft: {
         icon: Info,
@@ -219,7 +219,7 @@ function NextActionBar({ system }: { system: DashboardSystem }) {
 export function SystemCard({ system }: SystemCardProps) {
   const navigate = useNavigate();
   const isOverdue = system.reviewStatus === 'overdue';
-  const showStepper = system.actualReviewStatus && !['approved', 'rejected'].includes(system.actualReviewStatus);
+  const showStepper = system.actualReviewStatus && !['approved', 'rejected', 'cancelled'].includes(system.actualReviewStatus);
 
   return (
     <div

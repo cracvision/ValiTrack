@@ -10,6 +10,15 @@ export interface TransitionRule {
   labelKey: string;
 }
 
+const CANCEL_TRANSITION: TransitionRule = {
+  to: 'cancelled',
+  requiredRoles: ['super_user'],
+  label: 'Cancel review',
+  labelKey: 'reviewCases.actions.cancelReview',
+  requiresReason: true,
+  requiresESignature: true,
+};
+
 const TRANSITION_MAP: Record<ReviewStatus, TransitionRule[]> = {
   draft: [
     {
@@ -18,6 +27,7 @@ const TRANSITION_MAP: Record<ReviewStatus, TransitionRule[]> = {
       label: 'Submit for review',
       labelKey: 'reviews.actions.submitForReview',
     },
+    CANCEL_TRANSITION,
   ],
 
   plan_review: [
@@ -34,6 +44,7 @@ const TRANSITION_MAP: Record<ReviewStatus, TransitionRule[]> = {
       labelKey: 'reviews.actions.returnToDraft',
       requiresReason: true,
     },
+    CANCEL_TRANSITION,
   ],
 
   plan_approval: [
@@ -51,6 +62,7 @@ const TRANSITION_MAP: Record<ReviewStatus, TransitionRule[]> = {
       labelKey: 'reviews.actions.returnForReview',
       requiresReason: true,
     },
+    CANCEL_TRANSITION,
   ],
 
   approved_for_execution: [
@@ -60,6 +72,7 @@ const TRANSITION_MAP: Record<ReviewStatus, TransitionRule[]> = {
       label: 'Start execution',
       labelKey: 'reviews.actions.startExecution',
     },
+    CANCEL_TRANSITION,
   ],
 
   in_progress: [
@@ -76,6 +89,7 @@ const TRANSITION_MAP: Record<ReviewStatus, TransitionRule[]> = {
       labelKey: 'reviews.actions.stepBack',
       requiresReason: true,
     },
+    CANCEL_TRANSITION,
   ],
 
   execution_review: [
@@ -102,6 +116,7 @@ const TRANSITION_MAP: Record<ReviewStatus, TransitionRule[]> = {
       labelKey: 'reviews.actions.returnForCorrections',
       requiresReason: true,
     },
+    CANCEL_TRANSITION,
   ],
 
   approved: [],
@@ -119,7 +134,10 @@ const TRANSITION_MAP: Record<ReviewStatus, TransitionRule[]> = {
       label: 'Return to execution',
       labelKey: 'reviews.actions.returnToExecution',
     },
+    CANCEL_TRANSITION,
   ],
+
+  cancelled: [],
 };
 
 export function getValidTransitions(currentStatus: ReviewStatus, userRoles: string[]): TransitionRule[] {
@@ -160,6 +178,7 @@ export const REVIEW_STATUS_CONFIG: Record<string, { label: string; labelKey: str
   execution_review: { label: 'Execution review', labelKey: 'reviews.status.execution_review', className: 'bg-orange-50 text-orange-700 border-orange-200 dark:bg-neutral-800 dark:text-orange-400 dark:border-neutral-700' },
   approved: { label: 'Approved', labelKey: 'reviews.status.approved', className: 'bg-green-50 text-green-700 border-green-200 dark:bg-neutral-800 dark:text-green-400 dark:border-neutral-700' },
   rejected: { label: 'Rejected', labelKey: 'reviews.status.rejected', className: 'bg-red-50 text-red-700 border-red-200 dark:bg-neutral-800 dark:text-red-400 dark:border-neutral-700' },
+  cancelled: { label: 'Cancelled', labelKey: 'reviews.status.cancelled', className: 'bg-neutral-100 text-neutral-500 border-neutral-300 dark:bg-neutral-800 dark:text-neutral-400 dark:border-neutral-600' },
   // === OLD STATES (historical transition display only) ===
   in_preparation: { label: 'In preparation', labelKey: 'reviews.status.in_preparation', className: 'bg-blue-50 text-blue-700 border-blue-200 dark:bg-neutral-800 dark:text-blue-400 dark:border-neutral-700' },
   under_review: { label: 'Under review', labelKey: 'reviews.status.under_review', className: 'bg-amber-50 text-amber-700 border-amber-200 dark:bg-neutral-800 dark:text-amber-400 dark:border-neutral-700' },

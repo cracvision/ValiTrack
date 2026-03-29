@@ -179,7 +179,8 @@ export function useDashboardSystems() {
             reviewStatus = 'in_progress';
           } else if (cs === 'execution_review') {
             reviewStatus = 'pending_approval';
-          } else if (cs === 'approved') {
+          } else if (cs === 'approved' || cs === 'cancelled') {
+            // Terminal states — fall through to date-based status
             reviewStatus = daysUntilDue >= 0 ? 'compliant' : 'overdue';
           } else {
             reviewStatus = dateStatus;
