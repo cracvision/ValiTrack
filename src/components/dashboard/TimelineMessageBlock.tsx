@@ -65,10 +65,10 @@ function useTimelineData(system: DashboardSystem, t: (key: string, opts?: any) =
 
 const scenarioStyles: Record<string, { bg: string; text: string; border: string }> = {
   A_normal: { bg: 'bg-muted/50', text: 'text-muted-foreground', border: '' },
-  A_warn: { bg: 'bg-orange-50 dark:bg-orange-950', text: 'text-orange-800 dark:text-orange-300', border: 'border-l-4 border-orange-400 dark:border-orange-600' },
-  B: { bg: 'bg-orange-50 dark:bg-orange-950', text: 'text-orange-800 dark:text-orange-300', border: 'border-l-4 border-orange-400 dark:border-orange-600' },
-  C: { bg: 'bg-red-50 dark:bg-red-950', text: 'text-destructive', border: 'border-l-4 border-destructive' },
-  D: { bg: 'bg-red-50 dark:bg-red-950', text: 'text-destructive font-semibold', border: 'border-l-4 border-destructive' },
+  A_warn: { bg: 'bg-orange-50 dark:bg-neutral-800', text: 'text-orange-800 dark:text-orange-400', border: 'border-l-4 border-orange-400 dark:border-neutral-600' },
+  B: { bg: 'bg-orange-50 dark:bg-neutral-800', text: 'text-orange-800 dark:text-orange-400', border: 'border-l-4 border-orange-400 dark:border-neutral-600' },
+  C: { bg: 'bg-red-50 dark:bg-neutral-800', text: 'text-red-700 dark:text-red-400', border: 'border-l-4 border-red-400 dark:border-neutral-600' },
+  D: { bg: 'bg-red-50 dark:bg-neutral-800', text: 'text-red-700 dark:text-red-400 font-semibold', border: 'border-l-4 border-red-400 dark:border-neutral-600' },
 };
 
 function getStyles(scenario: Scenario, daysUntilDueDate: number) {
