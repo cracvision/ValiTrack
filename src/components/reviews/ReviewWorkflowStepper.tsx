@@ -1,6 +1,6 @@
 import { useTranslation } from 'react-i18next';
 import { cn } from '@/lib/utils';
-import { Check, X } from 'lucide-react';
+import { Check, X, Ban } from 'lucide-react';
 import { STEPPER_PHASES } from '@/lib/reviewWorkflow';
 import type { ReviewStatus } from '@/types';
 
@@ -8,10 +8,22 @@ interface ReviewWorkflowStepperProps {
   currentStatus: ReviewStatus;
 }
 
-type PhaseState = 'completed' | 'active' | 'upcoming' | 'rejected';
+type PhaseState = 'completed' | 'active' | 'upcoming' | 'rejected' | 'cancelled';
 
 function getPhaseState(phaseIndex: number, currentStatus: ReviewStatus): PhaseState {
   if (currentStatus === 'approved') return 'completed';
+
+  if (currentStatus === 'cancelled') {
+    // Show phases up to the last active one as completed, the cancellation phase as cancelled
+    // Cancellation can happen from any active state — find which phase was active
+    const cancelledPhaseIndex = STEPPER_PHASES.findIndex(p =>
+      p.states.some(s => ['draft', 'plan_review', 'plan_approval', 'approved_for_execution', 'in_progress', 'execution_review', 'rejected'].includes(s))
+    );
+    // We don't know the pre-cancellation state here, so just grey everything out
+    // and mark phase 0 as cancelled for visual indicator
+    if (phaseIndex === 0) return 'cancelled';
+    return 'upcoming';
+  }
 
   if (currentStatus === 'rejected') {
     // Rejection happens from execution_review (phase index 3)
@@ -43,6 +55,7 @@ export function ReviewWorkflowStepper({ currentStatus }: ReviewWorkflowStepperPr
                 state === 'active' ? 'h-2 bg-primary' : 'h-1.5',
                 state === 'completed' && 'bg-green-600',
                 state === 'rejected' && 'bg-destructive',
+                state === 'cancelled' && 'bg-neutral-400 dark:bg-neutral-500',
                 state === 'upcoming' && 'bg-muted',
               )}
             />
@@ -62,14 +75,18 @@ export function ReviewWorkflowStepper({ currentStatus }: ReviewWorkflowStepperPr
               {state === 'rejected' && (
                 <X className="h-3 w-3 text-destructive" strokeWidth={2.5} />
               )}
+              {state === 'cancelled' && (
+                <Ban className="h-3 w-3 text-neutral-500 dark:text-neutral-400" strokeWidth={2.5} />
+              )}
               <span
                 className={cn(
                   'text-[10px] text-center leading-tight',
                   state === 'active' ? 'text-primary font-medium' : 'text-muted-foreground',
                   state === 'rejected' && 'text-destructive font-medium',
+                  state === 'cancelled' && 'text-neutral-500 dark:text-neutral-400 font-medium',
                 )}
               >
-                {state === 'rejected' ? t('reviews.status.rejected') : t(phase.labelKey)}
+                {state === 'rejected' ? t('reviews.status.rejected') : state === 'cancelled' ? t('reviews.status.cancelled') : t(phase.labelKey)}
               </span>
             </div>
           );

@@ -40,6 +40,9 @@ export function useReviewCase(id: string | undefined) {
         business_owner_id: data.business_owner_id,
         it_manager_id: data.it_manager_id ?? undefined,
         completed_at: data.completed_at ?? undefined,
+        cancelled_at: (data as any).cancelled_at ?? undefined,
+        cancelled_by: (data as any).cancelled_by ?? undefined,
+        cancellation_reason: (data as any).cancellation_reason ?? undefined,
         created_at: data.created_at,
         created_by: data.created_by,
         updated_at: data.updated_at,
@@ -80,6 +83,12 @@ export function useReviewCaseTransition() {
         updatePayload.conclusion = input.conclusion;
         updatePayload.conclusion_notes = input.conclusionNotes || null;
         updatePayload.completed_at = new Date().toISOString();
+      }
+
+      if (input.toStatus === 'cancelled') {
+        updatePayload.cancelled_at = new Date().toISOString();
+        updatePayload.cancelled_by = user.id;
+        updatePayload.cancellation_reason = input.reason || null;
       }
 
       // Fetch the review case data for system profile update on approval
@@ -274,9 +283,10 @@ export function useReviewCaseTransition() {
       queryClient.invalidateQueries({ queryKey: ['review-signoffs', input.reviewCaseId] });
       queryClient.invalidateQueries({ queryKey: ['review-tasks', input.reviewCaseId] });
       queryClient.invalidateQueries({ queryKey: ['dashboard-systems'] });
-      if (input.toStatus === 'approved') {
+      if (input.toStatus === 'approved' || input.toStatus === 'cancelled') {
         queryClient.invalidateQueries({ queryKey: ['system-profiles'] });
         queryClient.invalidateQueries({ queryKey: ['systems-for-review'] });
+        queryClient.invalidateQueries({ queryKey: ['active-review-cases-guard'] });
       }
     },
   });

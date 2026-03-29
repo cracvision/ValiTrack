@@ -174,6 +174,7 @@
         "PROFILE_SIGNOFF_OBJECTED": "Objetó verificación de perfil",
         "PROFILE_SUBMITTED_FOR_REVIEW": "Envió perfil a revisión",
         "REVIEW_CASE_DELETED": "Eliminó un caso de revisión",
+        "REVIEW_CASE_CANCELLED": "Canceló un caso de revisión",
         "SIGNOFF_APPROVED": "Aprobó verificación",
         "TASK_COMPLETED": "Completó una tarea",
         "TASK_REASSIGNED": "Reasignó una tarea",
@@ -222,6 +223,7 @@
       "execution_review": "Revisión de ejecución",
       "approved": "Aprobado",
       "rejected": "Rechazado",
+      "cancelled": "Cancelado",
       "in_preparation": "En preparación",
       "under_review": "Bajo revisión"
     },
@@ -313,7 +315,8 @@
       "returnToPreparation": "Volver a preparación",
       "approve": "Aprobar",
       "editDraft": "Editar Borrador",
-      "deleteDraft": "Eliminar Borrador"
+      "deleteDraft": "Eliminar Borrador",
+      "cancelReview": "Cancelar revisión"
     },
     "deleteModal": {
       "title": "¿Eliminar Borrador de Revisión?",
@@ -347,7 +350,12 @@
       "planApprovalTitle": "Esperando aprobación de QA",
       "planApproval": "Este plan de revisión está esperando la aprobación de QA. El plan debe ser aprobado antes de que pueda comenzar la ejecución.",
       "approvedForExecutionTitle": "Plan aprobado",
-      "approvedForExecution": "Plan aprobado. Listo para comenzar la ejecución. Inicie la ejecución para generar y asignar las tareas de revisión."
+      "approvedForExecution": "Plan aprobado. Listo para comenzar la ejecución. Inicie la ejecución para generar y asignar las tareas de revisión.",
+      "cancelled": {
+        "title": "Revisión Cancelada",
+        "description": "Esta revisión fue cancelada por {{name}} el {{date}}.",
+        "reason": "Razón"
+      }
     },
     "detail": {
       "backToList": "Casos de revisión",
@@ -947,7 +955,8 @@
       "reviewSignoffObject": "Está presentando objeciones a la {{phase}} para {{systemName}}. Sus objeciones bloquearán el avance hasta que sean atendidas.",
       "profileSignoffApprove": "Está confirmando que ha revisado el Perfil de Sistema para {{systemName}} ({{systemId}}) y no tiene objeciones.",
       "profileSignoffObject": "Está presentando objeciones al Perfil de Sistema para {{systemName}} ({{systemId}}). Sus objeciones bloquearán la aprobación hasta que sean atendidas.",
-      "approveProfile": "Está aprobando formalmente el Perfil de Sistema para {{systemName}} ({{systemId}}). Esto habilitará el sistema para revisiones periódicas."
+      "approveProfile": "Está aprobando formalmente el Perfil de Sistema para {{systemName}} ({{systemId}}). Esto habilitará el sistema para revisiones periódicas.",
+      "cancelReview": "Está cancelando la revisión periódica de {{systemName}} ({{systemId}}). Esta acción es permanente — el caso de revisión será cerrado y no podrá ser reabierto. Toda la evidencia y notas de trabajo serán preservadas."
     },
     "disclaimer": "Al firmar, usted confirma que ha revisado la documentación relevante y acepta responsabilidad por esta decisión.",
     "signAndSubmit": "Firmar y Enviar",

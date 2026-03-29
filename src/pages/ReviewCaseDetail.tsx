@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useParams, useNavigate } from 'react-router-dom';
 import { useQuery } from '@tanstack/react-query';
-import { ArrowLeft, AlertTriangle, Info, ShieldCheck, Pencil, Trash2 } from 'lucide-react';
+import { ArrowLeft, AlertTriangle, Info, ShieldCheck, Pencil, Trash2, Ban } from 'lucide-react';
 import { ReviewTasksPanel } from '@/components/reviews/ReviewTasksPanel';
 import { DeleteReviewDraftDialog } from '@/components/reviews/DeleteReviewDraftDialog';
 import { EditReviewDraftDialog } from '@/components/reviews/EditReviewDraftDialog';
@@ -38,7 +38,7 @@ export default function ReviewCaseDetail() {
 
   const { data: userNames = {} } = useResolveUserNames(
     reviewCase
-      ? [reviewCase.system_owner_id, reviewCase.system_admin_id, reviewCase.qa_id, reviewCase.business_owner_id, reviewCase.it_manager_id, reviewCase.initiated_by]
+      ? [reviewCase.system_owner_id, reviewCase.system_admin_id, reviewCase.qa_id, reviewCase.business_owner_id, reviewCase.it_manager_id, reviewCase.initiated_by, reviewCase.cancelled_by]
       : []
   );
 
@@ -177,6 +177,31 @@ export default function ReviewCaseDetail() {
           />
         </div>
       </div>
+
+      {/* Cancellation banner */}
+      {reviewCase.status === 'cancelled' && (() => {
+        const cancellerName = reviewCase.cancelled_by ? (userNames[reviewCase.cancelled_by] || '—') : '—';
+        const cancelDate = reviewCase.cancelled_at ? new Date(reviewCase.cancelled_at).toLocaleDateString() : '—';
+        return (
+          <div className="rounded-lg border border-neutral-300 bg-neutral-50 dark:bg-neutral-900 dark:border-neutral-700 p-4 flex items-start gap-3">
+            <Ban className="h-5 w-5 text-neutral-500 mt-0.5 flex-shrink-0" />
+            <div>
+              <p className="text-sm font-medium text-neutral-700 dark:text-neutral-300">
+                {t('reviewCases.banners.cancelled.title')}
+              </p>
+              <p className="text-sm text-neutral-600 dark:text-neutral-400 mt-1">
+                {t('reviewCases.banners.cancelled.description', { name: cancellerName, date: cancelDate })}
+              </p>
+              {reviewCase.cancellation_reason && (
+                <p className="text-sm text-neutral-600 dark:text-neutral-400 mt-2">
+                  <span className="font-medium">{t('reviewCases.banners.cancelled.reason')}:</span>{' '}
+                  {reviewCase.cancellation_reason}
+                </p>
+              )}
+            </div>
+          </div>
+        );
+      })()}
 
       {/* Rejection alert banner */}
       {reviewCase.status === 'rejected' && (() => {
@@ -342,7 +367,7 @@ export default function ReviewCaseDetail() {
             </div>
           </div>
         </div>
-      ) : (
+      ) : reviewCase.status === 'cancelled' ? null : (
         <ReviewTasksPanel
           reviewCaseId={reviewCase.id}
           reviewLevel={reviewCase.review_level as any}

@@ -66,7 +66,8 @@ export function CreateReviewDialog({ open, onOpenChange }: CreateReviewDialogPro
         .from('review_cases')
         .select('system_id, status')
         .eq('is_deleted', false)
-        .neq('status', 'approved');
+        .neq('status', 'approved')
+        .neq('status', 'cancelled');
 
       if (error) throw error;
       return data || [];

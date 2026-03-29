@@ -175,6 +175,7 @@
         "PROFILE_SIGNOFF_OBJECTED": "Objected to profile sign-off",
         "PROFILE_SUBMITTED_FOR_REVIEW": "Submitted profile for review",
         "REVIEW_CASE_DELETED": "Deleted a review case",
+        "REVIEW_CASE_CANCELLED": "Cancelled a review case",
         "SIGNOFF_APPROVED": "Approved sign-off",
         "TASK_COMPLETED": "Completed a task",
         "TASK_REASSIGNED": "Reassigned a task",
@@ -223,6 +224,7 @@
       "execution_review": "Execution review",
       "approved": "Approved",
       "rejected": "Rejected",
+      "cancelled": "Cancelled",
       "in_preparation": "In preparation",
       "under_review": "Under review"
     },
@@ -314,7 +316,8 @@
       "returnToPreparation": "Return to preparation",
       "approve": "Approve",
       "editDraft": "Edit Draft",
-      "deleteDraft": "Delete Draft"
+      "deleteDraft": "Delete Draft",
+      "cancelReview": "Cancel review"
     },
     "deleteModal": {
       "title": "Delete Review Draft?",
@@ -348,7 +351,12 @@
       "planApprovalTitle": "Awaiting QA Approval",
       "planApproval": "This review plan is awaiting QA approval. The plan must be approved before execution can begin.",
       "approvedForExecutionTitle": "Plan Approved",
-      "approvedForExecution": "Plan approved. Ready to begin execution. Start execution to generate and assign review tasks."
+      "approvedForExecution": "Plan approved. Ready to begin execution. Start execution to generate and assign review tasks.",
+      "cancelled": {
+        "title": "Review Cancelled",
+        "description": "This review was cancelled by {{name}} on {{date}}.",
+        "reason": "Reason"
+      }
     },
     "detail": {
       "backToList": "Review cases",
@@ -948,7 +956,8 @@
       "reviewSignoffObject": "You are raising objections to the {{phase}} for {{systemName}}. Your objections will block further advancement until addressed.",
       "profileSignoffApprove": "You are confirming that you have reviewed the System Profile for {{systemName}} ({{systemId}}) and have no objections.",
       "profileSignoffObject": "You are raising objections to the System Profile for {{systemName}} ({{systemId}}). Your objections will block approval until addressed.",
-      "approveProfile": "You are formally approving the System Profile for {{systemName}} ({{systemId}}). This will make the system available for periodic reviews."
+      "approveProfile": "You are formally approving the System Profile for {{systemName}} ({{systemId}}). This will make the system available for periodic reviews.",
+      "cancelReview": "You are cancelling the periodic review for {{systemName}} ({{systemId}}). This action is permanent — the review case will be closed and cannot be reopened. All evidence and work notes will be preserved."
     },
     "disclaimer": "By signing, you confirm that you have reviewed the relevant documentation and accept responsibility for this decision.",
     "signAndSubmit": "Sign & Submit",

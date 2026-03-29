@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
+import { Ban } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from '@/components/ui/dialog';
 import { Textarea } from '@/components/ui/textarea';
@@ -52,12 +53,19 @@ export function ReviewActionButtons({
   // E-signature state
   const [eSignOpen, setESignOpen] = useState(false);
 
-  const validTransitions = getValidTransitions(currentStatus, roles);
+  const allTransitions = getValidTransitions(currentStatus, roles);
+
+  // Separate cancel from normal transitions
+  const normalTransitions = allTransitions.filter(r => r.to !== 'cancelled');
+  const cancelTransition = allTransitions.find(r => r.to === 'cancelled');
 
   const getESignatureDescription = (rule: TransitionRule): string => {
     const sysLabel = systemName || '';
     const sysId = systemIdentifier || '';
 
+    if (rule.to === 'cancelled') {
+      return t('esignature.descriptions.cancelReview', { systemName: sysLabel, systemId: sysId });
+    }
     if (rule.to === 'approved_for_execution') {
       return t('esignature.descriptions.approvePlan', { systemName: sysLabel, systemId: sysId });
     }
@@ -161,7 +169,7 @@ export function ReviewActionButtons({
     }
   };
 
-  if (validTransitions.length === 0) return null;
+  if (normalTransitions.length === 0 && !cancelTransition) return null;
 
   const getButtonVariant = (rule: TransitionRule) => {
     if (rule.to === 'rejected') return 'destructive' as const;
@@ -186,7 +194,7 @@ export function ReviewActionButtons({
     <>
       <TooltipProvider>
         <div className="flex gap-2">
-          {validTransitions.map(rule => {
+          {normalTransitions.map(rule => {
             const isForwardBlocked =
               canAdvanceSignoff === false && (
                 (currentStatus === 'plan_review' && rule.to === 'plan_approval') ||
@@ -233,6 +241,22 @@ export function ReviewActionButtons({
         </div>
       </TooltipProvider>
 
+      {/* Cancel button — separated visually */}
+      {cancelTransition && (
+        <div className="mt-3 pt-3 border-t border-border">
+          <Button
+            variant="outline"
+            size="sm"
+            className="text-destructive border-destructive/30 hover:bg-destructive/5 hover:border-destructive/50"
+            onClick={() => handleTransition(cancelTransition)}
+            disabled={transitionMutation.isPending}
+          >
+            <Ban className="h-4 w-4 mr-1.5" />
+            {t(cancelTransition.labelKey, { defaultValue: cancelTransition.label })}
+          </Button>
+        </div>
+      )}
+
       {/* E-Signature Modal */}
       <ESignatureModal
         open={eSignOpen}
@@ -245,7 +269,7 @@ export function ReviewActionButtons({
         resourceType="review_case"
         additionalAuditDetails={{ review_case_id: reviewCaseId }}
         showConclusionSelector={pendingRule?.requiresConclusion === true}
-        showReasonField={pendingRule?.to === 'rejected'}
+        showReasonField={pendingRule?.to === 'rejected' || pendingRule?.to === 'cancelled'}
       />
 
       {/* Reason dialog (non-e-sig transitions) */}

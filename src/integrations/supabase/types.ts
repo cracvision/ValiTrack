@@ -299,6 +299,9 @@ export type Database = {
       review_cases: {
         Row: {
           business_owner_id: string
+          cancellation_reason: string | null
+          cancelled_at: string | null
+          cancelled_by: string | null
           completed_at: string | null
           conclusion: string | null
           conclusion_notes: string | null
@@ -327,6 +330,9 @@ export type Database = {
         }
         Insert: {
           business_owner_id: string
+          cancellation_reason?: string | null
+          cancelled_at?: string | null
+          cancelled_by?: string | null
           completed_at?: string | null
           conclusion?: string | null
           conclusion_notes?: string | null
@@ -355,6 +361,9 @@ export type Database = {
         }
         Update: {
           business_owner_id?: string
+          cancellation_reason?: string | null
+          cancelled_at?: string | null
+          cancelled_by?: string | null
           completed_at?: string | null
           conclusion?: string | null
           conclusion_notes?: string | null
