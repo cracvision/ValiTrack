@@ -9,7 +9,7 @@ import {
   Users,
   LogOut,
 } from 'lucide-react';
-const LOGO_URL = `${import.meta.env.VITE_SUPABASE_URL}/storage/v1/object/public/images/ValiTrack_Logo_small.png?v=2`;
+const LOGO_URL = `${import.meta.env.VITE_SUPABASE_URL}/storage/v1/object/public/images/ValiTrack_Logo_Transparent_v2.png?v=1`;
 import { useTranslation } from 'react-i18next';
 import { NavLink } from '@/components/NavLink';
 import { ThemeSwitcher } from '@/components/ThemeSwitcher';
