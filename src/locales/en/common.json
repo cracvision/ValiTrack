@@ -164,7 +164,33 @@
       "daysAway_other": "{{count}} days away"
     },
     "auditFeed": {
-      "noActivity": "No recent activity"
+      "noActivity": "No recent activity",
+      "actions": {
+        "E_SIGNATURE": "Signed electronically",
+        "EVIDENCE_UPLOADED": "Uploaded evidence",
+        "PROFILE_APPROVED": "Approved system profile",
+        "PROFILE_RETURNED_TO_DRAFT": "Returned profile to draft",
+        "PROFILE_REVISED": "Revised system profile",
+        "PROFILE_SIGNOFF_APPROVED": "Approved profile sign-off",
+        "PROFILE_SIGNOFF_OBJECTED": "Objected to profile sign-off",
+        "PROFILE_SUBMITTED_FOR_REVIEW": "Submitted profile for review",
+        "REVIEW_CASE_DELETED": "Deleted a review case",
+        "SIGNOFF_APPROVED": "Approved sign-off",
+        "TASK_COMPLETED": "Completed a task",
+        "TASK_REASSIGNED": "Reassigned a task",
+        "TASK_REOPENED": "Reopened a task",
+        "TASK_STARTED": "Started a task",
+        "TASKS_GENERATED": "Generated review tasks",
+        "user_created": "Created a user account"
+      },
+      "time": {
+        "justNow": "Just now",
+        "minutesAgo": "{{count}} min ago",
+        "hoursAgo_one": "{{count}} hour ago",
+        "hoursAgo_other": "{{count}} hours ago",
+        "daysAgo_one": "{{count}} day ago",
+        "daysAgo_other": "{{count}} days ago"
+      }
     },
     "noRecentActivity": "No recent activity",
     "auditActions": {
