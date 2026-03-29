@@ -9,12 +9,12 @@ import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/comp
 import { useAuth } from '@/hooks/useAuth';
 import { useReviewCaseTransition } from '@/hooks/useReviewCase';
 import { useReviewTasks } from '@/hooks/useReviewTasks';
-import { useESignature } from '@/hooks/useESignature';
 import { getValidTransitions, CONCLUSION_CONFIG } from '@/lib/reviewWorkflow';
 import { ESignatureModal } from './ESignatureModal';
 import { toast } from '@/hooks/use-toast';
 import type { ReviewStatus, ReviewConclusion } from '@/types';
 import type { TransitionRule } from '@/lib/reviewWorkflow';
+import type { ESignatureResult } from './ESignatureModal';
 
 interface ReviewActionButtonsProps {
   reviewCaseId: string;
@@ -23,13 +23,21 @@ interface ReviewActionButtonsProps {
   hasObjections?: boolean;
   reviewTitle?: string;
   systemName?: string;
+  systemIdentifier?: string;
 }
 
-export function ReviewActionButtons({ reviewCaseId, currentStatus, canAdvanceSignoff, hasObjections, reviewTitle, systemName }: ReviewActionButtonsProps) {
+export function ReviewActionButtons({
+  reviewCaseId,
+  currentStatus,
+  canAdvanceSignoff,
+  hasObjections,
+  reviewTitle,
+  systemName,
+  systemIdentifier,
+}: ReviewActionButtonsProps) {
   const { t } = useTranslation();
-  const { roles, profile } = useAuth();
+  const { roles } = useAuth();
   const transitionMutation = useReviewCaseTransition();
-  const { verifyAndSign } = useESignature();
 
   // Fetch tasks to check completion for in_progress → execution_review gate
   const { data: tasks } = useReviewTasks(currentStatus === 'in_progress' ? reviewCaseId : undefined);
@@ -43,16 +51,29 @@ export function ReviewActionButtons({ reviewCaseId, currentStatus, canAdvanceSig
 
   // E-signature state
   const [eSignOpen, setESignOpen] = useState(false);
-  const [eSignLoading, setESignLoading] = useState(false);
-  const [eSignError, setESignError] = useState<string | null>(null);
 
   const validTransitions = getValidTransitions(currentStatus, roles);
+
+  const getESignatureDescription = (rule: TransitionRule): string => {
+    const sysLabel = systemName || '';
+    const sysId = systemIdentifier || '';
+
+    if (rule.to === 'approved_for_execution') {
+      return t('esignature.descriptions.approvePlan', { systemName: sysLabel, systemId: sysId });
+    }
+    if (rule.to === 'approved') {
+      return t('esignature.descriptions.approveReview', { systemName: sysLabel, systemId: sysId });
+    }
+    if (rule.to === 'rejected') {
+      return t('esignature.descriptions.rejectReview', { systemName: sysLabel, systemId: sysId });
+    }
+    return '';
+  };
 
   const handleTransition = async (rule: TransitionRule) => {
     // If requires e-signature, open the modal instead
     if (rule.requiresESignature) {
       setPendingRule(rule);
-      setESignError(null);
       setESignOpen(true);
       return;
     }
@@ -80,42 +101,25 @@ export function ReviewActionButtons({ reviewCaseId, currentStatus, canAdvanceSig
     }
   };
 
-  const handleESign = async (password: string, eSignReason: string, eSignConclusion?: ReviewConclusion) => {
+  const handleESignatureSuccess = async (result: ESignatureResult) => {
     if (!pendingRule) return;
-    setESignLoading(true);
-    setESignError(null);
 
     try {
-      const transitionLabel = `${currentStatus}_to_${pendingRule.to}`;
-      await verifyAndSign({
-        password,
-        reason: eSignReason,
-        conclusion: eSignConclusion,
-        transition: transitionLabel,
-        reviewCaseId,
-        systemName: systemName || '',
-      });
-
-      // E-signature verified — now execute the transition
       await transitionMutation.mutateAsync({
         reviewCaseId,
         fromStatus: currentStatus,
         toStatus: pendingRule.to,
-        reason: eSignReason,
-        conclusion: eSignConclusion as ReviewConclusion | undefined,
+        reason: result.reason || undefined,
+        conclusion: result.conclusion as ReviewConclusion | undefined,
       });
 
       toast({ title: t('reviews.actions.transitionSuccess') });
       setESignOpen(false);
       setPendingRule(null);
     } catch (err: any) {
-      if (err.message === 'incorrect_password') {
-        setESignError(t('esignature.incorrectPassword'));
-      } else {
-        setESignError(err.message);
-      }
-    } finally {
-      setESignLoading(false);
+      toast({ title: t('common.error'), description: err.message, variant: 'destructive' });
+      setESignOpen(false);
+      setPendingRule(null);
     }
   };
 
@@ -178,13 +182,6 @@ export function ReviewActionButtons({ reviewCaseId, currentStatus, canAdvanceSig
     return t('reviews.actions.reasonRequiredDesc');
   };
 
-  // Determine the role label for e-signature display
-  const signerRoleLabel = roles.includes('quality_assurance')
-    ? t('reviews.detail.roles.qa')
-    : roles.includes('super_user')
-      ? 'Super User'
-      : roles[0] || '';
-
   return (
     <>
       <TooltipProvider>
@@ -239,18 +236,17 @@ export function ReviewActionButtons({ reviewCaseId, currentStatus, canAdvanceSig
       {/* E-Signature Modal */}
       <ESignatureModal
         open={eSignOpen}
-        onClose={() => { setESignOpen(false); setPendingRule(null); setESignError(null); }}
-        onSign={handleESign}
-        actionLabel={pendingRule ? t(pendingRule.labelKey, { defaultValue: pendingRule.label }) : ''}
-        reviewTitle={reviewTitle || ''}
-        signerName={profile?.full_name || ''}
-        signerRole={signerRoleLabel}
-        showConclusion={pendingRule?.requiresConclusion === true}
-        isLoading={eSignLoading}
-        error={eSignError}
+        onClose={() => { setESignOpen(false); setPendingRule(null); }}
+        onSuccess={handleESignatureSuccess}
+        actionTitle={pendingRule ? t(pendingRule.labelKey, { defaultValue: pendingRule.label }) : ''}
+        actionDescription={pendingRule ? getESignatureDescription(pendingRule) : ''}
+        transitionLabel={pendingRule ? `${currentStatus}_to_${pendingRule.to}` : ''}
+        reviewCaseId={reviewCaseId}
+        showConclusionSelector={pendingRule?.requiresConclusion === true}
+        showReasonField={pendingRule?.to === 'rejected'}
       />
 
-      {/* Reason dialog */}
+      {/* Reason dialog (non-e-sig transitions) */}
       <Dialog open={reasonDialogOpen} onOpenChange={setReasonDialogOpen}>
         <DialogContent className="sm:max-w-md">
           <DialogHeader>
@@ -283,7 +279,7 @@ export function ReviewActionButtons({ reviewCaseId, currentStatus, canAdvanceSig
         </DialogContent>
       </Dialog>
 
-      {/* Approve dialog (non-e-sig path — kept for backwards compat but e-sig transitions now bypass this) */}
+      {/* Approve dialog (non-e-sig path — kept for backwards compat) */}
       <Dialog open={approveDialogOpen} onOpenChange={setApproveDialogOpen}>
         <DialogContent className="sm:max-w-md">
           <DialogHeader>

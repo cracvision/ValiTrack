@@ -173,6 +173,7 @@ export default function ReviewCaseDetail() {
             hasObjections={isSignoffPhase ? signoffData.hasObjections : undefined}
             reviewTitle={reviewCase.title}
             systemName={reviewCase.system_name}
+            systemIdentifier={snapshot?.system_identifier || ''}
           />
         </div>
       </div>
