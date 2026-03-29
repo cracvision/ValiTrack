@@ -909,5 +909,11 @@
     "verifying": "Verifying...",
     "signed": "E-Signature verified",
     "failedAttempt": "Failed e-signature attempt"
+  },
+  "theme": {
+    "switchTheme": "Switch Theme",
+    "light": "Light",
+    "dark": "Dark",
+    "system": "Auto"
   }
 }

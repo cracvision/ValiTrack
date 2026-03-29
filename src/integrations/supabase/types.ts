@@ -27,6 +27,7 @@ export type Database = {
           id: string
           is_blocked: boolean
           must_change_password: boolean
+          theme_preference: string
           updated_at: string
           username: string | null
         }
@@ -42,6 +43,7 @@ export type Database = {
           id: string
           is_blocked?: boolean
           must_change_password?: boolean
+          theme_preference?: string
           updated_at?: string
           username?: string | null
         }
@@ -57,6 +59,7 @@ export type Database = {
           id?: string
           is_blocked?: boolean
           must_change_password?: boolean
+          theme_preference?: string
           updated_at?: string
           username?: string | null
         }
