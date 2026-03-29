@@ -10,31 +10,6 @@ interface AuditEntry {
   full_name?: string;
 }
 
-export function useSystemAuditLog(systemId: string | undefined) {
-  return useQuery({
-    queryKey: ['system-audit-log', systemId],
-    queryFn: async (): Promise<AuditEntry[]> => {
-      if (!systemId) return [];
-
-      // TODO: System profile CRUD operations need to write to audit_log
-      // for this feed to show data. Currently only admin user operations
-      // (create/edit/delete/block users) write to audit_log via Edge Functions.
-      const { data, error } = await supabase
-        .from('audit_log')
-        .select('id, action, created_at, user_id, details')
-        .eq('resource_type', 'system_profile')
-        .eq('resource_id', systemId)
-        .order('created_at', { ascending: false })
-        .limit(3);
-
-      if (error) throw error;
-      return (data as AuditEntry[]) ?? [];
-    },
-    enabled: !!systemId,
-    staleTime: 5 * 60 * 1000,
-  });
-}
-
 export function useRecentAuditLog(limit: number = 10) {
   return useQuery({
     queryKey: ['recent-audit-log', limit],
