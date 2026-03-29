@@ -51,17 +51,17 @@ export const PROFILE_APPROVAL_STATUS_CONFIG: Record<ProfileApprovalStatus, {
   draft: {
     label: 'Draft',
     labelKey: 'systemProfiles.approval.status.draft',
-    className: 'border border-muted-foreground/30 bg-muted text-muted-foreground',
+    className: 'border border-neutral-300 bg-neutral-100 text-neutral-600 dark:bg-neutral-800 dark:text-neutral-400 dark:border-neutral-700',
   },
   in_review: {
     label: 'In Review',
     labelKey: 'systemProfiles.approval.status.inReview',
-    className: 'border border-blue-200 bg-blue-50 text-blue-700',
+    className: 'border border-blue-200 bg-blue-50 text-blue-700 dark:bg-neutral-800 dark:text-blue-400 dark:border-neutral-700',
   },
   approved: {
     label: 'Approved',
     labelKey: 'systemProfiles.approval.status.approved',
-    className: 'border border-green-200 bg-green-50 text-green-700',
+    className: 'border border-green-200 bg-green-50 text-green-700 dark:bg-neutral-800 dark:text-green-400 dark:border-neutral-700',
   },
 };
 
