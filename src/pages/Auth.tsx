@@ -20,6 +20,18 @@ export default function Auth() {
   const [showPassword, setShowPassword] = useState(false);
   const [submitting, setSubmitting] = useState(false);
 
+  // Apply system theme on login page (6am-6pm = light, else dark)
+  useEffect(() => {
+    const apply = () => {
+      const hour = new Date().getHours();
+      const dark = hour < 6 || hour >= 18;
+      document.documentElement.classList.toggle('dark', dark);
+    };
+    apply();
+    const interval = setInterval(apply, 60_000);
+    return () => clearInterval(interval);
+  }, []);
+
   if (loading) {
     return (
       <div className="flex h-screen items-center justify-center bg-background">
