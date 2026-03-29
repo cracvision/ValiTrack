@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Pencil, AlertTriangle, ChevronDown, ChevronRight } from 'lucide-react';
+import { Pencil, AlertTriangle, ChevronDown, ChevronRight, Lock } from 'lucide-react';
 import { addDays, differenceInDays } from 'date-fns';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
@@ -12,6 +12,7 @@ import {
 import {
   Collapsible, CollapsibleContent, CollapsibleTrigger,
 } from '@/components/ui/collapsible';
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
 import { useResolveUserNames } from '@/hooks/useResolveUserNames';
 import { useProfileSignoffs } from '@/hooks/useProfileSignoffs';
 import { ProfileSignoffPanel } from '@/components/profiles/ProfileSignoffPanel';
@@ -134,6 +135,29 @@ export function SystemProfileDetailDialog({ system, open, onOpenChange, onEdit, 
         .limit(20);
       if (error) throw error;
       return (data || []) as unknown as ProfileTransition[];
+    },
+    enabled: !!system?.id,
+  });
+
+  // Fetch e-signature audit entries for this system profile
+  const { data: profileESignatures = [] } = useQuery({
+    queryKey: ['e-signatures-profile', system?.id],
+    queryFn: async () => {
+      if (!system?.id) return [];
+      const { data, error } = await supabase
+        .from('audit_log')
+        .select('*')
+        .eq('action', 'E_SIGNATURE')
+        .in('resource_type', ['system_profile', 'profile_signoff'])
+        .order('created_at', { ascending: false });
+      if (error) return [];
+      // Filter to entries related to this profile
+      return (data || []).filter((entry: any) => {
+        if (entry.resource_type === 'system_profile' && entry.resource_id === system.id) return true;
+        const details = entry.details as Record<string, any> | null;
+        if (entry.resource_type === 'profile_signoff' && details?.system_profile_id === system.id) return true;
+        return false;
+      });
     },
     enabled: !!system?.id,
   });
@@ -283,7 +307,7 @@ export function SystemProfileDetailDialog({ system, open, onOpenChange, onEdit, 
 
           {isInReview && (
             <>
-              <ProfileSignoffPanel
+            <ProfileSignoffPanel
                 signoffs={signoffs}
                 isLoading={signoffsLoading}
                 canSignOff={canSignOff}
@@ -295,6 +319,9 @@ export function SystemProfileDetailDialog({ system, open, onOpenChange, onEdit, 
                   await submitDecision.mutateAsync(args);
                 }}
                 isPending={submitDecision.isPending}
+                systemProfileId={system.id}
+                systemName={system.name}
+                systemIdentifier={system.system_identifier}
               />
               <Separator />
             </>
@@ -406,6 +433,17 @@ export function SystemProfileDetailDialog({ system, open, onOpenChange, onEdit, 
                         <div key={`tr-${tr.id}`} className="flex items-start gap-3 text-xs border rounded-md p-2 bg-muted/20">
                           <div className="min-w-0 flex-1">
                             <div className="flex items-center gap-1.5 flex-wrap">
+                              {/* Lock icon for e-signed transitions */}
+                              {tr.to_status === 'approved' && tr.from_status === 'in_review' && profileESignatures.some((e: any) => e.resource_type === 'system_profile') && (
+                                <TooltipProvider>
+                                  <Tooltip>
+                                    <TooltipTrigger asChild>
+                                      <Lock className="h-3.5 w-3.5 text-primary" />
+                                    </TooltipTrigger>
+                                    <TooltipContent>{t('esignature.eSigned')}</TooltipContent>
+                                  </Tooltip>
+                                </TooltipProvider>
+                              )}
                               <span className="font-medium text-foreground">{historyNames[tr.transitioned_by] || '—'}</span>
                               <span className="text-muted-foreground">
                                 {transitionStatusLabel(tr.from_status)} → {transitionStatusLabel(tr.to_status)}

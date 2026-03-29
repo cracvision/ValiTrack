@@ -6,6 +6,8 @@ import { Textarea } from '@/components/ui/textarea';
 import { Label } from '@/components/ui/label';
 import { useAuth } from '@/hooks/useAuth';
 import { getProfileTransitions, type ProfileTransitionRule } from '@/lib/profileApprovalWorkflow';
+import { ESignatureModal } from '@/components/reviews/ESignatureModal';
+import type { ESignatureResult } from '@/components/reviews/ESignatureModal';
 import { toast } from '@/hooks/use-toast';
 import type { ProfileApprovalStatus, SystemProfile } from '@/types';
 
@@ -31,6 +33,10 @@ export function ProfileActionButtons({
   const [pendingRule, setPendingRule] = useState<ProfileTransitionRule | null>(null);
   const [reason, setReason] = useState('');
 
+  // E-signature state
+  const [eSignOpen, setESignOpen] = useState(false);
+  const [eSignRule, setESignRule] = useState<ProfileTransitionRule | null>(null);
+
   const approvalStatus = system.approval_status ?? 'draft';
   const transitions = getProfileTransitions(approvalStatus as ProfileApprovalStatus, roles);
 
@@ -38,6 +44,13 @@ export function ProfileActionButtons({
   const missingReviewers = !system.system_admin_id || !system.qa_id || !system.business_owner_id;
 
   const handleTransition = async (rule: ProfileTransitionRule) => {
+    // If requires e-signature, open modal
+    if (rule.requiresESignature) {
+      setESignRule(rule);
+      setESignOpen(true);
+      return;
+    }
+
     if (rule.requiresReason) {
       setPendingRule(rule);
       setReasonDialogOpen(true);
@@ -49,6 +62,18 @@ export function ProfileActionButtons({
     } catch (err: any) {
       toast({ title: t('common.error'), description: err.message, variant: 'destructive' });
     }
+  };
+
+  const handleESignSuccess = async (_result: ESignatureResult) => {
+    if (!eSignRule) return;
+    setESignOpen(false);
+    try {
+      await onTransition(eSignRule.to);
+      toast({ title: t('reviews.actions.transitionSuccess') });
+    } catch (err: any) {
+      toast({ title: t('common.error'), description: err.message, variant: 'destructive' });
+    }
+    setESignRule(null);
   };
 
   const handleReasonSubmit = async () => {
@@ -105,6 +130,23 @@ export function ProfileActionButtons({
           );
         })}
       </div>
+
+      {/* E-Signature Modal for profile approval */}
+      <ESignatureModal
+        open={eSignOpen}
+        onClose={() => { setESignOpen(false); setESignRule(null); }}
+        onSuccess={handleESignSuccess}
+        actionTitle={eSignRule ? t(eSignRule.labelKey, { defaultValue: eSignRule.label }) : ''}
+        actionDescription={t('esignature.descriptions.approveProfile', {
+          systemName: system.name,
+          systemId: system.system_identifier,
+        })}
+        transitionLabel="system_profile:in_review→approved"
+        resourceId={system.id}
+        resourceType="system_profile"
+        showConclusionSelector={false}
+        showReasonField={false}
+      />
 
       <Dialog open={reasonDialogOpen} onOpenChange={setReasonDialogOpen}>
         <DialogContent className="sm:max-w-md">
