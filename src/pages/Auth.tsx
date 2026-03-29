@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Navigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { useAuth } from '@/hooks/useAuth';
@@ -19,6 +19,18 @@ export default function Auth() {
   const [password, setPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
   const [submitting, setSubmitting] = useState(false);
+
+  // Apply system theme on login page (6am-6pm = light, else dark)
+  useEffect(() => {
+    const apply = () => {
+      const hour = new Date().getHours();
+      const dark = hour < 6 || hour >= 18;
+      document.documentElement.classList.toggle('dark', dark);
+    };
+    apply();
+    const interval = setInterval(apply, 60_000);
+    return () => clearInterval(interval);
+  }, []);
 
   if (loading) {
     return (
