@@ -111,7 +111,7 @@ export function ReviewSignoffPanel({
         <div className="flex items-center justify-between text-xs text-muted-foreground">
           <span>{t('reviews.signoffs.progress', { completed: completedCount, total: totalCount })}</span>
           {completedCount === totalCount && !hasObjections && (
-            <span className="text-green-700 font-medium">✓ {t('reviews.signoffs.allApproved')}</span>
+            <span className="text-green-700 dark:text-green-400 font-medium">✓ {t('reviews.signoffs.allApproved')}</span>
           )}
         </div>
         <Progress value={progressPercent} className="h-1.5" />
@@ -126,16 +126,16 @@ export function ReviewSignoffPanel({
 
           if (signoff.status === 'approved') {
             return (
-              <div key={signoff.id} className="flex items-start gap-3 rounded-md border border-green-200 bg-green-50 p-3">
-                <CheckCircle2 className="h-4 w-4 text-green-600 shrink-0 mt-0.5" />
+              <div key={signoff.id} className="flex items-start gap-3 rounded-md border border-green-200 dark:border-neutral-700 bg-green-50 dark:bg-neutral-800 p-3">
+                <CheckCircle2 className="h-4 w-4 text-green-600 dark:text-green-400 shrink-0 mt-0.5" />
                 <div className="min-w-0 flex-1">
                   <div className="flex items-center gap-2">
-                    <span className="text-sm font-medium text-green-800">{name}</span>
-                    <span className="text-xs text-green-600">({roleLabel})</span>
+                    <span className="text-sm font-medium text-green-800 dark:text-green-300">{name}</span>
+                    <span className="text-xs text-green-600 dark:text-green-400">({roleLabel})</span>
                   </div>
-                  <p className="text-xs text-green-700 mt-0.5">{t('reviews.signoffs.approved')}</p>
+                  <p className="text-xs text-green-700 dark:text-green-400 mt-0.5">{t('reviews.signoffs.approved')}</p>
                   {signoff.comments && (
-                    <p className="text-xs text-green-600 mt-1 italic">"{signoff.comments}"</p>
+                    <p className="text-xs text-green-600 dark:text-green-500 mt-1 italic">"{signoff.comments}"</p>
                   )}
                   {signoff.completed_at && (
                     <p className="text-xs text-green-500 mt-1">
@@ -149,16 +149,16 @@ export function ReviewSignoffPanel({
 
           if (signoff.status === 'objected') {
             return (
-              <div key={signoff.id} className="flex items-start gap-3 rounded-md border border-red-200 bg-red-50 p-3">
-                <XCircle className="h-4 w-4 text-red-600 shrink-0 mt-0.5" />
+              <div key={signoff.id} className="flex items-start gap-3 rounded-md border border-red-200 dark:border-neutral-700 bg-red-50 dark:bg-neutral-800 p-3">
+                <XCircle className="h-4 w-4 text-red-600 dark:text-red-400 shrink-0 mt-0.5" />
                 <div className="min-w-0 flex-1">
                   <div className="flex items-center gap-2">
-                    <span className="text-sm font-medium text-red-800">{name}</span>
-                    <span className="text-xs text-red-600">({roleLabel})</span>
+                    <span className="text-sm font-medium text-red-800 dark:text-red-300">{name}</span>
+                    <span className="text-xs text-red-600 dark:text-red-400">({roleLabel})</span>
                   </div>
-                  <p className="text-xs text-red-700 mt-0.5">{t('reviews.signoffs.objected')}</p>
+                  <p className="text-xs text-red-700 dark:text-red-400 mt-0.5">{t('reviews.signoffs.objected')}</p>
                   {signoff.comments && (
-                    <p className="text-xs text-red-600 mt-1 italic">"{signoff.comments}"</p>
+                    <p className="text-xs text-red-600 dark:text-red-500 mt-1 italic">"{signoff.comments}"</p>
                   )}
                   {signoff.completed_at && (
                     <p className="text-xs text-red-500 mt-1">
@@ -173,13 +173,13 @@ export function ReviewSignoffPanel({
           // Pending
           if (isCurrentUser && canSignOff) {
             return (
-              <div key={signoff.id} className="rounded-md border border-blue-200 bg-blue-50 p-3 space-y-3">
+              <div key={signoff.id} className="rounded-md border border-blue-200 dark:border-neutral-700 bg-blue-50 dark:bg-neutral-800 p-3 space-y-3">
                 <div className="flex items-center gap-2">
-                  <Clock className="h-4 w-4 text-blue-600 shrink-0" />
-                  <span className="text-sm font-medium text-blue-800">{name}</span>
-                  <span className="text-xs text-blue-600">({roleLabel})</span>
+                  <Clock className="h-4 w-4 text-blue-600 dark:text-blue-400 shrink-0" />
+                  <span className="text-sm font-medium text-blue-800 dark:text-blue-300">{name}</span>
+                  <span className="text-xs text-blue-600 dark:text-blue-400">({roleLabel})</span>
                 </div>
-                <p className="text-xs text-blue-700 font-medium">{t('reviews.signoffs.yourSignoff')}</p>
+                <p className="text-xs text-blue-700 dark:text-blue-400 font-medium">{t('reviews.signoffs.yourSignoff')}</p>
                 <div className="space-y-1.5">
                   <Label className="text-xs">{t('reviews.signoffs.commentsOptional')}</Label>
                   <Textarea
@@ -233,10 +233,10 @@ export function ReviewSignoffPanel({
 
       {/* Objection alert */}
       {hasObjections && (
-        <Alert className="bg-amber-50 border-amber-200">
-          <AlertTriangle className="h-4 w-4 text-amber-700" />
-          <AlertTitle className="text-amber-800">{t('reviews.signoffs.objectionsRaised')}</AlertTitle>
-          <AlertDescription className="text-amber-700">
+        <Alert className="bg-amber-50 dark:bg-neutral-800 border-amber-200 dark:border-neutral-700">
+          <AlertTriangle className="h-4 w-4 text-amber-700 dark:text-amber-400" />
+          <AlertTitle className="text-amber-800 dark:text-amber-300">{t('reviews.signoffs.objectionsRaised')}</AlertTitle>
+          <AlertDescription className="text-amber-700 dark:text-amber-400">
             {t('reviews.signoffs.objectionsDescription')}
           </AlertDescription>
         </Alert>
