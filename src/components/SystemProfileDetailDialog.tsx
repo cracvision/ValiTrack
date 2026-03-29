@@ -12,6 +12,7 @@ import {
 import {
   Collapsible, CollapsibleContent, CollapsibleTrigger,
 } from '@/components/ui/collapsible';
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
 import { useResolveUserNames } from '@/hooks/useResolveUserNames';
 import { useProfileSignoffs } from '@/hooks/useProfileSignoffs';
 import { ProfileSignoffPanel } from '@/components/profiles/ProfileSignoffPanel';
@@ -432,6 +433,17 @@ export function SystemProfileDetailDialog({ system, open, onOpenChange, onEdit, 
                         <div key={`tr-${tr.id}`} className="flex items-start gap-3 text-xs border rounded-md p-2 bg-muted/20">
                           <div className="min-w-0 flex-1">
                             <div className="flex items-center gap-1.5 flex-wrap">
+                              {/* Lock icon for e-signed transitions */}
+                              {tr.to_status === 'approved' && tr.from_status === 'in_review' && profileESignatures.some((e: any) => e.resource_type === 'system_profile') && (
+                                <TooltipProvider>
+                                  <Tooltip>
+                                    <TooltipTrigger asChild>
+                                      <Lock className="h-3.5 w-3.5 text-primary" />
+                                    </TooltipTrigger>
+                                    <TooltipContent>{t('esignature.eSigned')}</TooltipContent>
+                                  </Tooltip>
+                                </TooltipProvider>
+                              )}
                               <span className="font-medium text-foreground">{historyNames[tr.transitioned_by] || '—'}</span>
                               <span className="text-muted-foreground">
                                 {transitionStatusLabel(tr.from_status)} → {transitionStatusLabel(tr.to_status)}
