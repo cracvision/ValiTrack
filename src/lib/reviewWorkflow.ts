@@ -153,16 +153,16 @@ export function calculateReviewLevel(riskLevel: string, gampCategory: string): R
 export const REVIEW_STATUS_CONFIG: Record<string, { label: string; labelKey: string; className: string }> = {
   // === NEW STATES ===
   draft: { label: 'Draft', labelKey: 'reviews.status.draft', className: 'bg-muted text-muted-foreground border-border' },
-  plan_review: { label: 'Plan review', labelKey: 'reviews.status.plan_review', className: 'bg-blue-50 text-blue-700 border-blue-200' },
-  plan_approval: { label: 'Plan approval', labelKey: 'reviews.status.plan_approval', className: 'bg-purple-50 text-purple-700 border-purple-200' },
-  approved_for_execution: { label: 'Approved for execution', labelKey: 'reviews.status.approved_for_execution', className: 'bg-teal-50 text-teal-700 border-teal-200' },
-  in_progress: { label: 'In progress', labelKey: 'reviews.status.in_progress', className: 'bg-amber-50 text-amber-700 border-amber-200' },
-  execution_review: { label: 'Execution review', labelKey: 'reviews.status.execution_review', className: 'bg-orange-50 text-orange-700 border-orange-200' },
-  approved: { label: 'Approved', labelKey: 'reviews.status.approved', className: 'bg-green-50 text-green-700 border-green-200' },
-  rejected: { label: 'Rejected', labelKey: 'reviews.status.rejected', className: 'bg-red-50 text-red-700 border-red-200' },
+  plan_review: { label: 'Plan review', labelKey: 'reviews.status.plan_review', className: 'bg-blue-50 text-blue-700 border-blue-200 dark:bg-neutral-800 dark:text-blue-400 dark:border-neutral-700' },
+  plan_approval: { label: 'Plan approval', labelKey: 'reviews.status.plan_approval', className: 'bg-purple-50 text-purple-700 border-purple-200 dark:bg-neutral-800 dark:text-purple-400 dark:border-neutral-700' },
+  approved_for_execution: { label: 'Approved for execution', labelKey: 'reviews.status.approved_for_execution', className: 'bg-teal-50 text-teal-700 border-teal-200 dark:bg-neutral-800 dark:text-teal-400 dark:border-neutral-700' },
+  in_progress: { label: 'In progress', labelKey: 'reviews.status.in_progress', className: 'bg-amber-50 text-amber-700 border-amber-200 dark:bg-neutral-800 dark:text-amber-400 dark:border-neutral-700' },
+  execution_review: { label: 'Execution review', labelKey: 'reviews.status.execution_review', className: 'bg-orange-50 text-orange-700 border-orange-200 dark:bg-neutral-800 dark:text-orange-400 dark:border-neutral-700' },
+  approved: { label: 'Approved', labelKey: 'reviews.status.approved', className: 'bg-green-50 text-green-700 border-green-200 dark:bg-neutral-800 dark:text-green-400 dark:border-neutral-700' },
+  rejected: { label: 'Rejected', labelKey: 'reviews.status.rejected', className: 'bg-red-50 text-red-700 border-red-200 dark:bg-neutral-800 dark:text-red-400 dark:border-neutral-700' },
   // === OLD STATES (historical transition display only) ===
-  in_preparation: { label: 'In preparation', labelKey: 'reviews.status.in_preparation', className: 'bg-blue-50 text-blue-700 border-blue-200' },
-  under_review: { label: 'Under review', labelKey: 'reviews.status.under_review', className: 'bg-amber-50 text-amber-700 border-amber-200' },
+  in_preparation: { label: 'In preparation', labelKey: 'reviews.status.in_preparation', className: 'bg-blue-50 text-blue-700 border-blue-200 dark:bg-neutral-800 dark:text-blue-400 dark:border-neutral-700' },
+  under_review: { label: 'Under review', labelKey: 'reviews.status.under_review', className: 'bg-amber-50 text-amber-700 border-amber-200 dark:bg-neutral-800 dark:text-amber-400 dark:border-neutral-700' },
 };
 
 // Stepper phase groupings (5 visual phases for 8 states)
@@ -189,7 +189,7 @@ export const REVIEW_LEVEL_CONFIG: Record<ReviewLevel, { label: string; descripti
 
 // Conclusion display
 export const CONCLUSION_CONFIG: Record<ReviewConclusion, { label: string; className: string }> = {
-  remains_validated: { label: 'Remains validated', className: 'bg-green-50 text-green-700' },
-  requires_remediation: { label: 'Requires remediation', className: 'bg-amber-50 text-amber-700' },
-  requires_revalidation: { label: 'Requires revalidation', className: 'bg-red-50 text-red-700' },
+  remains_validated: { label: 'Remains validated', className: 'bg-green-50 text-green-700 dark:bg-neutral-800 dark:text-green-400' },
+  requires_remediation: { label: 'Requires remediation', className: 'bg-amber-50 text-amber-700 dark:bg-neutral-800 dark:text-amber-400' },
+  requires_revalidation: { label: 'Requires revalidation', className: 'bg-red-50 text-red-700 dark:bg-neutral-800 dark:text-red-400' },
 };

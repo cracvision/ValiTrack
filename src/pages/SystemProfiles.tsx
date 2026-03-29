@@ -26,32 +26,32 @@ import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/comp
 import type { SystemProfile, GxPClassification, SystemEnvironment, GampCategory, ProfileApprovalStatus } from '@/types';
 
 const classificationColor: Record<string, string> = {
-  GMP: 'bg-destructive/10 text-destructive',
-  GLP: 'bg-destructive/10 text-destructive',
-  GCP: 'bg-destructive/10 text-destructive',
-  GDP: 'bg-orange-100 text-orange-700',
-  GVP: 'bg-destructive/10 text-destructive',
-  NON_GXP_CRITICAL: 'bg-orange-100 text-orange-700',
+  GMP: 'bg-red-50 text-red-700 dark:bg-neutral-800 dark:text-red-400 dark:border-neutral-700',
+  GLP: 'bg-red-50 text-red-700 dark:bg-neutral-800 dark:text-red-400 dark:border-neutral-700',
+  GCP: 'bg-red-50 text-red-700 dark:bg-neutral-800 dark:text-red-400 dark:border-neutral-700',
+  GDP: 'bg-orange-50 text-orange-700 dark:bg-neutral-800 dark:text-orange-400 dark:border-neutral-700',
+  GVP: 'bg-red-50 text-red-700 dark:bg-neutral-800 dark:text-red-400 dark:border-neutral-700',
+  NON_GXP_CRITICAL: 'bg-orange-50 text-orange-700 dark:bg-neutral-800 dark:text-orange-400 dark:border-neutral-700',
   NON_GXP_STANDARD: 'bg-muted text-muted-foreground',
 };
 
 const riskColor: Record<string, string> = {
-  High: 'bg-destructive/10 text-destructive',
-  Medium: 'bg-orange-100 text-orange-700',
-  Low: 'bg-green-100 text-green-700',
+  High: 'bg-red-50 text-red-600 dark:bg-neutral-800 dark:text-red-400 dark:border-neutral-700',
+  Medium: 'bg-amber-50 text-amber-700 dark:bg-neutral-800 dark:text-amber-400 dark:border-neutral-700',
+  Low: 'bg-green-50 text-green-700 dark:bg-neutral-800 dark:text-green-400 dark:border-neutral-700',
 };
 
 const statusColor: Record<string, string> = {
-  Active: 'bg-green-100 text-green-700',
+  Active: 'bg-green-50 text-green-700 dark:bg-neutral-800 dark:text-green-400 dark:border-neutral-700',
   Retired: 'bg-muted text-muted-foreground',
-  'Under Validation': 'bg-primary/10 text-primary',
+  'Under Validation': 'bg-primary/10 text-primary dark:bg-neutral-800 dark:text-primary dark:border-neutral-700',
 };
 
 const gampColor: Record<string, string> = {
-  '1': 'bg-green-100 text-green-700',
+  '1': 'bg-green-50 text-green-700 dark:bg-neutral-800 dark:text-green-400 dark:border-neutral-700',
   '3': 'bg-muted text-muted-foreground',
-  '4': 'bg-orange-100 text-orange-700',
-  '5': 'bg-destructive/10 text-destructive',
+  '4': 'bg-orange-50 text-orange-700 dark:bg-neutral-800 dark:text-orange-300 dark:border-neutral-700',
+  '5': 'bg-red-50 text-red-700 dark:bg-neutral-800 dark:text-red-400 dark:border-neutral-700',
 };
 
 export default function SystemProfiles() {
