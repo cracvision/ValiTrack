@@ -129,6 +129,29 @@ export function useReviewCaseTransition() {
 
       if (transError) throw transError;
 
+      // Audit log for cancellation
+      if (input.toStatus === 'cancelled') {
+        const { data: rcSnap } = await supabase
+          .from('review_cases')
+          .select('frozen_system_snapshot')
+          .eq('id', input.reviewCaseId)
+          .single();
+
+        const systemName = (rcSnap?.frozen_system_snapshot as any)?.name || '';
+
+        await supabase.from('audit_log').insert({
+          user_id: user.id,
+          action: 'REVIEW_CASE_CANCELLED',
+          resource_type: 'review_case',
+          resource_id: input.reviewCaseId,
+          details: {
+            system_name: systemName,
+            from_status: input.fromStatus,
+            reason: input.reason || '',
+          },
+        });
+      }
+
       // Create/reset signoffs when entering plan_review or execution_review
       if (input.toStatus === 'plan_review' || input.toStatus === 'execution_review') {
         // Fetch the review case to get role user IDs
