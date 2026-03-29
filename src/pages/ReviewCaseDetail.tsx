@@ -198,10 +198,10 @@ export default function ReviewCaseDetail() {
 
       {/* Objection alert banner (amber) */}
       {isSignoffPhase && signoffData.hasObjections && (
-        <Alert className="bg-amber-50 border-amber-200">
-          <AlertTriangle className="h-4 w-4 text-amber-700" />
-          <AlertTitle className="text-amber-800">{t('reviews.signoffs.objectionsRaised')}</AlertTitle>
-          <AlertDescription className="text-amber-700">
+        <Alert className="bg-amber-50 dark:bg-neutral-800 border-amber-200 dark:border-neutral-700">
+          <AlertTriangle className="h-4 w-4 text-amber-700 dark:text-amber-400" />
+          <AlertTitle className="text-amber-800 dark:text-amber-300">{t('reviews.signoffs.objectionsRaised')}</AlertTitle>
+          <AlertDescription className="text-amber-700 dark:text-amber-400">
             {t('reviews.signoffs.objectionsDescription')}
           </AlertDescription>
         </Alert>
@@ -209,10 +209,10 @@ export default function ReviewCaseDetail() {
 
       {/* Plan approval banner */}
       {reviewCase.status === 'plan_approval' && (
-        <Alert className="bg-blue-50 border-blue-200">
-          <ShieldCheck className="h-4 w-4 text-blue-700" />
-          <AlertTitle className="text-blue-800">{t('reviews.banners.planApprovalTitle')}</AlertTitle>
-          <AlertDescription className="text-blue-700">
+        <Alert className="bg-blue-50 dark:bg-neutral-800 border-blue-200 dark:border-neutral-700">
+          <ShieldCheck className="h-4 w-4 text-blue-700 dark:text-blue-400" />
+          <AlertTitle className="text-blue-800 dark:text-blue-300">{t('reviews.banners.planApprovalTitle')}</AlertTitle>
+          <AlertDescription className="text-blue-700 dark:text-blue-400">
             {t('reviews.banners.planApproval')}
           </AlertDescription>
         </Alert>
@@ -220,10 +220,10 @@ export default function ReviewCaseDetail() {
 
       {/* Approved for execution banner */}
       {reviewCase.status === 'approved_for_execution' && (
-        <Alert className="bg-teal-50 border-teal-200">
-          <ShieldCheck className="h-4 w-4 text-teal-700" />
-          <AlertTitle className="text-teal-800">{t('reviews.banners.approvedForExecutionTitle')}</AlertTitle>
-          <AlertDescription className="text-teal-700">
+        <Alert className="bg-teal-50 dark:bg-neutral-800 border-teal-200 dark:border-neutral-700">
+          <ShieldCheck className="h-4 w-4 text-teal-700 dark:text-teal-400" />
+          <AlertTitle className="text-teal-800 dark:text-teal-300">{t('reviews.banners.approvedForExecutionTitle')}</AlertTitle>
+          <AlertDescription className="text-teal-700 dark:text-teal-400">
             {t('reviews.banners.approvedForExecution')}
           </AlertDescription>
         </Alert>

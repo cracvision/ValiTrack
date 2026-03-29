@@ -57,7 +57,7 @@ export function PlatformHealthSection({ systems }: PlatformHealthSectionProps) {
       description: overdueSystems.length > 0
         ? t('dashboard.overdue', { count: overdueSystems.length })
         : t('dashboard.onSchedule'),
-      descClass: overdueSystems.length > 0 ? 'text-destructive' : 'text-green-600',
+      descClass: overdueSystems.length > 0 ? 'text-destructive' : 'text-green-600 dark:text-green-400',
     },
   ];
 

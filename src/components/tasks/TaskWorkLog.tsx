@@ -28,8 +28,8 @@ const NOTE_TYPE_STYLES: Record<string, { bg: string; icon: React.ReactNode }> = 
     icon: <Paperclip className="h-3.5 w-3.5 text-muted-foreground shrink-0" />,
   },
   reopen_reason: {
-    bg: 'bg-amber-50 border-amber-200',
-    icon: <AlertTriangle className="h-3.5 w-3.5 text-amber-600 shrink-0" />,
+    bg: 'bg-amber-50 dark:bg-neutral-800 border-amber-200 dark:border-neutral-700',
+    icon: <AlertTriangle className="h-3.5 w-3.5 text-amber-600 dark:text-amber-400 shrink-0" />,
   },
   work_note: {
     bg: '',
