@@ -238,24 +238,21 @@ export function ReviewActionButtons({
               </Tooltip>
             );
           })}
+          {cancelTransition && <div className="flex-1" />}
+          {cancelTransition && (
+            <Button
+              variant="outline"
+              size="sm"
+              className="text-destructive border-destructive/30 hover:bg-destructive/5 hover:border-destructive/50"
+              onClick={() => handleTransition(cancelTransition)}
+              disabled={transitionMutation.isPending}
+            >
+              <Ban className="h-4 w-4 mr-1.5" />
+              {t(cancelTransition.labelKey, { defaultValue: cancelTransition.label })}
+            </Button>
+          )}
         </div>
       </TooltipProvider>
-
-      {/* Cancel button — separated visually */}
-      {cancelTransition && (
-        <div className="mt-3 pt-3 border-t border-border">
-          <Button
-            variant="outline"
-            size="sm"
-            className="text-destructive border-destructive/30 hover:bg-destructive/5 hover:border-destructive/50"
-            onClick={() => handleTransition(cancelTransition)}
-            disabled={transitionMutation.isPending}
-          >
-            <Ban className="h-4 w-4 mr-1.5" />
-            {t(cancelTransition.labelKey, { defaultValue: cancelTransition.label })}
-          </Button>
-        </div>
-      )}
 
       {/* E-Signature Modal */}
       <ESignatureModal
