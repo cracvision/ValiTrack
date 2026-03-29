@@ -163,7 +163,33 @@
       "daysAway_other": "{{count}} días restantes"
     },
     "auditFeed": {
-      "noActivity": "Sin actividad reciente"
+      "noActivity": "Sin actividad reciente",
+      "actions": {
+        "E_SIGNATURE": "Firmó electrónicamente",
+        "EVIDENCE_UPLOADED": "Subió evidencia",
+        "PROFILE_APPROVED": "Aprobó perfil de sistema",
+        "PROFILE_RETURNED_TO_DRAFT": "Devolvió perfil a borrador",
+        "PROFILE_REVISED": "Revisó perfil de sistema",
+        "PROFILE_SIGNOFF_APPROVED": "Aprobó verificación de perfil",
+        "PROFILE_SIGNOFF_OBJECTED": "Objetó verificación de perfil",
+        "PROFILE_SUBMITTED_FOR_REVIEW": "Envió perfil a revisión",
+        "REVIEW_CASE_DELETED": "Eliminó un caso de revisión",
+        "SIGNOFF_APPROVED": "Aprobó verificación",
+        "TASK_COMPLETED": "Completó una tarea",
+        "TASK_REASSIGNED": "Reasignó una tarea",
+        "TASK_REOPENED": "Reabrió una tarea",
+        "TASK_STARTED": "Inició una tarea",
+        "TASKS_GENERATED": "Generó tareas de revisión",
+        "user_created": "Creó una cuenta de usuario"
+      },
+      "time": {
+        "justNow": "Ahora mismo",
+        "minutesAgo": "Hace {{count}} min",
+        "hoursAgo_one": "Hace {{count}} hora",
+        "hoursAgo_other": "Hace {{count}} horas",
+        "daysAgo_one": "Hace {{count}} día",
+        "daysAgo_other": "Hace {{count}} días"
+      }
     },
     "noRecentActivity": "Sin actividad reciente",
     "auditActions": {

@@ -1039,6 +1039,19 @@ export type Database = {
           total_required: number
         }[]
       }
+      get_system_recent_activity: {
+        Args: { p_limit?: number; p_system_id: string }
+        Returns: {
+          action: string
+          created_at: string
+          details: Json
+          id: string
+          resource_id: string
+          resource_type: string
+          user_id: string
+          user_name: string
+        }[]
+      }
       get_user_roles: {
         Args: { _user_id: string }
         Returns: Database["public"]["Enums"]["app_role"][]
