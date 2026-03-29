@@ -1,53 +1,59 @@
 
 
-## Duplicate System Profile Prevention (System Identifier Uniqueness)
+# E-Signature Implementation — Approved for Implementation
 
-### Problem
-Users can create multiple system profiles with the same System Identifier (e.g., "SYS-MES-003"), breaking the one-system-one-profile principle.
+## Namespace Confirmation
+Existing i18n keys use **`esignature`** (lowercase) in both locale files and all `t()` calls. All new keys will be added under this same `esignature` namespace — no camelCase `eSignature` namespace will be created.
 
-### Plan
+## Implementation — 7 Files
 
-#### 1. Database migration — Case-insensitive partial unique index
-```sql
-CREATE UNIQUE INDEX idx_unique_system_identifier
-ON public.system_profiles (LOWER(system_identifier))
-WHERE is_deleted = false;
-```
+### 1. `src/components/reviews/ESignatureModal.tsx` — FULL REWRITE
+Replace current minimal modal with spec-compliant version:
+- Signer info card with name, role, locale-formatted date/time
+- `actionDescription` prop for contextual system info
+- Conclusion radio group (3 options, no default, only when `showConclusionSelector`)
+- Reason textarea (min 10 chars, char counter, only when `showReasonField`)
+- Comment textarea (always visible, optional)
+- Password field with show/hide eye toggle, error clears on typing, Enter submits
+- Amber legal disclaimer card (dark mode: `dark:bg-neutral-800 dark:text-amber-400 dark:border-neutral-700`)
+- `onInteractOutside` prevented, full state reset on close
+- Internal `logESignatureAttempt` helper using `resource_type: 'review_case'` (singular)
+- New props: `onSuccess(ESignatureResult)`, `actionDescription`, `showReasonField`, `showConclusionSelector`, `reviewCaseId`, `transitionLabel`
 
-#### 2. Frontend — Real-time validation in SystemProfileForm
-In `src/components/SystemProfileForm.tsx`:
+### 2. `src/components/reviews/ReviewActionButtons.tsx` — MODIFY
+- Add `systemIdentifier` prop
+- Add `getESignatureDescription()` helper using `systemName` + `systemIdentifier`
+- Replace `handleESign` with `handleESignatureSuccess(result: ESignatureResult)` that extracts conclusion/reason and calls existing transition mutation
+- Update modal render to pass new props (`actionDescription`, `showReasonField`, `showConclusionSelector`, `onSuccess`)
+- E-sig transitions bypass existing reason/conclusion dialogs (already the case via intercept order)
 
-- Add local state for duplicate check: `identifierError`, `identifierChecking`
-- Add a debounced (~500ms) check on the `system_identifier` field using `onBlur` or debounced `onChange`
-- Query: `supabase.from('system_profiles').select('id, name').ilike('system_identifier', value).eq('is_deleted', false).neq('id', currentProfileId)` (exclude self when editing)
-- If match found: show red border + red text on input, display inline error with conflicting system name, disable submit button
-- If no match: clear error, re-enable submit
+### 3. `src/pages/ReviewCaseDetail.tsx` — MINOR
+- Pass `systemIdentifier={snapshot?.system_identifier || ''}` to `ReviewActionButtons`
 
-#### 3. Backend error handling — useSystemProfiles hook
-In `src/hooks/useSystemProfiles.ts`:
+### 4. `src/hooks/useESignature.ts` — MODIFY
+- Fix `resource_type` from `'review_cases'` → `'review_case'`
+- Add `comment` field to audit log details JSON
 
-- In both `addSystem` and `updateSystem`, catch Postgres error code `23505` and show a user-friendly toast using the new i18n key `systemProfiles.identifierDuplicateError`
+### 5. `src/components/reviews/TransitionHistory.tsx` — MINOR
+- Fix query `resource_type` from `'review_cases'` → `'review_case'`
+- Add tooltip on lock icon: `t('esignature.eSigned')`
+- Display e-signature comment if present
 
-#### 4. i18n keys
-Add to `systemProfiles` namespace in both locale files:
+### 6-7. `src/locales/en/common.json` & `src/locales/es/common.json` — ADD KEYS
+Add under existing `esignature` (lowercase) namespace:
+- `signerInfo`, `signerName`, `signerRole`, `signerDate`
+- `comment`, `commentPlaceholder`
+- `reasonLabel`, `reasonPlaceholder`
+- `conclusionLabel`, `conclusions.remains_validated`, `conclusions.requires_remediation`, `conclusions.requires_revalidation`
+- `descriptions.approvePlan`, `descriptions.approveReview`, `descriptions.rejectReview` (with `{{systemName}}`, `{{systemId}}` interpolation)
+- `eSigned`, `verificationError`
 
-**EN**: `identifierDuplicate` and `identifierDuplicateError`
-**ES**: Same keys with Spanish translations
+## No Database Changes
+All audit entries use existing `audit_log` table with `E_SIGNATURE` / `E_SIGNATURE_FAILED` actions and `resource_type: 'review_case'`.
 
-### Files modified
-| File | Change |
-|---|---|
-| New migration | Case-insensitive partial unique index on `system_profiles(LOWER(system_identifier))` |
-| `src/components/SystemProfileForm.tsx` | Debounced duplicate check on identifier field; red styling + inline error; disable submit |
-| `src/hooks/useSystemProfiles.ts` | Catch `23505` in addSystem/updateSystem with i18n toast |
-| `src/locales/en/common.json` | Add `systemProfiles.identifierDuplicate` and `identifierDuplicateError` |
-| `src/locales/es/common.json` | Same keys in Spanish |
-
-### Impact evaluation
-- **RLS**: Uses existing SELECT policies — the duplicate check query runs as the authenticated user who already has visibility on system profiles
-- **Soft deletes**: Index and query both filter `is_deleted = false` — deleted profiles don't block reuse
-- **Edit case**: Self-exclusion via `neq('id', editingSystem.id)` prevents false positives
-- **Case sensitivity**: `LOWER()` in index + `ilike` in query ensure case-insensitive matching
-- **Components**: Change scoped to form + hook only; no other components affected
-- **Types**: No TypeScript type changes needed
+## Impact Assessment
+- **RLS**: No change — audit_log INSERT allows `user_id = auth.uid()`
+- **Non-e-sig transitions**: Untouched — reason/approve dialogs remain for their flows
+- **i18n**: All strings via `t()`, both EN and ES, under existing `esignature` namespace
+- **Dark mode**: Disclaimer card follows neutral dark pattern
 
