@@ -9,7 +9,7 @@ type AppRole = Database['public']['Enums']['app_role'];
 interface AuthState {
   user: User | null;
   session: Session | null;
-  profile: { full_name: string; email: string; must_change_password: boolean } | null;
+  profile: { full_name: string; email: string; must_change_password: boolean; theme_preference: string } | null;
   roles: AppRole[];
   loading: boolean;
   isSigningOut: boolean;
@@ -56,7 +56,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
     try {
       const [profileRes, rolesRes, langRes] = await Promise.all([
-        supabase.from('app_users').select('full_name, email, must_change_password').eq('id', userId).single(),
+        supabase.from('app_users').select('full_name, email, must_change_password, theme_preference').eq('id', userId).single(),
         supabase.rpc('get_user_roles', { _user_id: userId }),
         supabase.from('user_language_preference').select('language_code').eq('user_id', userId).single(),
       ]);

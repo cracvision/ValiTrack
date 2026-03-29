@@ -908,5 +908,11 @@
     "verifying": "Verificando...",
     "signed": "Firma electrónica verificada",
     "failedAttempt": "Intento fallido de firma electrónica"
+  },
+  "theme": {
+    "switchTheme": "Cambiar tema",
+    "light": "Claro",
+    "dark": "Oscuro",
+    "system": "Automático"
   }
 }
