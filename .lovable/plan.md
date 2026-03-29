@@ -1,82 +1,48 @@
-# E-Signature Implementation — COMPLETED
 
-# Review Case Cancellation (Sub-iteration 3D-7) — COMPLETED
 
-## What was implemented
-- New terminal state `cancelled` added to review case workflow
-- Only Super Users can cancel from any active state (not `approved` or already `cancelled`)
-- Requires e-signature + mandatory reason (min 10 chars)
-- Cancellation preserves all tasks, signoffs, evidence, and work notes untouched
+# Add REVIEW_CASE_CANCELLED Audit Log Entry
 
-## Database Migration
-- Updated `review_cases_status_check` constraint to include `'cancelled'`
-- Updated `idx_one_active_review_per_system` partial unique index to exclude `cancelled`
-- Added columns: `cancelled_at`, `cancelled_by`, `cancellation_reason`
+## Status
+- **i18n keys**: Already present in both EN and ES — no changes needed
+- **CreateReviewDialog**: Already excludes `cancelled` (line 70: `.neq('status', 'cancelled')`) — no changes needed
+- **Audit log entry**: Missing — needs to be added
 
-## Files Modified (14)
-- Migration SQL, `src/types/index.ts`, `src/lib/reviewWorkflow.ts`
-- `src/components/reviews/ReviewActionButtons.tsx` — separated cancel button with Ban icon
-- `src/hooks/useReviewCase.ts` — cancellation metadata in transition + query mapping
-- `src/hooks/useReviewCases.ts` — map new fields in list query
-- `src/pages/ReviewCaseDetail.tsx` — cancellation banner with name/date/reason
-- `src/components/reviews/ReviewWorkflowStepper.tsx` — handle cancelled state
-- `src/hooks/useDashboardSystems.ts` — treat cancelled as terminal
-- `src/components/dashboard/SystemCard.tsx` — exclude cancelled from active display
-- `src/pages/ReviewCases.tsx` — added to status filter + overdue check
-- `src/components/reviews/CreateReviewDialog.tsx` — exclude cancelled from guard
-- `src/locales/en/common.json` + `src/locales/es/common.json` — all i18n keys
+## Single Change
 
-## Namespace Confirmation
-Existing i18n keys use **`esignature`** (lowercase) in both locale files and all `t()` calls. All new keys will be added under this same `esignature` namespace — no camelCase `eSignature` namespace will be created.
+### `src/hooks/useReviewCase.ts`
+After the cancellation metadata block (lines 88-92) and before the status update executes, fetch the review case's `frozen_system_snapshot` to get `system_name`. Then after the transition record insert succeeds, add a `REVIEW_CASE_CANCELLED` audit log entry:
 
-## Implementation — 7 Files
+```typescript
+if (input.toStatus === 'cancelled') {
+  // Fetch system name from frozen snapshot for audit
+  const { data: rcSnap } = await supabase
+    .from('review_cases')
+    .select('frozen_system_snapshot')
+    .eq('id', input.reviewCaseId)
+    .single();
 
-### 1. `src/components/reviews/ESignatureModal.tsx` — FULL REWRITE
-Replace current minimal modal with spec-compliant version:
-- Signer info card with name, role, locale-formatted date/time
-- `actionDescription` prop for contextual system info
-- Conclusion radio group (3 options, no default, only when `showConclusionSelector`)
-- Reason textarea (min 10 chars, char counter, only when `showReasonField`)
-- Comment textarea (always visible, optional)
-- Password field with show/hide eye toggle, error clears on typing, Enter submits
-- Amber legal disclaimer card (dark mode: `dark:bg-neutral-800 dark:text-amber-400 dark:border-neutral-700`)
-- `onInteractOutside` prevented, full state reset on close
-- Internal `logESignatureAttempt` helper using `resource_type: 'review_case'` (singular)
-- New props: `onSuccess(ESignatureResult)`, `actionDescription`, `showReasonField`, `showConclusionSelector`, `reviewCaseId`, `transitionLabel`
+  const systemName = (rcSnap?.frozen_system_snapshot as any)?.name || '';
 
-### 2. `src/components/reviews/ReviewActionButtons.tsx` — MODIFY
-- Add `systemIdentifier` prop
-- Add `getESignatureDescription()` helper using `systemName` + `systemIdentifier`
-- Replace `handleESign` with `handleESignatureSuccess(result: ESignatureResult)` that extracts conclusion/reason and calls existing transition mutation
-- Update modal render to pass new props (`actionDescription`, `showReasonField`, `showConclusionSelector`, `onSuccess`)
-- E-sig transitions bypass existing reason/conclusion dialogs (already the case via intercept order)
+  await supabase.from('audit_log').insert({
+    user_id: user.id,
+    action: 'REVIEW_CASE_CANCELLED',
+    resource_type: 'review_case',
+    resource_id: input.reviewCaseId,
+    details: {
+      system_name: systemName,
+      from_status: input.fromStatus,
+      reason: input.reason || '',
+    },
+  });
+}
+```
 
-### 3. `src/pages/ReviewCaseDetail.tsx` — MINOR
-- Pass `systemIdentifier={snapshot?.system_identifier || ''}` to `ReviewActionButtons`
+This block goes after the transition record insert (after line ~127), so both the status update and transition record are already committed. The audit entry is in addition to the `E_SIGNATURE` entry created by the modal.
 
-### 4. `src/hooks/useESignature.ts` — MODIFY
-- Fix `resource_type` from `'review_cases'` → `'review_case'`
-- Add `comment` field to audit log details JSON
+## Files
+| File | Action |
+|------|--------|
+| `src/hooks/useReviewCase.ts` | MODIFY — add cancellation audit log block |
 
-### 5. `src/components/reviews/TransitionHistory.tsx` — MINOR
-- Fix query `resource_type` from `'review_cases'` → `'review_case'`
-- Add tooltip on lock icon: `t('esignature.eSigned')`
-- Display e-signature comment if present
+No other files need changes.
 
-### 6-7. `src/locales/en/common.json` & `src/locales/es/common.json` — ADD KEYS
-Add under existing `esignature` (lowercase) namespace:
-- `signerInfo`, `signerName`, `signerRole`, `signerDate`
-- `comment`, `commentPlaceholder`
-- `reasonLabel`, `reasonPlaceholder`
-- `conclusionLabel`, `conclusions.remains_validated`, `conclusions.requires_remediation`, `conclusions.requires_revalidation`
-- `descriptions.approvePlan`, `descriptions.approveReview`, `descriptions.rejectReview` (with `{{systemName}}`, `{{systemId}}` interpolation)
-- `eSigned`, `verificationError`
-
-## No Database Changes
-All audit entries use existing `audit_log` table with `E_SIGNATURE` / `E_SIGNATURE_FAILED` actions and `resource_type: 'review_case'`.
-
-## Impact Assessment
-- **RLS**: No change — audit_log INSERT allows `user_id = auth.uid()`
-- **Non-e-sig transitions**: Untouched — reason/approve dialogs remain for their flows
-- **i18n**: All strings via `t()`, both EN and ES, under existing `esignature` namespace
-- **Dark mode**: Disclaimer card follows neutral dark pattern
