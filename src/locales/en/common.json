@@ -580,6 +580,26 @@
         "performance_report": "Performance Report",
         "ai_analysis_output": "AI Analysis Output",
         "other": "Other"
+      },
+      "replace": {
+        "button": "Replace file",
+        "dialogTitle": "Replace Evidence File",
+        "currentFile": "Current file",
+        "reasonLabel": "Reason for replacement",
+        "reasonPlaceholder": "Explain why this file needs to be replaced (minimum 10 characters)",
+        "reasonMinLength": "Reason must be at least 10 characters",
+        "newFile": "New file",
+        "categoryLabel": "Evidence category",
+        "cancel": "Cancel",
+        "submit": "Replace File",
+        "replacing": "Replacing...",
+        "success": "File replaced successfully",
+        "error": "Failed to replace file. Please try again.",
+        "superseded": "Superseded",
+        "supersededBy": "Replaced by {{name}} on {{date}}",
+        "reason": "Reason",
+        "showSuperseded": "Show {{count}} superseded file(s)",
+        "hideSuperseded": "Hide superseded files"
       }
     },
     "validation": {

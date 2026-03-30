@@ -579,6 +579,26 @@
         "performance_report": "Reporte de Rendimiento",
         "ai_analysis_output": "Resultado de Análisis IA",
         "other": "Otro"
+      },
+      "replace": {
+        "button": "Reemplazar archivo",
+        "dialogTitle": "Reemplazar Archivo de Evidencia",
+        "currentFile": "Archivo actual",
+        "reasonLabel": "Razón del reemplazo",
+        "reasonPlaceholder": "Explique por qué este archivo necesita ser reemplazado (mínimo 10 caracteres)",
+        "reasonMinLength": "La razón debe tener al menos 10 caracteres",
+        "newFile": "Nuevo archivo",
+        "categoryLabel": "Categoría de evidencia",
+        "cancel": "Cancelar",
+        "submit": "Reemplazar Archivo",
+        "replacing": "Reemplazando...",
+        "success": "Archivo reemplazado exitosamente",
+        "error": "Error al reemplazar el archivo. Inténtelo de nuevo.",
+        "superseded": "Reemplazado",
+        "supersededBy": "Reemplazado por {{name}} el {{date}}",
+        "reason": "Razón",
+        "showSuperseded": "Mostrar {{count}} archivo(s) reemplazado(s)",
+        "hideSuperseded": "Ocultar archivos reemplazados"
       }
     },
     "validation": {
