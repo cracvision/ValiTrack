@@ -85,7 +85,8 @@ export function useCreateReviewCase() {
         .select('*', { count: 'exact', head: true })
         .eq('system_id', input.system.id)
         .eq('is_deleted', false)
-        .neq('status', 'approved');
+        .neq('status', 'approved')
+        .neq('status', 'cancelled');
 
       if (checkError) throw checkError;
       if ((count ?? 0) > 0) {
