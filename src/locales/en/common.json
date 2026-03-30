@@ -547,7 +547,8 @@
         "status_change": "Status change",
         "evidence_upload": "Evidence uploaded",
         "reopen_reason": "Reopen reason",
-        "reassignment": "Reassignment"
+        "reassignment": "Reassignment",
+        "na_justification": "N/A Justification"
       }
     },
     "evidence": {

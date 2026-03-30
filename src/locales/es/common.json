@@ -546,7 +546,8 @@
         "status_change": "Cambio de estado",
         "evidence_upload": "Evidencia subida",
         "reopen_reason": "Razón de reapertura",
-        "reassignment": "Reasignación"
+        "reassignment": "Reasignación",
+        "na_justification": "Justificación N/A"
       }
     },
     "evidence": {
