@@ -70,11 +70,11 @@ export function TaskReassignDialog({ task, reviewCaseId, onReassign, isReassigni
 
   return (
     <Dialog open={open} onOpenChange={setOpen}>
-      <TooltipProvider>
+      <TooltipProvider delayDuration={300}>
         <Tooltip>
           <TooltipTrigger asChild>
             <DialogTrigger asChild>
-              <Button variant="ghost" size="icon" className="h-5 w-5">
+              <Button variant="ghost" size="icon" className="h-5 w-5" tabIndex={-1}>
                 <UserRoundPen className="h-3.5 w-3.5" />
               </Button>
             </DialogTrigger>
