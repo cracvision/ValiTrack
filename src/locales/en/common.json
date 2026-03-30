@@ -180,6 +180,8 @@
         "TASK_COMPLETED": "Completed a task",
         "TASK_REASSIGNED": "Reassigned a task",
         "TASK_REOPENED": "Reopened a task",
+        "TASK_MARKED_NA": "Marked a task as N/A",
+        "TASK_REOPENED_FROM_NA": "Reopened a task from N/A",
         "TASK_STARTED": "Started a task",
         "TASKS_GENERATED": "Generated review tasks",
         "user_created": "Created a user account"

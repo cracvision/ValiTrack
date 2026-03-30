@@ -179,6 +179,8 @@
         "TASK_COMPLETED": "Completó una tarea",
         "TASK_REASSIGNED": "Reasignó una tarea",
         "TASK_REOPENED": "Reabrió una tarea",
+        "TASK_MARKED_NA": "Marcó una tarea como N/A",
+        "TASK_REOPENED_FROM_NA": "Reabrió una tarea desde N/A",
         "TASK_STARTED": "Inició una tarea",
         "TASKS_GENERATED": "Generó tareas de revisión",
         "user_created": "Creó una cuenta de usuario"
