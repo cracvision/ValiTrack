@@ -68,7 +68,7 @@ export function ReviewTasksPanel({ reviewCaseId, reviewLevel, reviewCaseStatus, 
     const phase = t.execution_phase || PHASE_MAP[t.task_group] || 1;
     if (!phaseCompletion[phase]) phaseCompletion[phase] = { total: 0, completed: 0, isComplete: false };
     phaseCompletion[phase].total++;
-    if (t.status === 'completed') phaseCompletion[phase].completed++;
+    if (t.status === 'completed' || t.status === 'not_applicable') phaseCompletion[phase].completed++;
   }
   for (const key of Object.keys(phaseCompletion)) {
     const p = phaseCompletion[Number(key)];
