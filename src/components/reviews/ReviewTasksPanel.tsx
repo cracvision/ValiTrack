@@ -97,7 +97,7 @@ export function ReviewTasksPanel({ reviewCaseId, reviewLevel, reviewCaseStatus, 
     }))
     .filter(g => g.tasks.length > 0);
 
-  const totalCompleted = filteredTasks.filter(t => t.status === 'completed').length;
+  const totalCompleted = filteredTasks.filter(t => t.status === 'completed' || t.status === 'not_applicable').length;
   const totalCount = filteredTasks.length;
 
   return (
