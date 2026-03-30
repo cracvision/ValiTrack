@@ -33,7 +33,7 @@ export const TASK_GROUP_TO_PHASE: Record<string, ExecutionPhase> = {
 };
 export type TaskExecutionType = 'manual' | 'ai_assisted' | 'auto_generated';
 export type TaskStatus = 'pending' | 'in_progress' | 'completed';
-export type WorkNoteType = 'work_note' | 'status_change' | 'evidence_upload' | 'reopen_reason' | 'reassignment';
+export type WorkNoteType = 'work_note' | 'status_change' | 'evidence_upload' | 'reopen_reason' | 'reassignment' | 'evidence_replaced';
 
 export type FindingSeverity = 'Critical' | 'Major' | 'Minor' | 'Observation';
 export type FindingStatus = 'Open' | 'In Progress' | 'Closed';
@@ -203,6 +203,10 @@ export interface TaskEvidenceFile {
   description: string;
   version: number;
   replaces_file_id: string | null;
+  is_superseded: boolean;
+  superseded_at?: string;
+  superseded_by?: string;
+  superseded_reason?: string;
   created_at: string;
   created_by: string;
   is_deleted: boolean;

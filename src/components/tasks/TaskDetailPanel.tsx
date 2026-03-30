@@ -294,6 +294,8 @@ export function TaskDetailPanel({ task, open, onClose, reviewCaseId, reviewCaseS
               isReadOnly={execution.isReadOnly || task.status !== 'in_progress'}
               highlight={highlightSections && evidenceFiles.fileCount < 1}
               isPending={task.status === 'pending'}
+              taskStatus={task.status}
+              canExecuteTask={execution.isAssignee || execution.isSystemOwner || execution.isSuperUser}
             />
           </>
         )}
