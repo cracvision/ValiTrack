@@ -160,7 +160,7 @@ export function ReviewTasksPanel({ reviewCaseId, reviewLevel, reviewCaseStatus, 
                     <span className="font-semibold text-xs font-mono text-muted-foreground">{group}</span>
                     <span className="font-medium truncate">{t(`reviews.tasks.groups.${group}`)}</span>
                     <span className="ml-auto mr-2 text-xs text-muted-foreground whitespace-nowrap">
-                      {completedInGroup}/{groupTasks.length} {t('reviews.tasks.completed')}
+                      {completedInGroup}/{groupTasks.length} {t('tasks.resolved')}
                     </span>
                   </div>
                 </AccordionTrigger>
