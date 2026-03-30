@@ -20,7 +20,7 @@ function sanitizeStoragePath(filename: string): string {
     .replace(/_+/g, '_');
 }
 
-async function calculateSHA256(file: File): Promise<string> {
+export async function calculateSHA256(file: File): Promise<string> {
   const buffer = await file.arrayBuffer();
   const hashBuffer = await crypto.subtle.digest('SHA-256', buffer);
   const hashArray = Array.from(new Uint8Array(hashBuffer));
@@ -102,30 +102,40 @@ export function useTaskEvidenceFiles({ taskId, reviewCaseId }: UseTaskEvidenceFi
         .eq('is_deleted', false)
         .order('created_at', { ascending: false });
       if (error) throw error;
-      return (data || []) as TaskEvidenceFile[];
+      return (data || []).map(row => ({
+        ...row,
+        is_superseded: (row as any).is_superseded ?? false,
+        superseded_at: (row as any).superseded_at ?? undefined,
+        superseded_by: (row as any).superseded_by ?? undefined,
+        superseded_reason: (row as any).superseded_reason ?? undefined,
+      })) as TaskEvidenceFile[];
     },
     enabled: !!taskId,
   });
 
-  // Resolve uploader names
-  const uploaderIds = [...new Set(rawFiles.map(f => f.created_by).filter(Boolean))];
-  const { data: userNames = {} } = useResolveUserNames(uploaderIds);
+  // Resolve uploader + superseder names
+  const userIds = [
+    ...new Set([
+      ...rawFiles.map(f => f.created_by),
+      ...rawFiles.filter(f => f.superseded_by).map(f => f.superseded_by!),
+    ].filter(Boolean)),
+  ];
+  const { data: userNames = {} } = useResolveUserNames(userIds);
 
   const files = rawFiles.map(f => ({
     ...f,
     created_by_name: userNames[f.created_by] || '—',
+    superseded_by_name: f.superseded_by ? (userNames[f.superseded_by] || '—') : undefined,
   }));
 
-  const fileCount = files.length;
+  // fileCount excludes superseded files — used for completion validation
+  const fileCount = files.filter(f => !f.is_superseded).length;
 
   const uploadFile = useMutation({
     mutationFn: async ({ file, category, description }: { file: File; category: string; description?: string }) => {
       if (!taskId || !user?.id) throw new Error('Missing task or user');
 
-      // 1. Client-side SHA-256
       const sha256Hash = await calculateSHA256(file);
-
-      // 2. Upload to storage
       const timestamp = Date.now();
       const safeName = sanitizeStoragePath(file.name);
       const storagePath = `${reviewCaseId}/${taskId}/${timestamp}_${safeName}`;
@@ -135,7 +145,6 @@ export function useTaskEvidenceFiles({ taskId, reviewCaseId }: UseTaskEvidenceFi
         .upload(storagePath, file, { contentType: file.type });
       if (uploadError) throw uploadError;
 
-      // 3. Insert metadata
       const { error: insertError } = await supabase
         .from('task_evidence_files')
         .insert({
@@ -151,7 +160,6 @@ export function useTaskEvidenceFiles({ taskId, reviewCaseId }: UseTaskEvidenceFi
         } as any);
       if (insertError) throw insertError;
 
-      // 4. Auto work note
       const sizeFormatted = formatFileSize(file.size);
       const hashShort = sha256Hash.substring(0, 16);
 
@@ -162,7 +170,6 @@ export function useTaskEvidenceFiles({ taskId, reviewCaseId }: UseTaskEvidenceFi
         created_by: user.id,
       } as any);
 
-      // 5. Audit log
       await supabase.from('audit_log').insert({
         user_id: user.id,
         action: 'EVIDENCE_UPLOADED',
@@ -188,10 +195,122 @@ export function useTaskEvidenceFiles({ taskId, reviewCaseId }: UseTaskEvidenceFi
     },
   });
 
+  const supersedeFile = useMutation({
+    mutationFn: async ({
+      originalFile,
+      newFile,
+      reason,
+      category,
+    }: {
+      originalFile: TaskEvidenceFile;
+      newFile: File;
+      reason: string;
+      category: string;
+    }) => {
+      if (!taskId || !user?.id) throw new Error('Missing task or user');
+
+      // Step 1: Mark original as superseded
+      const { error: updateError } = await supabase
+        .from('task_evidence_files')
+        .update({
+          is_superseded: true,
+          superseded_at: new Date().toISOString(),
+          superseded_by: user.id,
+          superseded_reason: reason,
+          updated_at: new Date().toISOString(),
+          updated_by: user.id,
+        } as any)
+        .eq('id', originalFile.id);
+      if (updateError) throw updateError;
+
+      // Step 2: Upload new file + create new record
+      try {
+        const sha256Hash = await calculateSHA256(newFile);
+        const timestamp = Date.now();
+        const safeName = sanitizeStoragePath(newFile.name);
+        const storagePath = `${reviewCaseId}/${taskId}/${timestamp}_${safeName}`;
+
+        const { error: uploadError } = await supabase.storage
+          .from('review-evidence')
+          .upload(storagePath, newFile, { contentType: newFile.type });
+        if (uploadError) throw uploadError;
+
+        const { error: insertError } = await supabase
+          .from('task_evidence_files')
+          .insert({
+            task_id: taskId,
+            file_name: newFile.name,
+            file_size_bytes: newFile.size,
+            mime_type: newFile.type,
+            storage_path: storagePath,
+            sha256_hash: sha256Hash,
+            evidence_category: category,
+            description: '',
+            replaces_file_id: originalFile.id,
+            version: originalFile.version + 1,
+            created_by: user.id,
+          } as any);
+        if (insertError) throw insertError;
+      } catch (step2Error) {
+        // Rollback step 1 — revert supersede
+        await supabase
+          .from('task_evidence_files')
+          .update({
+            is_superseded: false,
+            superseded_at: null,
+            superseded_by: null,
+            superseded_reason: null,
+            updated_at: new Date().toISOString(),
+            updated_by: user.id,
+          } as any)
+          .eq('id', originalFile.id);
+        throw step2Error;
+      }
+
+      // Step 3: Auto work note (non-critical — don't revert if fails)
+      try {
+        await supabase.from('task_work_notes').insert({
+          task_id: taskId,
+          note_type: 'evidence_replaced',
+          content: `Evidence file "${originalFile.file_name}" was superseded. Reason: ${reason}. Replaced with "${newFile.name}".`,
+          created_by: user.id,
+        } as any);
+      } catch (noteErr) {
+        console.error('Failed to create work note for evidence replacement:', noteErr);
+      }
+
+      // Audit log (non-critical)
+      try {
+        await supabase.from('audit_log').insert({
+          user_id: user.id,
+          action: 'EVIDENCE_SUPERSEDED',
+          resource_type: 'task_evidence_files',
+          resource_id: taskId,
+          details: {
+            review_case_id: reviewCaseId,
+            original_file_id: originalFile.id,
+            original_file_name: originalFile.file_name,
+            new_file_name: newFile.name,
+            reason,
+          },
+        } as any);
+      } catch (auditErr) {
+        console.error('Failed to create audit log for evidence replacement:', auditErr);
+      }
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['task-evidence-files', taskId] });
+      queryClient.invalidateQueries({ queryKey: ['task-work-notes', taskId] });
+    },
+    onError: (err: any) => {
+      console.error('Failed to supersede evidence:', err);
+    },
+  });
+
   const getDownloadUrl = async (storagePath: string): Promise<string | null> => {
     const { data, error } = await supabase.storage
       .from('review-evidence')
-      .createSignedUrl(storagePath, 3600); // 1 hour
+      .createSignedUrl(storagePath, 3600);
     if (error) {
       console.error('Failed to create signed URL:', error);
       return null;
@@ -203,6 +322,7 @@ export function useTaskEvidenceFiles({ taskId, reviewCaseId }: UseTaskEvidenceFi
     files,
     isLoading,
     uploadFile,
+    supersedeFile,
     fileCount,
     getDownloadUrl,
   };

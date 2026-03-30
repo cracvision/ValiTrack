@@ -2,7 +2,7 @@ import { useState, useRef, useCallback } from 'react';
 import { useTranslation } from 'react-i18next';
 import {
   Upload, FileText, FileImage, FileSpreadsheet, File as FileIcon,
-  Download, Eye, Copy, Check,
+  Download, Eye, Copy, Check, RefreshCw, History,
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
@@ -15,6 +15,7 @@ import {
 import { Skeleton } from '@/components/ui/skeleton';
 import { toast } from '@/hooks/use-toast';
 import { useTaskEvidenceFiles, suggestEvidenceCategory } from '@/hooks/useTaskEvidenceFiles';
+import { ReplaceEvidenceDialog } from '@/components/tasks/ReplaceEvidenceDialog';
 import type { TaskEvidenceFile } from '@/types';
 
 const EVIDENCE_CATEGORIES = [
@@ -51,17 +52,28 @@ interface TaskEvidenceSectionProps {
   isReadOnly?: boolean;
   highlight?: boolean;
   isPending?: boolean;
+  taskStatus?: string;
+  canExecuteTask?: boolean;
 }
 
-export function TaskEvidenceSection({ taskId, taskGroup, taskTitle, reviewCaseId, canUpload, isReadOnly = false, highlight = false, isPending = false }: TaskEvidenceSectionProps) {
+export function TaskEvidenceSection({
+  taskId, taskGroup, taskTitle, reviewCaseId, canUpload,
+  isReadOnly = false, highlight = false, isPending = false,
+  taskStatus, canExecuteTask = false,
+}: TaskEvidenceSectionProps) {
   const { t } = useTranslation();
-  const { files, isLoading, uploadFile, getDownloadUrl } = useTaskEvidenceFiles({ taskId, reviewCaseId });
+  const { files, isLoading, uploadFile, supersedeFile, getDownloadUrl } = useTaskEvidenceFiles({ taskId, reviewCaseId });
 
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
   const [category, setCategory] = useState(() => suggestEvidenceCategory(taskGroup, taskTitle));
   const [description, setDescription] = useState('');
   const [isDragOver, setIsDragOver] = useState(false);
+  const [replacingFile, setReplacingFile] = useState<TaskEvidenceFile | null>(null);
+  const [showSuperseded, setShowSuperseded] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
+
+  const activeFiles = files.filter(f => !f.is_superseded);
+  const supersededFiles = files.filter(f => f.is_superseded);
 
   const handleFileSelect = useCallback((file: File) => {
     setSelectedFile(file);
@@ -106,7 +118,21 @@ export function TaskEvidenceSection({ taskId, taskGroup, taskTitle, reviewCaseId
     if (url) window.open(url, '_blank');
   };
 
+  const handleReplace = (params: { originalFile: TaskEvidenceFile; newFile: File; reason: string; category: string }) => {
+    supersedeFile.mutate(params, {
+      onSuccess: () => {
+        setReplacingFile(null);
+        toast({ title: t('tasks.evidence.replace.success') });
+      },
+      onError: (err: any) => {
+        toast({ title: t('tasks.evidence.replace.error'), description: err.message, variant: 'destructive' });
+      },
+    });
+  };
+
   if (isLoading) return <Skeleton className="h-24 w-full" />;
+
+  const canReplace = taskStatus === 'in_progress' && canExecuteTask;
 
   return (
     <div className={`space-y-3 rounded-md p-2 -m-2 transition-colors ${highlight ? 'border border-destructive bg-destructive/5' : ''}`}>
@@ -188,33 +214,79 @@ export function TaskEvidenceSection({ taskId, taskGroup, taskTitle, reviewCaseId
         </div>
       )}
 
-      {/* File list */}
-      {files.length === 0 ? (
+      {/* Active file list */}
+      {activeFiles.length === 0 ? (
         <p className="text-xs text-muted-foreground italic">{t(isPending ? 'tasks.evidence.startFirst' : isReadOnly ? 'tasks.evidence.emptyStateReadOnly' : 'tasks.evidence.emptyState')}</p>
       ) : (
         <div className="space-y-2">
-          {files.map(file => (
+          {activeFiles.map(file => (
             <EvidenceFileRow
               key={file.id}
               file={file}
               onDownload={() => handleDownload(file.storage_path, file.file_name)}
               onPreview={() => handlePreview(file.storage_path)}
+              canReplace={canReplace}
+              onReplace={() => setReplacingFile(file)}
             />
           ))}
         </div>
+      )}
+
+      {/* Superseded files toggle */}
+      {supersededFiles.length > 0 && (
+        <>
+          <button
+            className="text-xs text-muted-foreground hover:text-foreground flex items-center gap-1 mt-2 transition-colors"
+            onClick={() => setShowSuperseded(!showSuperseded)}
+          >
+            <History className="h-3 w-3" />
+            {showSuperseded
+              ? t('tasks.evidence.replace.hideSuperseded')
+              : t('tasks.evidence.replace.showSuperseded', { count: supersededFiles.length })
+            }
+          </button>
+
+          {showSuperseded && (
+            <div className="space-y-2 mt-1">
+              {supersededFiles.map(file => (
+                <SupersededFileRow
+                  key={file.id}
+                  file={file}
+                  onDownload={() => handleDownload(file.storage_path, file.file_name)}
+                />
+              ))}
+            </div>
+          )}
+        </>
+      )}
+
+      {/* Replace dialog */}
+      {replacingFile && (
+        <ReplaceEvidenceDialog
+          open
+          onClose={() => setReplacingFile(null)}
+          onReplace={handleReplace}
+          isReplacing={supersedeFile.isPending}
+          file={replacingFile}
+        />
       )}
     </div>
   );
 }
 
+/* ─── Active file row ─── */
 function EvidenceFileRow({
   file,
   onDownload,
   onPreview,
+  canReplace,
+  onReplace,
 }: {
   file: TaskEvidenceFile & { created_by_name?: string };
   onDownload: () => void;
   onPreview: () => void;
+  canReplace: boolean;
+  onReplace: () => void;
 }) {
   const { t } = useTranslation();
   const [hashCopied, setHashCopied] = useState(false);
@@ -262,6 +334,11 @@ function EvidenceFileRow({
         <span>·</span>
         <span>{new Date(file.created_at).toLocaleString()}</span>
         <div className="ml-auto flex gap-1">
+          {canReplace && (
+            <Button size="sm" variant="ghost" className="h-6 px-1.5 text-[10px]" onClick={onReplace}>
+              <RefreshCw className="h-3 w-3 mr-0.5" /> {t('tasks.evidence.replace.button')}
+            </Button>
+          )}
           {isPreviewable && (
             <Button size="sm" variant="ghost" className="h-6 px-1.5 text-[10px]" onClick={onPreview}>
               <Eye className="h-3 w-3 mr-0.5" /> {t('tasks.evidence.preview')}
@@ -277,6 +354,41 @@ function EvidenceFileRow({
       {file.description && (
         <p className="text-muted-foreground italic pl-6">{file.description}</p>
       )}
+    </div>
+  );
+}
+
+/* ─── Superseded file row ─── */
+function SupersededFileRow({
+  file,
+  onDownload,
+}: {
+  file: TaskEvidenceFile & { created_by_name?: string; superseded_by_name?: string };
+  onDownload: () => void;
+}) {
+  const { t } = useTranslation();
+
+  return (
+    <div className="opacity-50 border-l-2 border-muted pl-3 py-2 space-y-1 text-xs">
+      <div className="flex items-center gap-2">
+        <Badge variant="outline" className="text-[10px] text-muted-foreground">
+          {t('tasks.evidence.replace.superseded')}
+        </Badge>
+        <span className="text-muted-foreground line-through truncate">{file.file_name}</span>
+        <span className="text-muted-foreground">{formatFileSize(file.file_size_bytes)}</span>
+      </div>
+      <p className="text-[10px] text-muted-foreground">
+        {t('tasks.evidence.replace.supersededBy', {
+          name: (file as any).superseded_by_name || '—',
+          date: file.superseded_at ? new Date(file.superseded_at).toLocaleString() : '—',
+        })}
+      </p>
+      <p className="text-[10px] text-muted-foreground">
+        {t('tasks.evidence.replace.reason')}: {file.superseded_reason || '—'}
+      </p>
+      <Button size="sm" variant="ghost" className="h-6 px-1.5 text-[10px]" onClick={onDownload}>
+        <Download className="h-3 w-3 mr-0.5" /> {t('tasks.evidence.download')}
+      </Button>
     </div>
   );
 }
