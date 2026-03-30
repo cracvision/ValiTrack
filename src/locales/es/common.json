@@ -503,8 +503,22 @@
     "status": {
       "pending": "Pendiente",
       "in_progress": "En Progreso",
-      "completed": "Completada"
+      "completed": "Completada",
+      "not_applicable": "N/A"
     },
+    "markNA": "Marcar N/A",
+    "markNADialog": {
+      "title": "Marcar Tarea como No Aplica",
+      "description": "Proporcione una justificación de por qué esta tarea no aplica a este sistema. Esto se documentará en la pista de auditoría.",
+      "placeholder": "Explique por qué esta tarea no aplica...",
+      "confirm": "Confirmar N/A",
+      "minChars": "Mínimo {{min}} caracteres requeridos ({{remaining}} restantes)"
+    },
+    "naMarkedBy": "Marcada N/A por {{name}} · {{date}}",
+    "naJustification": "Justificación N/A",
+    "progressResolved": "{{completed}}/{{total}} resueltas",
+    "resolved": "resueltas",
+    "submitGateTooltipNA": "Todas las tareas deben estar resueltas (completadas o marcadas N/A) antes de enviar para revisión final. Progreso: {{resolved}}/{{total}} resueltas.",
     "actions": {
       "startTask": "Iniciar tarea",
       "completeTask": "Completar tarea",
