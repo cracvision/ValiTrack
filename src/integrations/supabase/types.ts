@@ -711,10 +711,14 @@ export type Database = {
           file_size_bytes: number
           id: string
           is_deleted: boolean
+          is_superseded: boolean
           mime_type: string
           replaces_file_id: string | null
           sha256_hash: string
           storage_path: string
+          superseded_at: string | null
+          superseded_by: string | null
+          superseded_reason: string | null
           task_id: string
           updated_at: string
           updated_by: string | null
@@ -731,10 +735,14 @@ export type Database = {
           file_size_bytes: number
           id?: string
           is_deleted?: boolean
+          is_superseded?: boolean
           mime_type: string
           replaces_file_id?: string | null
           sha256_hash: string
           storage_path: string
+          superseded_at?: string | null
+          superseded_by?: string | null
+          superseded_reason?: string | null
           task_id: string
           updated_at?: string
           updated_by?: string | null
@@ -751,10 +759,14 @@ export type Database = {
           file_size_bytes?: number
           id?: string
           is_deleted?: boolean
+          is_superseded?: boolean
           mime_type?: string
           replaces_file_id?: string | null
           sha256_hash?: string
           storage_path?: string
+          superseded_at?: string | null
+          superseded_by?: string | null
+          superseded_reason?: string | null
           task_id?: string
           updated_at?: string
           updated_by?: string | null
