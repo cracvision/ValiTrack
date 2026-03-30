@@ -139,7 +139,7 @@ export function ReviewTasksPanel({ reviewCaseId, reviewLevel, reviewCaseStatus, 
         {/* Overall progress */}
         <div className="space-y-1">
           <div className="flex justify-between text-xs text-muted-foreground">
-            <span>{t('reviews.tasks.progressOverall', { completed: totalCompleted, total: totalCount })}</span>
+            <span>{t('tasks.progressResolved', { completed: totalCompleted, total: totalCount })}</span>
             <span>{totalCount > 0 ? Math.round((totalCompleted / totalCount) * 100) : 0}%</span>
           </div>
           <Progress value={totalCount > 0 ? (totalCompleted / totalCount) * 100 : 0} className="h-2" />
