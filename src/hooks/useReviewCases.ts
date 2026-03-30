@@ -141,6 +141,21 @@ export function useCreateReviewCase() {
 
       if (transError) throw transError;
 
+      // Audit log entry for review case creation
+      await supabase.from('audit_log').insert({
+        user_id: user.id,
+        action: 'REVIEW_CASE_CREATED',
+        resource_type: 'review_case',
+        resource_id: data.id,
+        details: {
+          system_name: input.system.name,
+          system_id: input.system.id,
+          review_level: input.review_level,
+          period_start: input.review_period_start,
+          period_end: input.review_period_end,
+        },
+      });
+
       return data.id;
     },
     onSuccess: () => {
