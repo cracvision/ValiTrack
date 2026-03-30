@@ -28,6 +28,7 @@ import { TaskReassignDialog } from '@/components/tasks/TaskReassignDialog';
 import { TaskWorkLog } from '@/components/tasks/TaskWorkLog';
 import { TaskEvidenceSection } from '@/components/tasks/TaskEvidenceSection';
 import { TaskInstructionsSection } from '@/components/tasks/TaskInstructionsSection';
+import { parseSteps } from '@/lib/parseInstructionSteps';
 import type { ReviewTask, TaskGroup } from '@/types';
 
 const STATUS_BADGE: Record<string, string> = {
@@ -104,8 +105,11 @@ export function TaskDetailPanel({ task, open, onClose, reviewCaseId, reviewCaseS
   const isOverdue = task.status !== 'completed' && new Date(task.due_date) < new Date();
   const assigneeName = userNames[task.assigned_to] || task.assigned_to_name || '—';
 
-  const instructionStepCount = task.instruction_step_count ?? 0;
-  const instructionsIncomplete = instructionStepCount > 0 && checkoffs.completedCount < instructionStepCount;
+  const langInstructions = i18n.language === 'es' && task.execution_instructions_es
+    ? task.execution_instructions_es
+    : task.execution_instructions;
+  const parsedStepCount = parseSteps(langInstructions).length;
+  const instructionsIncomplete = parsedStepCount > 0 && checkoffs.completedCount < parsedStepCount;
 
   const getCompletionBlockedReason = (): string | null => {
     if (task.status !== 'in_progress') return null;
@@ -216,15 +220,10 @@ export function TaskDetailPanel({ task, open, onClose, reviewCaseId, reviewCaseS
         </div>
 
         {/* Instructions section — language-aware */}
-        {(() => {
-          const langInstructions = i18n.language === 'es' && task.execution_instructions_es
-            ? task.execution_instructions_es
-            : task.execution_instructions;
-          return langInstructions && langInstructions.trim() !== '' ? (
+        {langInstructions && langInstructions.trim() !== '' && (
           <TaskInstructionsSection
             instructions={langInstructions}
             taskStatus={task.status}
-            instructionStepCount={instructionStepCount}
             canInteract={
               task.status === 'in_progress'
                 ? (execution.isAssignee || execution.isSystemOwner || execution.isSuperUser)
@@ -238,8 +237,7 @@ export function TaskDetailPanel({ task, open, onClose, reviewCaseId, reviewCaseS
             isToggling={checkoffs.toggleCheckoff.isPending}
             highlight={highlightSections && instructionsIncomplete}
           />
-          ) : null;
-        })()}
+        )}
 
         {/* Phase blocked message */}
         {isPhaseBlocked && phaseStatus && (
