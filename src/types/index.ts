@@ -203,6 +203,10 @@ export interface TaskEvidenceFile {
   description: string;
   version: number;
   replaces_file_id: string | null;
+  is_superseded: boolean;
+  superseded_at?: string;
+  superseded_by?: string;
+  superseded_reason?: string;
   created_at: string;
   created_by: string;
   is_deleted: boolean;
