@@ -151,7 +151,7 @@ export function ReviewTasksPanel({ reviewCaseId, reviewLevel, reviewCaseStatus, 
         {/* Grouped accordion — all expanded by default */}
         <Accordion type="multiple" defaultValue={grouped.map(g => g.group)}>
           {grouped.map(({ group, tasks: groupTasks }) => {
-            const completedInGroup = groupTasks.filter(t => t.status === 'completed').length;
+            const completedInGroup = groupTasks.filter(t => t.status === 'completed' || t.status === 'not_applicable').length;
 
             return (
               <AccordionItem key={group} value={group} className="border rounded-md mb-2 last:mb-0">
