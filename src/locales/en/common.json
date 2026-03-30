@@ -504,8 +504,22 @@
     "status": {
       "pending": "Pending",
       "in_progress": "In Progress",
-      "completed": "Completed"
+      "completed": "Completed",
+      "not_applicable": "N/A"
     },
+    "markNA": "Mark as N/A",
+    "markNADialog": {
+      "title": "Mark Task as Not Applicable",
+      "description": "Provide a justification for why this task does not apply to this system. This will be documented in the audit trail.",
+      "placeholder": "Explain why this task is not applicable...",
+      "confirm": "Confirm N/A",
+      "minChars": "Minimum {{min}} characters required ({{remaining}} remaining)"
+    },
+    "naMarkedBy": "Marked N/A by {{name}} · {{date}}",
+    "naJustification": "N/A Justification",
+    "progressResolved": "{{completed}}/{{total}} resolved",
+    "resolved": "resolved",
+    "submitGateTooltipNA": "All tasks must be resolved (completed or marked as N/A) before submitting for final review. Progress: {{resolved}}/{{total}} resolved.",
     "actions": {
       "startTask": "Start task",
       "completeTask": "Complete task",
