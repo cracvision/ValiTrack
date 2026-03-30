@@ -1,48 +1,53 @@
 
+# Evidence File Replacement (Supersede) Feature — COMPLETED
 
-# Add REVIEW_CASE_CANCELLED Audit Log Entry
+## Summary
+ALCOA+-compliant evidence file supersede/replace feature. Original files are never deleted — marked as superseded with mandatory reason, timestamp, and user. Replacement uploaded as new record with `replaces_file_id` and incremented `version`.
 
-## Status
-- **i18n keys**: Already present in both EN and ES — no changes needed
-- **CreateReviewDialog**: Already excludes `cancelled` (line 70: `.neq('status', 'cancelled')`) — no changes needed
-- **Audit log entry**: Missing — needs to be added
+## Completed Changes
 
-## Single Change
+### 1. Database Migration
+- Added `is_superseded`, `superseded_at`, `superseded_by`, `superseded_reason` to `task_evidence_files`
+- Replaced `Super users can update evidence records` RLS policy with `Authorized users can update evidence records` (assignee, SO, super_user — scoped to `in_progress` tasks)
+- Note: `review_cases.system_owner_id` is UUID (not TEXT like `system_profiles`), so no `::text` cast needed in this policy
+- Added `evidence_replaced` to `task_work_notes.note_type` CHECK constraint
 
-### `src/hooks/useReviewCase.ts`
-After the cancellation metadata block (lines 88-92) and before the status update executes, fetch the review case's `frozen_system_snapshot` to get `system_name`. Then after the transition record insert succeeds, add a `REVIEW_CASE_CANCELLED` audit log entry:
+### 2. Types (`src/types/index.ts`)
+- Added `is_superseded`, `superseded_at`, `superseded_by`, `superseded_reason` to `TaskEvidenceFile`
+- Added `evidence_replaced` to `WorkNoteType`
 
-```typescript
-if (input.toStatus === 'cancelled') {
-  // Fetch system name from frozen snapshot for audit
-  const { data: rcSnap } = await supabase
-    .from('review_cases')
-    .select('frozen_system_snapshot')
-    .eq('id', input.reviewCaseId)
-    .single();
+### 3. Hook (`src/hooks/useTaskEvidenceFiles.ts`)
+- Query maps new supersede fields from DB
+- Resolves `superseded_by` user names
+- `fileCount` excludes superseded files (completion validation)
+- New `supersedeFile` mutation with rollback if upload fails
+- Exported `calculateSHA256` for reuse
 
-  const systemName = (rcSnap?.frozen_system_snapshot as any)?.name || '';
+### 4. New Component (`src/components/tasks/ReplaceEvidenceDialog.tsx`)
+- Dialog with original file info, mandatory reason (min 10 chars), file picker, category dropdown
+- Calls `supersedeFile` mutation
 
-  await supabase.from('audit_log').insert({
-    user_id: user.id,
-    action: 'REVIEW_CASE_CANCELLED',
-    resource_type: 'review_case',
-    resource_id: input.reviewCaseId,
-    details: {
-      system_name: systemName,
-      from_status: input.fromStatus,
-      reason: input.reason || '',
-    },
-  });
-}
-```
+### 5. UI (`src/components/tasks/TaskEvidenceSection.tsx`)
+- Replace button (RefreshCw icon) on active files when task is `in_progress` and user is authorized
+- Active/superseded file split
+- "Show N superseded file(s)" toggle
+- Superseded files: dimmed, line-through, badge, reason, who/when, download still available
+- Version badge on replacement files
 
-This block goes after the transition record insert (after line ~127), so both the status update and transition record are already committed. The audit entry is in addition to the `E_SIGNATURE` entry created by the modal.
+### 6. TaskDetailPanel
+- Passes `taskStatus` and `canExecuteTask` to `TaskEvidenceSection`
 
-## Files
+### 7. i18n
+- `tasks.evidence.replace.*` keys in EN and ES
+
+## Files Changed
 | File | Action |
 |------|--------|
-| `src/hooks/useReviewCase.ts` | MODIFY — add cancellation audit log block |
-
-No other files need changes.
-
+| `supabase/migrations/..._add_evidence_supersede.sql` | CREATE |
+| `src/types/index.ts` | MODIFY |
+| `src/hooks/useTaskEvidenceFiles.ts` | REWRITE |
+| `src/components/tasks/ReplaceEvidenceDialog.tsx` | CREATE |
+| `src/components/tasks/TaskEvidenceSection.tsx` | REWRITE |
+| `src/components/tasks/TaskDetailPanel.tsx` | MODIFY |
+| `src/locales/en/common.json` | MODIFY |
+| `src/locales/es/common.json` | MODIFY |
