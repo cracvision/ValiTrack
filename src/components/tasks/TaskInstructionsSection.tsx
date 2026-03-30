@@ -2,13 +2,13 @@ import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { ClipboardList, ChevronDown, ChevronUp } from 'lucide-react';
 import { Checkbox } from '@/components/ui/checkbox';
+import { parseSteps } from '@/lib/parseInstructionSteps';
 import type { TaskStatus } from '@/types';
 import type { CheckoffDetail } from '@/hooks/useTaskCheckoffs';
 
 interface TaskInstructionsSectionProps {
   instructions: string;
   taskStatus: TaskStatus;
-  instructionStepCount: number;
   canInteract: boolean;
   checkedSteps: Set<number>;
   checkoffDetails: Map<number, CheckoffDetail>;
@@ -17,24 +17,6 @@ interface TaskInstructionsSectionProps {
   highlight?: boolean;
 }
 
-/** Parse instruction text into numbered steps. Returns array of { index (1-based), text }. */
-function parseSteps(text: string): Array<{ index: number; text: string }> {
-  const lines = text.split('\n');
-  const steps: Array<{ index: number; text: string }> = [];
-  let currentStep: { index: number; text: string } | null = null;
-
-  for (const line of lines) {
-    const match = line.match(/^(\d+)\.\s+(.*)/);
-    if (match) {
-      if (currentStep) steps.push(currentStep);
-      currentStep = { index: parseInt(match[1], 10), text: match[2] };
-    } else if (currentStep && line.trim()) {
-      currentStep.text += '\n' + line;
-    }
-  }
-  if (currentStep) steps.push(currentStep);
-  return steps;
-}
 
 function formatDate(iso: string): string {
   return new Date(iso).toLocaleDateString();
@@ -43,7 +25,6 @@ function formatDate(iso: string): string {
 export function TaskInstructionsSection({
   instructions,
   taskStatus,
-  instructionStepCount,
   canInteract,
   checkedSteps,
   checkoffDetails,
@@ -60,7 +41,7 @@ export function TaskInstructionsSection({
   const steps = parseSteps(instructions);
   const showCheckboxes = taskStatus === 'in_progress' || taskStatus === 'completed';
   const completedCount = checkedSteps.size;
-  const totalSteps = instructionStepCount || steps.length;
+  const totalSteps = steps.length;
   const allComplete = totalSteps > 0 && completedCount >= totalSteps;
 
   const borderColor = highlight && !allComplete
