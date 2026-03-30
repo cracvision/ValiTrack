@@ -26,6 +26,7 @@ const STATUS_STYLES: Record<string, string> = {
   pending: 'bg-muted text-muted-foreground',
   in_progress: 'bg-blue-100 text-blue-800 border-blue-200 dark:bg-neutral-800 dark:text-blue-400 dark:border-neutral-700',
   completed: 'bg-emerald-100 text-emerald-800 border-emerald-200 dark:bg-neutral-800 dark:text-emerald-400 dark:border-neutral-700',
+  not_applicable: 'bg-muted text-muted-foreground border-border',
 };
 
 type TaskFilter = 'all' | 'mine';
