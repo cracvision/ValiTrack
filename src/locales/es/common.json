@@ -179,6 +179,8 @@
         "TASK_COMPLETED": "Completó una tarea",
         "TASK_REASSIGNED": "Reasignó una tarea",
         "TASK_REOPENED": "Reabrió una tarea",
+        "TASK_MARKED_NA": "Marcó una tarea como N/A",
+        "TASK_REOPENED_FROM_NA": "Reabrió una tarea desde N/A",
         "TASK_STARTED": "Inició una tarea",
         "TASKS_GENERATED": "Generó tareas de revisión",
         "user_created": "Creó una cuenta de usuario"
@@ -503,8 +505,22 @@
     "status": {
       "pending": "Pendiente",
       "in_progress": "En Progreso",
-      "completed": "Completada"
+      "completed": "Completada",
+      "not_applicable": "N/A"
     },
+    "markNA": "Marcar N/A",
+    "markNADialog": {
+      "title": "Marcar Tarea como No Aplica",
+      "description": "Proporcione una justificación de por qué esta tarea no aplica a este sistema. Esto se documentará en la pista de auditoría.",
+      "placeholder": "Explique por qué esta tarea no aplica...",
+      "confirm": "Confirmar N/A",
+      "minChars": "Mínimo {{min}} caracteres requeridos ({{remaining}} restantes)"
+    },
+    "naMarkedBy": "Marcada N/A por {{name}} · {{date}}",
+    "naJustification": "Justificación N/A",
+    "progressResolved": "{{completed}}/{{total}} resueltas",
+    "resolved": "resueltas",
+    "submitGateTooltipNA": "Todas las tareas deben estar resueltas (completadas o marcadas N/A) antes de enviar para revisión final. Progreso: {{resolved}}/{{total}} resueltas.",
     "actions": {
       "startTask": "Iniciar tarea",
       "completeTask": "Completar tarea",
@@ -532,7 +548,8 @@
         "status_change": "Cambio de estado",
         "evidence_upload": "Evidencia subida",
         "reopen_reason": "Razón de reapertura",
-        "reassignment": "Reasignación"
+        "reassignment": "Reasignación",
+        "na_justification": "Justificación N/A"
       }
     },
     "evidence": {

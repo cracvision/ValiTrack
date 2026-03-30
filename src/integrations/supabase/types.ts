@@ -482,6 +482,9 @@ export type Database = {
           id: string
           instruction_step_count: number
           is_deleted: boolean
+          na_marked_at: string | null
+          na_marked_by: string | null
+          na_reason: string | null
           phase: string
           reassigned_at: string | null
           reassigned_by: string | null
@@ -520,6 +523,9 @@ export type Database = {
           id?: string
           instruction_step_count?: number
           is_deleted?: boolean
+          na_marked_at?: string | null
+          na_marked_by?: string | null
+          na_reason?: string | null
           phase: string
           reassigned_at?: string | null
           reassigned_by?: string | null
@@ -558,6 +564,9 @@ export type Database = {
           id?: string
           instruction_step_count?: number
           is_deleted?: boolean
+          na_marked_at?: string | null
+          na_marked_by?: string | null
+          na_reason?: string | null
           phase?: string
           reassigned_at?: string | null
           reassigned_by?: string | null

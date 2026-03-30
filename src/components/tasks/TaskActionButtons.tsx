@@ -1,9 +1,17 @@
 import { useState, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Play, CheckCircle2, RotateCcw } from 'lucide-react';
+import { Play, CheckCircle2, RotateCcw, Ban } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
+import {
+  AlertDialog,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from '@/components/ui/alert-dialog';
 import {
   Dialog,
   DialogContent,
@@ -20,13 +28,17 @@ interface TaskActionButtonsProps {
   canStart: boolean;
   canComplete: boolean;
   canReopen: boolean;
+  canMarkNA: boolean;
   isInProgress: boolean;
+  isPhaseBlocked: boolean;
   onStart: () => void;
   onComplete: () => void;
   onReopen: (reason: string) => void;
+  onMarkNA: (justification: string) => void;
   isStarting?: boolean;
   isCompleting?: boolean;
   isReopening?: boolean;
+  isMarkingNA?: boolean;
   completionBlocked?: string | null;
   onValidationError?: (blocked: boolean) => void;
 }
@@ -36,20 +48,26 @@ export function TaskActionButtons({
   canStart,
   canComplete,
   canReopen,
+  canMarkNA,
   isInProgress,
+  isPhaseBlocked,
   onStart,
   onComplete,
   onReopen,
+  onMarkNA,
   isStarting,
   isCompleting,
   isReopening,
+  isMarkingNA,
   completionBlocked,
   onValidationError,
 }: TaskActionButtonsProps) {
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
   const [reopenOpen, setReopenOpen] = useState(false);
   const [reopenReason, setReopenReason] = useState('');
   const [showValidationError, setShowValidationError] = useState(false);
+  const [naDialogOpen, setNaDialogOpen] = useState(false);
+  const [naJustification, setNaJustification] = useState('');
 
   // Clear validation error when requirements are met
   useEffect(() => {
@@ -77,16 +95,39 @@ export function TaskActionButtons({
     onComplete();
   };
 
+  const handleConfirmNA = () => {
+    if (naJustification.trim().length < 10) return;
+    onMarkNA(naJustification.trim());
+    setNaDialogOpen(false);
+    setNaJustification('');
+  };
+
   const notInProgressTooltip = !isInProgress
     ? t('tasks.actions.reviewCaseNotInProgress')
     : null;
+
+  const naCharCount = naJustification.trim().length;
+  const naRemaining = Math.max(0, 10 - naCharCount);
 
   return (
     <TooltipProvider>
       <div className="space-y-2">
         <div className="flex items-center gap-2 flex-wrap">
-          {/* Start Task */}
-          {task.status === 'pending' && (
+          {/* Mark as N/A — renders regardless of phase lock */}
+          {canMarkNA && (task.status === 'pending' || task.status === 'in_progress') && (
+            <Button
+              size="sm"
+              variant="outline"
+              onClick={() => setNaDialogOpen(true)}
+              disabled={isMarkingNA}
+            >
+              <Ban className="h-3.5 w-3.5 mr-1" />
+              {t('tasks.markNA')}
+            </Button>
+          )}
+
+          {/* Start Task — hidden when phase blocked */}
+          {!isPhaseBlocked && task.status === 'pending' && (
             <Tooltip>
               <TooltipTrigger asChild>
                 <span>
@@ -108,8 +149,8 @@ export function TaskActionButtons({
             </Tooltip>
           )}
 
-          {/* Complete Task — always enabled when canComplete, validation on click */}
-          {task.status === 'in_progress' && (
+          {/* Complete Task — hidden when phase blocked */}
+          {!isPhaseBlocked && task.status === 'in_progress' && (
             <Tooltip>
               <TooltipTrigger asChild>
                 <span>
@@ -132,8 +173,8 @@ export function TaskActionButtons({
             </Tooltip>
           )}
 
-          {/* Reopen Task */}
-          {task.status === 'completed' && (
+          {/* Reopen Task — for completed AND not_applicable */}
+          {(task.status === 'completed' || task.status === 'not_applicable') && (
             <Tooltip>
               <TooltipTrigger asChild>
                 <span>
@@ -193,6 +234,46 @@ export function TaskActionButtons({
           </DialogFooter>
         </DialogContent>
       </Dialog>
+
+      {/* N/A confirmation dialog */}
+      <AlertDialog open={naDialogOpen} onOpenChange={setNaDialogOpen}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>{t('tasks.markNADialog.title')}</AlertDialogTitle>
+            <AlertDialogDescription>
+              {t('tasks.markNADialog.description')}
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <div className="space-y-3 py-2">
+            <p className="text-sm font-medium text-foreground">
+              {i18n.language === 'es' && task.title_es ? task.title_es : task.title}
+            </p>
+            <Textarea
+              value={naJustification}
+              onChange={e => setNaJustification(e.target.value)}
+              placeholder={t('tasks.markNADialog.placeholder')}
+              rows={3}
+              className="max-h-[120px]"
+            />
+            {naCharCount > 0 && naCharCount < 10 && (
+              <p className="text-xs text-muted-foreground">
+                {t('tasks.markNADialog.minChars', { min: 10, remaining: naRemaining })}
+              </p>
+            )}
+          </div>
+          <AlertDialogFooter>
+            <Button variant="outline" onClick={() => { setNaDialogOpen(false); setNaJustification(''); }}>
+              {t('userForm.cancel')}
+            </Button>
+            <Button
+              onClick={handleConfirmNA}
+              disabled={naCharCount < 10 || isMarkingNA}
+            >
+              {t('tasks.markNADialog.confirm')}
+            </Button>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </TooltipProvider>
   );
 }

@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { User, Sparkles, AlertTriangle, CheckCircle2, Lock } from 'lucide-react';
+import { User, Sparkles, AlertTriangle, CheckCircle2, Lock, Ban } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@/components/ui/accordion';
 import { Progress } from '@/components/ui/progress';
@@ -26,6 +26,7 @@ const STATUS_STYLES: Record<string, string> = {
   pending: 'bg-muted text-muted-foreground',
   in_progress: 'bg-blue-100 text-blue-800 border-blue-200 dark:bg-neutral-800 dark:text-blue-400 dark:border-neutral-700',
   completed: 'bg-emerald-100 text-emerald-800 border-emerald-200 dark:bg-neutral-800 dark:text-emerald-400 dark:border-neutral-700',
+  not_applicable: 'bg-muted text-muted-foreground border-border',
 };
 
 type TaskFilter = 'all' | 'mine';
@@ -67,7 +68,7 @@ export function ReviewTasksPanel({ reviewCaseId, reviewLevel, reviewCaseStatus, 
     const phase = t.execution_phase || PHASE_MAP[t.task_group] || 1;
     if (!phaseCompletion[phase]) phaseCompletion[phase] = { total: 0, completed: 0, isComplete: false };
     phaseCompletion[phase].total++;
-    if (t.status === 'completed') phaseCompletion[phase].completed++;
+    if (t.status === 'completed' || t.status === 'not_applicable') phaseCompletion[phase].completed++;
   }
   for (const key of Object.keys(phaseCompletion)) {
     const p = phaseCompletion[Number(key)];
@@ -96,7 +97,7 @@ export function ReviewTasksPanel({ reviewCaseId, reviewLevel, reviewCaseStatus, 
     }))
     .filter(g => g.tasks.length > 0);
 
-  const totalCompleted = filteredTasks.filter(t => t.status === 'completed').length;
+  const totalCompleted = filteredTasks.filter(t => t.status === 'completed' || t.status === 'not_applicable').length;
   const totalCount = filteredTasks.length;
 
   return (
@@ -138,7 +139,7 @@ export function ReviewTasksPanel({ reviewCaseId, reviewLevel, reviewCaseStatus, 
         {/* Overall progress */}
         <div className="space-y-1">
           <div className="flex justify-between text-xs text-muted-foreground">
-            <span>{t('reviews.tasks.progressOverall', { completed: totalCompleted, total: totalCount })}</span>
+            <span>{t('tasks.progressResolved', { completed: totalCompleted, total: totalCount })}</span>
             <span>{totalCount > 0 ? Math.round((totalCompleted / totalCount) * 100) : 0}%</span>
           </div>
           <Progress value={totalCount > 0 ? (totalCompleted / totalCount) * 100 : 0} className="h-2" />
@@ -150,7 +151,7 @@ export function ReviewTasksPanel({ reviewCaseId, reviewLevel, reviewCaseStatus, 
         {/* Grouped accordion — all expanded by default */}
         <Accordion type="multiple" defaultValue={grouped.map(g => g.group)}>
           {grouped.map(({ group, tasks: groupTasks }) => {
-            const completedInGroup = groupTasks.filter(t => t.status === 'completed').length;
+            const completedInGroup = groupTasks.filter(t => t.status === 'completed' || t.status === 'not_applicable').length;
 
             return (
               <AccordionItem key={group} value={group} className="border rounded-md mb-2 last:mb-0">
@@ -159,7 +160,7 @@ export function ReviewTasksPanel({ reviewCaseId, reviewLevel, reviewCaseStatus, 
                     <span className="font-semibold text-xs font-mono text-muted-foreground">{group}</span>
                     <span className="font-medium truncate">{t(`reviews.tasks.groups.${group}`)}</span>
                     <span className="ml-auto mr-2 text-xs text-muted-foreground whitespace-nowrap">
-                      {completedInGroup}/{groupTasks.length} {t('reviews.tasks.completed')}
+                      {completedInGroup}/{groupTasks.length} {t('tasks.resolved')}
                     </span>
                   </div>
                 </AccordionTrigger>
@@ -197,11 +198,13 @@ export function ReviewTasksPanel({ reviewCaseId, reviewLevel, reviewCaseStatus, 
 function TaskRow({ task, onClick, isPhaseBlocked }: { task: ReviewTask; onClick: () => void; isPhaseBlocked: boolean }) {
   const { t, i18n } = useTranslation();
   const isCompleted = task.status === 'completed';
+  const isNA = task.status === 'not_applicable';
+  const isResolved = isCompleted || isNA;
 
   return (
     <div
       className={`flex items-center gap-2 py-1.5 px-2 rounded hover:bg-muted/50 text-sm cursor-pointer transition-colors ${
-        isCompleted ? 'opacity-70' : ''
+        isResolved ? 'opacity-60' : ''
       } ${isPhaseBlocked ? 'opacity-50' : ''}`}
       onClick={onClick}
       role="button"
@@ -219,6 +222,8 @@ function TaskRow({ task, onClick, isPhaseBlocked }: { task: ReviewTask; onClick:
           </div>
         ) : isCompleted ? (
           <CheckCircle2 className="h-4 w-4 text-emerald-600" />
+        ) : isNA ? (
+          <Ban className="h-4 w-4 text-muted-foreground" />
         ) : (
           <Badge variant="outline" className={`text-[10px] px-1.5 py-0 ${STATUS_STYLES[task.status] || ''}`}>
             {t(`tasks.status.${task.status}`)}
@@ -254,7 +259,9 @@ function TaskRow({ task, onClick, isPhaseBlocked }: { task: ReviewTask; onClick:
       <span className="text-xs text-muted-foreground shrink-0 tabular-nums">
         {isCompleted && task.completed_at
           ? new Date(task.completed_at).toLocaleDateString()
-          : task.due_date}
+          : isNA && task.na_marked_at
+            ? new Date(task.na_marked_at).toLocaleDateString()
+            : task.due_date}
       </span>
     </div>
   );

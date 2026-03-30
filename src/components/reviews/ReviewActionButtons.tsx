@@ -203,15 +203,15 @@ export function ReviewActionButtons({
 
             const isTasksIncomplete =
               currentStatus === 'in_progress' && rule.to === 'execution_review' && tasks &&
-              tasks.some(t => t.status !== 'completed');
+              tasks.some(t => t.status !== 'completed' && t.status !== 'not_applicable');
 
             const totalTasks = tasks?.length || 0;
-            const completedTasks = tasks?.filter(t => t.status === 'completed').length || 0;
+            const resolvedTasks = tasks?.filter(t => t.status === 'completed' || t.status === 'not_applicable').length || 0;
 
             const isBlocked = isForwardBlocked || !!isTasksIncomplete;
 
             const tooltipText = isTasksIncomplete
-              ? t('reviews.actions.tasksIncomplete', { completed: completedTasks, total: totalTasks })
+              ? t('tasks.submitGateTooltipNA', { resolved: resolvedTasks, total: totalTasks })
               : isForwardBlocked
                 ? (hasObjections
                   ? t('reviews.signoffs.blockedObjections')

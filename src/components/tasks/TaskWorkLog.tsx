@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
+import { Ban } from 'lucide-react';
 import { ClipboardList, Paperclip, AlertTriangle, User, UserRoundPen } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
@@ -38,6 +39,10 @@ const NOTE_TYPE_STYLES: Record<string, { bg: string; icon: React.ReactNode }> = 
   reassignment: {
     bg: 'bg-muted/60',
     icon: <UserRoundPen className="h-3.5 w-3.5 text-muted-foreground shrink-0" />,
+  },
+  na_justification: {
+    bg: 'bg-muted/40',
+    icon: <Ban className="h-3.5 w-3.5 text-muted-foreground shrink-0" />,
   },
 };
 
