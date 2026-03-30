@@ -211,7 +211,7 @@ export function ReviewActionButtons({
             const isBlocked = isForwardBlocked || !!isTasksIncomplete;
 
             const tooltipText = isTasksIncomplete
-              ? t('reviews.actions.tasksIncomplete', { completed: completedTasks, total: totalTasks })
+              ? t('tasks.submitGateTooltipNA', { resolved: resolvedTasks, total: totalTasks })
               : isForwardBlocked
                 ? (hasObjections
                   ? t('reviews.signoffs.blockedObjections')
