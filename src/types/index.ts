@@ -176,6 +176,9 @@ export interface ReviewTask {
   execution_instructions_es?: string | null;
   execution_phase: number;
   instruction_step_count?: number;
+  na_reason?: string | null;
+  na_marked_by?: string | null;
+  na_marked_at?: string | null;
   // Joined
   assigned_to_name?: string;
   approved_by_name?: string;

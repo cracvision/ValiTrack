@@ -1,7 +1,7 @@
-// build v3
+// build v4 — N/A support
 import { useState, useCallback, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
-import { AlertTriangle, User, Sparkles, Calendar, Info, Lock } from 'lucide-react';
+import { AlertTriangle, User, Sparkles, Calendar, Info, Lock, Ban } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
 import { Separator } from '@/components/ui/separator';
 import { Alert, AlertDescription } from '@/components/ui/alert';
@@ -35,6 +35,7 @@ const STATUS_BADGE: Record<string, string> = {
   pending: 'bg-muted text-muted-foreground',
   in_progress: 'bg-blue-100 text-blue-800 border-blue-200 dark:bg-neutral-800 dark:text-blue-400 dark:border-neutral-700',
   completed: 'bg-emerald-100 text-emerald-800 border-emerald-200 dark:bg-neutral-800 dark:text-emerald-400 dark:border-neutral-700',
+  not_applicable: 'bg-muted text-muted-foreground border-border',
 };
 
 const GROUP_COLORS: Record<string, string> = {
@@ -76,7 +77,7 @@ export function TaskDetailPanel({ task, open, onClose, reviewCaseId, reviewCaseS
   }, [task?.id, open]);
 
   const { data: userNames = {} } = useResolveUserNames(
-    task ? [task.assigned_to, task.approved_by_user, task.completed_by] : []
+    task ? [task.assigned_to, task.approved_by_user, task.completed_by, task.na_marked_by].filter(Boolean) as string[] : []
   );
 
   const execution = useTaskExecution({
@@ -102,7 +103,8 @@ export function TaskDetailPanel({ task, open, onClose, reviewCaseId, reviewCaseS
 
   if (!task) return null;
 
-  const isOverdue = task.status !== 'completed' && new Date(task.due_date) < new Date();
+  const isNA = task.status === 'not_applicable';
+  const isOverdue = task.status !== 'completed' && task.status !== 'not_applicable' && new Date(task.due_date) < new Date();
   const assigneeName = userNames[task.assigned_to] || task.assigned_to_name || '—';
 
   const langInstructions = i18n.language === 'es' && task.execution_instructions_es
@@ -157,6 +159,19 @@ export function TaskDetailPanel({ task, open, onClose, reviewCaseId, reviewCaseS
           </SheetTitle>
           <SheetDescription className="sr-only">{t('tasks.detail.title')}</SheetDescription>
         </SheetHeader>
+
+        {/* N/A metadata banner */}
+        {isNA && task.na_marked_by && (
+          <div className="mb-4 rounded-md border bg-muted/50 px-3 py-2 flex items-center gap-2">
+            <Ban className="h-4 w-4 text-muted-foreground shrink-0" />
+            <span className="text-xs text-muted-foreground">
+              {t('tasks.naMarkedBy', {
+                name: userNames[task.na_marked_by] || '—',
+                date: task.na_marked_at ? new Date(task.na_marked_at).toLocaleString() : '—',
+              })}
+            </span>
+          </div>
+        )}
 
         {/* Read-only info banner for non-authorized users */}
         {execution.isReadOnly && (
@@ -219,17 +234,19 @@ export function TaskDetailPanel({ task, open, onClose, reviewCaseId, reviewCaseS
           )}
         </div>
 
-        {/* Instructions section — language-aware */}
+        {/* Instructions section — language-aware (collapsed read-only for N/A) */}
         {langInstructions && langInstructions.trim() !== '' && (
           <TaskInstructionsSection
             instructions={langInstructions}
             taskStatus={task.status}
             canInteract={
-              task.status === 'in_progress'
-                ? (execution.isAssignee || execution.isSystemOwner || execution.isSuperUser)
-                : task.status === 'completed'
-                  ? (execution.isSystemOwner || execution.isSuperUser)
-                  : false
+              isNA
+                ? false
+                : task.status === 'in_progress'
+                  ? (execution.isAssignee || execution.isSystemOwner || execution.isSuperUser)
+                  : task.status === 'completed'
+                    ? (execution.isSystemOwner || execution.isSuperUser)
+                    : false
             }
             checkedSteps={checkoffs.checkedSteps}
             checkoffDetails={checkoffs.checkoffDetails}
@@ -241,7 +258,7 @@ export function TaskDetailPanel({ task, open, onClose, reviewCaseId, reviewCaseS
 
         {/* Phase blocked message */}
         {isPhaseBlocked && phaseStatus && (
-          <div className="mt-4 rounded-lg border border-amber-200 bg-amber-50 dark:bg-amber-950/30 dark:border-amber-800 p-4">
+          <div className="mt-4 rounded-lg border border-amber-200 bg-amber-50 dark:bg-neutral-800 dark:border-neutral-700 p-4">
             <div className="flex items-start gap-3">
               <Lock className="h-5 w-5 text-amber-700 dark:text-amber-400 shrink-0 mt-0.5" />
               <div>
@@ -260,29 +277,33 @@ export function TaskDetailPanel({ task, open, onClose, reviewCaseId, reviewCaseS
           </div>
         )}
 
-        {/* Action Buttons — hidden for read-only users and phase-blocked tasks */}
-        {!execution.isReadOnly && !isPhaseBlocked && (
-           <div className="mt-4">
+        {/* Action Buttons — pass isPhaseBlocked as prop, component handles visibility internally */}
+        {!execution.isReadOnly && (
+          <div className="mt-4">
             <TaskActionButtons
               task={task}
               canStart={execution.canStart}
               canComplete={execution.canComplete}
               canReopen={execution.canReopen}
+              canMarkNA={execution.canMarkNA}
               isInProgress={execution.isInProgress}
+              isPhaseBlocked={!!isPhaseBlocked}
               onStart={() => execution.startTask.mutate()}
               onComplete={handleComplete}
               onReopen={(reason) => execution.reopenTask.mutate(reason)}
+              onMarkNA={(justification) => execution.markTaskNA.mutate(justification)}
               isStarting={execution.startTask.isPending}
               isCompleting={execution.completeTask.isPending}
               isReopening={execution.reopenTask.isPending}
+              isMarkingNA={execution.markTaskNA.isPending}
               completionBlocked={completionBlocked}
               onValidationError={handleValidationError}
             />
           </div>
         )}
 
-        {/* Evidence Files */}
-        {EVIDENCE_GROUPS.includes(task.task_group as TaskGroup) && (
+        {/* Evidence Files — hidden for N/A tasks */}
+        {!isNA && EVIDENCE_GROUPS.includes(task.task_group as TaskGroup) && (
           <>
             <Separator className="my-4" />
             <TaskEvidenceSection
@@ -302,7 +323,7 @@ export function TaskDetailPanel({ task, open, onClose, reviewCaseId, reviewCaseS
 
         <Separator className="my-4" />
 
-        {/* Work Log */}
+        {/* Work Log — visible but input hidden for N/A tasks */}
         <TaskWorkLog
           notes={workNotes.notes}
           isLoading={workNotes.isLoading}
@@ -310,7 +331,7 @@ export function TaskDetailPanel({ task, open, onClose, reviewCaseId, reviewCaseS
           onAddNote={(content) => workNotes.addNote.mutate(content)}
           isAdding={workNotes.addNote.isPending}
           canAddNotes={execution.canAddNotes && task.status === 'in_progress'}
-          isReadOnly={execution.isReadOnly || task.status !== 'in_progress'}
+          isReadOnly={execution.isReadOnly || task.status !== 'in_progress' || isNA}
           highlight={highlightSections && workNotes.noteCount < 1}
           isPending={task.status === 'pending'}
         />

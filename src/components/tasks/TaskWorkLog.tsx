@@ -40,6 +40,10 @@ const NOTE_TYPE_STYLES: Record<string, { bg: string; icon: React.ReactNode }> = 
     bg: 'bg-muted/60',
     icon: <UserRoundPen className="h-3.5 w-3.5 text-muted-foreground shrink-0" />,
   },
+  na_justification: {
+    bg: 'bg-muted/40',
+    icon: <Ban className="h-3.5 w-3.5 text-muted-foreground shrink-0" />,
+  },
 };
 
 export function TaskWorkLog({ notes, isLoading, taskStatus, onAddNote, isAdding, canAddNotes = true, isReadOnly = false, highlight = false, isPending = false }: TaskWorkLogProps) {

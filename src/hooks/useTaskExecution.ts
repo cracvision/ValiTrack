@@ -12,6 +12,8 @@ interface UseTaskExecutionOptions {
   systemOwnerId?: string;
 }
 
+const MODIFIABLE_STATUSES = ['in_progress', 'approved_for_execution'];
+
 export function useTaskExecution({ task, reviewCaseId, reviewCaseStatus, systemOwnerId }: UseTaskExecutionOptions) {
   const { user, roles } = useAuth();
   const queryClient = useQueryClient();
@@ -30,10 +32,17 @@ export function useTaskExecution({ task, reviewCaseId, reviewCaseStatus, systemO
   const canReassign = !!task && !!userId && (isSystemOwner || isSuperUser);
 
   const isInProgress = reviewCaseStatus === 'in_progress';
+  const isModifiable = MODIFIABLE_STATUSES.includes(reviewCaseStatus);
 
   const canStart = canExecute && task?.status === 'pending' && isInProgress;
   const canComplete = canExecute && task?.status === 'in_progress' && isInProgress;
-  const canReopen = canReopen_ && task?.status === 'completed' && isInProgress;
+  const canReopen = canReopen_ && (task?.status === 'completed' || task?.status === 'not_applicable') && isInProgress;
+
+  // N/A can be marked from pending or in_progress, by assignee/SO/SU, when review case allows modification
+  const canMarkNA = !!task && !!userId
+    && (isAssignee || isSuperUser || isSystemOwner)
+    && (task.status === 'pending' || task.status === 'in_progress')
+    && isModifiable;
 
   const isReadOnly = !canExecute && !canReopen_ && !isSuperUser;
 
@@ -145,31 +154,49 @@ export function useTaskExecution({ task, reviewCaseId, reviewCaseStatus, systemO
       if (!reason.trim()) throw new Error('Reason is required');
 
       const now = new Date().toISOString();
+      const wasNA = task.status === 'not_applicable';
+
+      // Reopening from N/A → pending; from completed → in_progress
+      const newStatus = wasNA ? 'pending' : 'in_progress';
+
+      const updatePayload: Record<string, any> = {
+        status: newStatus,
+        reopened_at: now,
+        reopened_by: userId,
+        reopened_reason: reason.trim(),
+        completed_at: null,
+        completed_by: null,
+        updated_by: userId,
+      };
+
+      // Clear N/A columns when reopening from N/A
+      if (wasNA) {
+        updatePayload.na_reason = null;
+        updatePayload.na_marked_by = null;
+        updatePayload.na_marked_at = null;
+      }
 
       const { error } = await supabase
         .from('review_tasks')
-        .update({
-          status: 'in_progress',
-          reopened_at: now,
-          reopened_by: userId,
-          reopened_reason: reason.trim(),
-          completed_at: null,
-          completed_by: null,
-          updated_by: userId,
-        } as any)
+        .update(updatePayload as any)
         .eq('id', task.id);
       if (error) throw error;
 
+      const auditAction = wasNA ? 'TASK_REOPENED_FROM_NA' : 'TASK_REOPENED';
+      const noteContent = wasNA
+        ? `Task reopened from N/A by ${currentUserName}. Reason: ${reason.trim()}`
+        : `Task reopened by ${currentUserName}. Reason: ${reason.trim()}`;
+
       await supabase.from('task_work_notes').insert({
         task_id: task.id,
-        content: `Task reopened by ${currentUserName}. Reason: ${reason.trim()}`,
+        content: noteContent,
         note_type: 'reopen_reason',
         created_by: userId,
       } as any);
 
       await supabase.from('audit_log').insert({
         user_id: userId,
-        action: 'TASK_REOPENED',
+        action: auditAction,
         resource_type: 'review_tasks',
         resource_id: task.id,
         details: { review_case_id: reviewCaseId, task_title: task.title, reason: reason.trim() },
@@ -181,6 +208,58 @@ export function useTaskExecution({ task, reviewCaseId, reviewCaseStatus, systemO
     },
     onError: (err: any) => {
       console.error('Failed to reopen task:', err);
+      toast({ title: 'Error', description: err.message, variant: 'destructive' });
+    },
+  });
+
+  const markTaskNA = useMutation({
+    mutationFn: async (justification: string) => {
+      if (!task || !userId) throw new Error('Missing task or user');
+      if (justification.trim().length < 10) throw new Error('Justification must be at least 10 characters');
+
+      const now = new Date().toISOString();
+
+      const { error } = await supabase
+        .from('review_tasks')
+        .update({
+          status: 'not_applicable',
+          na_reason: justification.trim(),
+          na_marked_by: userId,
+          na_marked_at: now,
+          updated_by: userId,
+        } as any)
+        .eq('id', task.id)
+        .eq('is_deleted', false);
+      if (error) throw error;
+
+      await supabase.from('task_work_notes').insert({
+        task_id: task.id,
+        content: `Task marked as N/A by ${currentUserName}. Justification: ${justification.trim()}`,
+        note_type: 'na_justification',
+        created_by: userId,
+        updated_by: userId,
+      } as any);
+
+      await supabase.from('audit_log').insert({
+        user_id: userId,
+        action: 'TASK_MARKED_NA',
+        resource_type: 'review_task',
+        resource_id: task.id,
+        details: {
+          task_title: task.title,
+          task_code: task.template_id,
+          review_case_id: reviewCaseId,
+          justification: justification.trim(),
+          previous_status: task.status,
+        },
+      } as any);
+    },
+    onSuccess: () => {
+      invalidateQueries();
+      toast({ title: 'Task marked as N/A' });
+    },
+    onError: (err: any) => {
+      console.error('Failed to mark task as N/A:', err);
       toast({ title: 'Error', description: err.message, variant: 'destructive' });
     },
   });
@@ -242,9 +321,11 @@ export function useTaskExecution({ task, reviewCaseId, reviewCaseStatus, systemO
     completeTask,
     reopenTask,
     reassignTask,
+    markTaskNA,
     canStart,
     canComplete,
     canReopen,
+    canMarkNA,
     canAddNotes,
     canReassign,
     isReadOnly,
