@@ -407,7 +407,7 @@
       "SEC": "Security",
       "INFRA": "Infrastructure",
       "DOC": "Documentation",
-      "AI_EVAL": "AI Evaluation",
+      "AI_EVAL": "Review Analysis",
       "APPR": "Approval"
     },
     "signoffs": {
