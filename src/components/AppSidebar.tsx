@@ -1,5 +1,6 @@
 import {
   LayoutDashboard,
+  Inbox,
   Server,
   ClipboardCheck,
   Archive,
