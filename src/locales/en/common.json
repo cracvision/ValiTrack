@@ -1045,6 +1045,10 @@
       "profile_signoff": "Profile sign-off",
       "action": "Action required"
     },
+    "taskStatus": {
+      "pending": "Pending",
+      "in_progress": "In Progress"
+    },
     "empty": {
       "title": "All clear!",
       "description": "You have no pending tasks, sign-offs, or actions at this time."
