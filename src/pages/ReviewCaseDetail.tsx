@@ -1,6 +1,6 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
-import { useParams, useNavigate } from 'react-router-dom';
+import { useParams, useNavigate, useSearchParams } from 'react-router-dom';
 import { useQuery } from '@tanstack/react-query';
 import { ArrowLeft, AlertTriangle, Info, ShieldCheck, Pencil, Trash2, Ban } from 'lucide-react';
 import { ReviewTasksPanel } from '@/components/reviews/ReviewTasksPanel';
@@ -30,8 +30,22 @@ export default function ReviewCaseDetail() {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
   const { user, roles } = useAuth();
+  const [searchParams, setSearchParams] = useSearchParams();
   const [editOpen, setEditOpen] = useState(false);
   const [deleteOpen, setDeleteOpen] = useState(false);
+  const [autoOpenTaskId, setAutoOpenTaskId] = useState<string | null>(null);
+
+  // Handle ?task= URL param for auto-opening a specific task
+  useEffect(() => {
+    const taskParam = searchParams.get('task');
+    if (taskParam) {
+      setAutoOpenTaskId(taskParam);
+      // Clean up the URL param after reading
+      const newParams = new URLSearchParams(searchParams);
+      newParams.delete('task');
+      setSearchParams(newParams, { replace: true });
+    }
+  }, [searchParams, setSearchParams]);
 
   const { data: reviewCase, isLoading } = useReviewCase(id);
   const { data: transitions = [] } = useReviewTransitions(id);
@@ -373,6 +387,8 @@ export default function ReviewCaseDetail() {
           reviewLevel={reviewCase.review_level as any}
           reviewCaseStatus={reviewCase.status}
           systemOwnerId={reviewCase.system_owner_id}
+          autoOpenTaskId={autoOpenTaskId}
+          onAutoOpenHandled={() => setAutoOpenTaskId(null)}
         />
       )}
 

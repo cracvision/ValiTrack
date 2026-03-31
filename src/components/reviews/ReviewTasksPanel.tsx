@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import { User, ClipboardCheck, AlertTriangle, CheckCircle2, Lock, Ban } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
@@ -20,6 +20,8 @@ interface ReviewTasksPanelProps {
   reviewLevel: ReviewLevel;
   reviewCaseStatus: string;
   systemOwnerId?: string;
+  autoOpenTaskId?: string | null;
+  onAutoOpenHandled?: () => void;
 }
 
 const STATUS_STYLES: Record<string, string> = {
@@ -31,12 +33,23 @@ const STATUS_STYLES: Record<string, string> = {
 
 type TaskFilter = 'all' | 'mine';
 
-export function ReviewTasksPanel({ reviewCaseId, reviewLevel, reviewCaseStatus, systemOwnerId }: ReviewTasksPanelProps) {
+export function ReviewTasksPanel({ reviewCaseId, reviewLevel, reviewCaseStatus, systemOwnerId, autoOpenTaskId, onAutoOpenHandled }: ReviewTasksPanelProps) {
   const { t } = useTranslation();
   const { user } = useAuth();
   const { data: tasks, isLoading } = useReviewTasks(reviewCaseId);
   const [selectedTaskId, setSelectedTaskId] = useState<string | null>(null);
   const [filter, setFilter] = useState<TaskFilter>('all');
+
+  // Auto-open task from URL param
+  useEffect(() => {
+    if (autoOpenTaskId && tasks && tasks.length > 0) {
+      const found = tasks.find(t => t.id === autoOpenTaskId);
+      if (found) {
+        setSelectedTaskId(found.id);
+      }
+      onAutoOpenHandled?.();
+    }
+  }, [autoOpenTaskId, tasks, onAutoOpenHandled]);
 
   const selectedTask = tasks?.find(t => t.id === selectedTaskId) || null;
 

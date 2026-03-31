@@ -1,5 +1,6 @@
 import {
   LayoutDashboard,
+  Inbox,
   Server,
   ClipboardCheck,
   Archive,
@@ -24,11 +25,13 @@ import {
   SidebarHeader,
   SidebarMenu,
   SidebarMenuButton,
+  SidebarMenuBadge,
   SidebarMenuItem,
   SidebarFooter,
   SidebarSeparator,
   useSidebar,
 } from '@/components/ui/sidebar';
+import { useIntrayCount } from '@/hooks/useIntrayCount';
 
 export function AppSidebar() {
   const { t } = useTranslation();
@@ -36,9 +39,12 @@ export function AppSidebar() {
   const collapsed = state === 'collapsed';
   const location = useLocation();
   const { profile, roles, signOut, isSuperUser } = useAuth();
+  const { data: intrayCount } = useIntrayCount();
+  const intrayTotal = intrayCount?.total_count || 0;
 
   const mainNav = [
     { title: t('nav.dashboard'), url: '/dashboard', icon: LayoutDashboard },
+    { title: t('nav.intray'), url: '/intray', icon: Inbox, badge: intrayTotal },
     { title: t('nav.systemProfiles'), url: '/systems', icon: Server },
     { title: t('nav.reviewCases'), url: '/reviews', icon: ClipboardCheck },
     { title: t('nav.evidenceVault'), url: '/evidence', icon: Archive },
@@ -89,10 +95,20 @@ export function AppSidebar() {
                 <SidebarMenuItem key={item.url}>
                   <SidebarMenuButton asChild isActive={isActive(item.url)} tooltip={item.title}>
                     <NavLink to={item.url}>
-                      <item.icon className="h-4 w-4" />
+                      <div className="relative">
+                        <item.icon className="h-4 w-4" />
+                        {collapsed && 'badge' in item && (item as any).badge > 0 && (
+                          <span className="absolute -top-1 -right-1 h-2 w-2 rounded-full bg-destructive" />
+                        )}
+                      </div>
                       {!collapsed && <span>{item.title}</span>}
                     </NavLink>
                   </SidebarMenuButton>
+                  {!collapsed && 'badge' in item && (item as any).badge > 0 && (
+                    <SidebarMenuBadge className="bg-destructive text-destructive-foreground text-[10px] rounded-full min-w-[18px] h-[18px] flex items-center justify-center">
+                      {(item as any).badge}
+                    </SidebarMenuBadge>
+                  )}
                 </SidebarMenuItem>
               ))}
             </SidebarMenu>

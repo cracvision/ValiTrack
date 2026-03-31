@@ -19,6 +19,7 @@ import FindingsActions from "./pages/FindingsActions";
 import Reports from "./pages/Reports";
 import AuditLog from "./pages/AuditLog";
 import UserManagement from "./pages/UserManagement";
+import IntrayPage from "./pages/IntrayPage";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient({
@@ -56,6 +57,7 @@ const App = () => (
                   <Routes>
                     <Route path="/" element={<Navigate to="/dashboard" replace />} />
                     <Route path="/dashboard" element={<Dashboard />} />
+                    <Route path="/intray" element={<IntrayPage />} />
                     <Route path="/systems" element={<SystemProfiles />} />
                     <Route path="/reviews" element={<ReviewCases />} />
                     <Route path="/reviews/:id" element={<ReviewCaseDetail />} />
