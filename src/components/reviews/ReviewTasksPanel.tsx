@@ -20,6 +20,8 @@ interface ReviewTasksPanelProps {
   reviewLevel: ReviewLevel;
   reviewCaseStatus: string;
   systemOwnerId?: string;
+  autoOpenTaskId?: string | null;
+  onAutoOpenHandled?: () => void;
 }
 
 const STATUS_STYLES: Record<string, string> = {
