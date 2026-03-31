@@ -39,9 +39,12 @@ export function AppSidebar() {
   const collapsed = state === 'collapsed';
   const location = useLocation();
   const { profile, roles, signOut, isSuperUser } = useAuth();
+  const { data: intrayCount } = useIntrayCount();
+  const intrayTotal = intrayCount?.total_count || 0;
 
   const mainNav = [
     { title: t('nav.dashboard'), url: '/dashboard', icon: LayoutDashboard },
+    { title: t('nav.intray'), url: '/intray', icon: Inbox, badge: intrayTotal },
     { title: t('nav.systemProfiles'), url: '/systems', icon: Server },
     { title: t('nav.reviewCases'), url: '/reviews', icon: ClipboardCheck },
     { title: t('nav.evidenceVault'), url: '/evidence', icon: Archive },
