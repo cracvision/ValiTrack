@@ -406,7 +406,7 @@
       "SEC": "Seguridad",
       "INFRA": "Infraestructura",
       "DOC": "Documentación",
-      "AI_EVAL": "Evaluación IA",
+      "AI_EVAL": "Análisis de Revisión",
       "APPR": "Aprobación"
     },
     "signoffs": {
@@ -450,7 +450,7 @@
         "SEC": "Seguridad y Control de Acceso",
         "INFRA": "Infraestructura y Respaldo",
         "DOC": "Documentación",
-        "AI_EVAL": "Evaluación de IA",
+        "AI_EVAL": "Análisis de Revisión",
         "APPR": "Aprobaciones"
       },
       "executionType": {
@@ -475,11 +475,11 @@
       "title": "Fases de Ejecución",
       "phase1": "Fase 1: Iniciación",
       "phase2": "Fase 2: Recopilación de Evidencia",
-      "phase3": "Fase 3: Evaluación IA",
+      "phase3": "Fase 3: Análisis de Revisión",
       "phase4": "Fase 4: Aprobaciones",
       "phase1Short": "Iniciación",
       "phase2Short": "Recopilación de Evidencia",
-      "phase3Short": "Evaluación IA",
+      "phase3Short": "Análisis de Revisión",
       "phase4Short": "Aprobaciones",
       "complete": "Completa",
       "active": "Activa",
@@ -496,7 +496,7 @@
       "overdue": "Vencida",
       "executionType": "Tipo de ejecución",
       "manual": "Manual",
-      "aiAssisted": "Asistida por IA",
+      "aiAssisted": "Evaluación",
       "templateId": "ID de plantilla",
       "reviewLevelMin": "Nivel de revisión mínimo",
       "taskGroup": "Grupo de tarea",

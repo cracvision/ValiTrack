@@ -1,7 +1,7 @@
 // build v4 — N/A support
 import { useState, useCallback, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
-import { AlertTriangle, User, Sparkles, Calendar, Info, Lock, Ban } from 'lucide-react';
+import { AlertTriangle, User, ClipboardCheck, Calendar, Info, Lock, Ban } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
 import { Separator } from '@/components/ui/separator';
 import { Alert, AlertDescription } from '@/components/ui/alert';
@@ -45,7 +45,7 @@ const GROUP_COLORS: Record<string, string> = {
   SEC: 'bg-red-100 text-red-700 dark:bg-neutral-800 dark:text-red-400',
   INFRA: 'bg-cyan-100 text-cyan-700 dark:bg-neutral-800 dark:text-cyan-400',
   DOC: 'bg-indigo-100 text-indigo-700 dark:bg-neutral-800 dark:text-indigo-400',
-  AI_EVAL: 'bg-amber-100 text-amber-700 dark:bg-neutral-800 dark:text-amber-400',
+  AI_EVAL: 'bg-slate-100 text-slate-700 dark:bg-neutral-800 dark:text-slate-400',
   APPR: 'bg-green-100 text-green-700 dark:bg-neutral-800 dark:text-green-400',
 };
 
@@ -148,7 +148,7 @@ export function TaskDetailPanel({ task, open, onClose, reviewCaseId, reviewCaseS
         <SheetHeader className="pb-4">
           <div className="flex items-center gap-2 flex-wrap">
             <Badge className={`text-[10px] ${GROUP_COLORS[task.task_group] || ''}`}>
-              {task.task_group}
+              {task.task_group === 'AI_EVAL' ? 'ANALYSIS' : task.task_group}
             </Badge>
             <Badge variant="outline" className={`text-[10px] ${STATUS_BADGE[task.status] || ''}`}>
               {t(`tasks.status.${task.status}`)}
@@ -220,7 +220,7 @@ export function TaskDetailPanel({ task, open, onClose, reviewCaseId, reviewCaseS
             <span className="text-muted-foreground text-xs">{t('tasks.detail.executionType')}</span>
             <div className="flex items-center gap-1">
               {task.execution_type === 'ai_assisted' ? (
-                <><Sparkles className="h-3.5 w-3.5 text-amber-500" /> <span>{t('tasks.detail.aiAssisted')}</span></>
+                <><ClipboardCheck className="h-3.5 w-3.5 text-muted-foreground" /> <span>{t('tasks.detail.aiAssisted')}</span></>
               ) : (
                 <><User className="h-3.5 w-3.5 text-muted-foreground" /> <span>{t('tasks.detail.manual')}</span></>
               )}

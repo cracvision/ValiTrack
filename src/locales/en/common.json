@@ -407,7 +407,7 @@
       "SEC": "Security",
       "INFRA": "Infrastructure",
       "DOC": "Documentation",
-      "AI_EVAL": "AI Evaluation",
+      "AI_EVAL": "Review Analysis",
       "APPR": "Approval"
     },
     "signoffs": {
@@ -451,7 +451,7 @@
         "SEC": "Security & Access Control",
         "INFRA": "Infrastructure & Backup",
         "DOC": "Documentation",
-        "AI_EVAL": "AI Evaluation",
+        "AI_EVAL": "Review Analysis",
         "APPR": "Approvals"
       },
       "executionType": {
@@ -476,11 +476,11 @@
       "title": "Execution Phases",
       "phase1": "Phase 1: Initiation",
       "phase2": "Phase 2: Evidence Gathering",
-      "phase3": "Phase 3: AI Evaluation",
+      "phase3": "Phase 3: Review Analysis",
       "phase4": "Phase 4: Approvals",
       "phase1Short": "Initiation",
       "phase2Short": "Evidence Gathering",
-      "phase3Short": "AI Evaluation",
+      "phase3Short": "Review Analysis",
       "phase4Short": "Approvals",
       "complete": "Complete",
       "active": "Active",
@@ -497,7 +497,7 @@
       "overdue": "Overdue",
       "executionType": "Execution type",
       "manual": "Manual",
-      "aiAssisted": "AI-Assisted",
+      "aiAssisted": "Evaluation",
       "templateId": "Template ID",
       "reviewLevelMin": "Review level minimum",
       "taskGroup": "Task group",

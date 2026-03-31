@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { User, Sparkles, AlertTriangle, CheckCircle2, Lock, Ban } from 'lucide-react';
+import { User, ClipboardCheck, AlertTriangle, CheckCircle2, Lock, Ban } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@/components/ui/accordion';
 import { Progress } from '@/components/ui/progress';
@@ -157,7 +157,7 @@ export function ReviewTasksPanel({ reviewCaseId, reviewLevel, reviewCaseStatus, 
               <AccordionItem key={group} value={group} className="border rounded-md mb-2 last:mb-0">
                 <AccordionTrigger className="px-3 py-2 hover:no-underline text-sm">
                   <div className="flex items-center gap-2 flex-1 min-w-0">
-                    <span className="font-semibold text-xs font-mono text-muted-foreground">{group}</span>
+                    <span className="font-semibold text-xs font-mono text-muted-foreground">{group === 'AI_EVAL' ? 'ANALYSIS' : group}</span>
                     <span className="font-medium truncate">{t(`reviews.tasks.groups.${group}`)}</span>
                     <span className="ml-auto mr-2 text-xs text-muted-foreground whitespace-nowrap">
                       {completedInGroup}/{groupTasks.length} {t('tasks.resolved')}
@@ -245,7 +245,7 @@ function TaskRow({ task, onClick, isPhaseBlocked }: { task: ReviewTask; onClick:
 
       {/* Execution type icon */}
       {task.execution_type === 'ai_assisted' ? (
-        <Sparkles className="h-3.5 w-3.5 text-amber-500 shrink-0" />
+        <ClipboardCheck className="h-3.5 w-3.5 text-muted-foreground shrink-0" />
       ) : (
         <User className="h-3.5 w-3.5 text-muted-foreground shrink-0" />
       )}
