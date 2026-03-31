@@ -37,6 +37,9 @@ export function MyTasksSection() {
         />
       ) : (
         <div className="space-y-2">
+          <Link to="/intray?tab=tasks" className="flex items-center gap-1 text-sm text-primary hover:underline mb-2">
+            {t('intray.dashboard.viewAllTasks')} <ChevronRight className="h-3.5 w-3.5" />
+          </Link>
           {tasks.map((task) => (
             <Card
               key={task.id}

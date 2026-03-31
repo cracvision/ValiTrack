@@ -95,10 +95,20 @@ export function AppSidebar() {
                 <SidebarMenuItem key={item.url}>
                   <SidebarMenuButton asChild isActive={isActive(item.url)} tooltip={item.title}>
                     <NavLink to={item.url}>
-                      <item.icon className="h-4 w-4" />
+                      <div className="relative">
+                        <item.icon className="h-4 w-4" />
+                        {collapsed && 'badge' in item && (item as any).badge > 0 && (
+                          <span className="absolute -top-1 -right-1 h-2 w-2 rounded-full bg-destructive" />
+                        )}
+                      </div>
                       {!collapsed && <span>{item.title}</span>}
                     </NavLink>
                   </SidebarMenuButton>
+                  {!collapsed && 'badge' in item && (item as any).badge > 0 && (
+                    <SidebarMenuBadge className="bg-destructive text-destructive-foreground text-[10px] rounded-full min-w-[18px] h-[18px] flex items-center justify-center">
+                      {(item as any).badge}
+                    </SidebarMenuBadge>
+                  )}
                 </SidebarMenuItem>
               ))}
             </SidebarMenu>
