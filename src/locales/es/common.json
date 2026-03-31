@@ -15,7 +15,8 @@
     "findingsActions": "Hallazgos y Acciones",
     "reports": "Reportes",
     "auditLog": "Registro de Auditoría",
-    "userManagement": "Gestión de Usuarios"
+    "userManagement": "Gestión de Usuarios",
+    "intray": "Bandeja"
   },
   "sidebar": {
     "signOut": "Cerrar sesión",
