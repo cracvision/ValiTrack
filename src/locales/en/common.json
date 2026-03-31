@@ -451,7 +451,7 @@
         "SEC": "Security & Access Control",
         "INFRA": "Infrastructure & Backup",
         "DOC": "Documentation",
-        "AI_EVAL": "AI Evaluation",
+        "AI_EVAL": "Review Analysis",
         "APPR": "Approvals"
       },
       "executionType": {
