@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { User, Sparkles, AlertTriangle, CheckCircle2, Lock, Ban } from 'lucide-react';
+import { User, ClipboardCheck, AlertTriangle, CheckCircle2, Lock, Ban } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@/components/ui/accordion';
 import { Progress } from '@/components/ui/progress';
