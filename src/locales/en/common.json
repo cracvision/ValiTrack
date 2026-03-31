@@ -1012,5 +1012,46 @@
     "light": "Light",
     "dark": "Dark",
     "system": "Auto"
+  },
+  "intray": {
+    "title": "Intray",
+    "subtitle": "Your personal task center — all pending items in one place",
+    "refresh": "Refresh",
+    "tabs": {
+      "all": "All",
+      "tasks": "Tasks",
+      "signoffs": "Sign-offs",
+      "actions": "Actions"
+    },
+    "filters": {
+      "allSystems": "All systems",
+      "sortDueDate": "Due date",
+      "sortSystem": "System",
+      "sortType": "Type",
+      "sortDateAdded": "Date added"
+    },
+    "superUser": {
+      "label": "Viewing as Super User",
+      "allUsers": "All users"
+    },
+    "urgency": {
+      "overdue": "Overdue",
+      "due_soon": "Due soon",
+      "upcoming": "Upcoming"
+    },
+    "itemTypes": {
+      "task": "Task",
+      "review_signoff": "Sign-off",
+      "profile_signoff": "Profile sign-off",
+      "action": "Action required"
+    },
+    "empty": {
+      "title": "All clear!",
+      "description": "You have no pending tasks, sign-offs, or actions at this time."
+    },
+    "dashboard": {
+      "viewAllTasks": "View all in Intray",
+      "viewAllSignoffs": "View all in Intray"
+    }
   }
 }

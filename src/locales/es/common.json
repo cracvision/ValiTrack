@@ -1011,5 +1011,46 @@
     "light": "Claro",
     "dark": "Oscuro",
     "system": "Automático"
+  },
+  "intray": {
+    "title": "Bandeja",
+    "subtitle": "Tu centro personal de tareas — todos los pendientes en un solo lugar",
+    "refresh": "Actualizar",
+    "tabs": {
+      "all": "Todos",
+      "tasks": "Tareas",
+      "signoffs": "Firmas",
+      "actions": "Acciones"
+    },
+    "filters": {
+      "allSystems": "Todos los sistemas",
+      "sortDueDate": "Fecha límite",
+      "sortSystem": "Sistema",
+      "sortType": "Tipo",
+      "sortDateAdded": "Fecha de creación"
+    },
+    "superUser": {
+      "label": "Vista de Super Usuario",
+      "allUsers": "Todos los usuarios"
+    },
+    "urgency": {
+      "overdue": "Vencido",
+      "due_soon": "Próximo a vencer",
+      "upcoming": "Próximo"
+    },
+    "itemTypes": {
+      "task": "Tarea",
+      "review_signoff": "Firma",
+      "profile_signoff": "Firma de perfil",
+      "action": "Acción requerida"
+    },
+    "empty": {
+      "title": "¡Todo al día!",
+      "description": "No tienes tareas, firmas ni acciones pendientes en este momento."
+    },
+    "dashboard": {
+      "viewAllTasks": "Ver todo en Bandeja",
+      "viewAllSignoffs": "Ver todo en Bandeja"
+    }
   }
 }
