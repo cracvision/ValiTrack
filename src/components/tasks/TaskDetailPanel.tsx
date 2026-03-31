@@ -148,7 +148,7 @@ export function TaskDetailPanel({ task, open, onClose, reviewCaseId, reviewCaseS
         <SheetHeader className="pb-4">
           <div className="flex items-center gap-2 flex-wrap">
             <Badge className={`text-[10px] ${GROUP_COLORS[task.task_group] || ''}`}>
-              {task.task_group}
+              {task.task_group === 'AI_EVAL' ? 'ANALYSIS' : task.task_group}
             </Badge>
             <Badge variant="outline" className={`text-[10px] ${STATUS_BADGE[task.status] || ''}`}>
               {t(`tasks.status.${task.status}`)}
