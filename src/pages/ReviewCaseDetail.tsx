@@ -1,6 +1,6 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
-import { useParams, useNavigate } from 'react-router-dom';
+import { useParams, useNavigate, useSearchParams } from 'react-router-dom';
 import { useQuery } from '@tanstack/react-query';
 import { ArrowLeft, AlertTriangle, Info, ShieldCheck, Pencil, Trash2, Ban } from 'lucide-react';
 import { ReviewTasksPanel } from '@/components/reviews/ReviewTasksPanel';
