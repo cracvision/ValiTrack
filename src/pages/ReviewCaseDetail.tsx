@@ -30,8 +30,22 @@ export default function ReviewCaseDetail() {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
   const { user, roles } = useAuth();
+  const [searchParams, setSearchParams] = useSearchParams();
   const [editOpen, setEditOpen] = useState(false);
   const [deleteOpen, setDeleteOpen] = useState(false);
+  const [autoOpenTaskId, setAutoOpenTaskId] = useState<string | null>(null);
+
+  // Handle ?task= URL param for auto-opening a specific task
+  useEffect(() => {
+    const taskParam = searchParams.get('task');
+    if (taskParam) {
+      setAutoOpenTaskId(taskParam);
+      // Clean up the URL param after reading
+      const newParams = new URLSearchParams(searchParams);
+      newParams.delete('task');
+      setSearchParams(newParams, { replace: true });
+    }
+  }, [searchParams, setSearchParams]);
 
   const { data: reviewCase, isLoading } = useReviewCase(id);
   const { data: transitions = [] } = useReviewTransitions(id);
