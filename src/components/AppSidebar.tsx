@@ -25,11 +25,13 @@ import {
   SidebarHeader,
   SidebarMenu,
   SidebarMenuButton,
+  SidebarMenuBadge,
   SidebarMenuItem,
   SidebarFooter,
   SidebarSeparator,
   useSidebar,
 } from '@/components/ui/sidebar';
+import { useIntrayCount } from '@/hooks/useIntrayCount';
 
 export function AppSidebar() {
   const { t } = useTranslation();
