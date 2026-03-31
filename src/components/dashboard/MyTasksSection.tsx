@@ -1,6 +1,6 @@
 import { useTranslation } from 'react-i18next';
-import { useNavigate } from 'react-router-dom';
-import { ClipboardList } from 'lucide-react';
+import { useNavigate, Link } from 'react-router-dom';
+import { ClipboardList, ChevronRight } from 'lucide-react';
 import { DashboardSectionHeader } from './DashboardSectionHeader';
 import { DashboardEmptyState } from './DashboardEmptyState';
 import { useMyTasks } from '@/hooks/useMyTasks';
