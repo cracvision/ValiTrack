@@ -45,7 +45,7 @@ const GROUP_COLORS: Record<string, string> = {
   SEC: 'bg-red-100 text-red-700 dark:bg-neutral-800 dark:text-red-400',
   INFRA: 'bg-cyan-100 text-cyan-700 dark:bg-neutral-800 dark:text-cyan-400',
   DOC: 'bg-indigo-100 text-indigo-700 dark:bg-neutral-800 dark:text-indigo-400',
-  AI_EVAL: 'bg-amber-100 text-amber-700 dark:bg-neutral-800 dark:text-amber-400',
+  AI_EVAL: 'bg-slate-100 text-slate-700 dark:bg-neutral-800 dark:text-slate-400',
   APPR: 'bg-green-100 text-green-700 dark:bg-neutral-800 dark:text-green-400',
 };
 
