@@ -24,6 +24,11 @@ const TYPE_ICONS: Record<string, typeof ClipboardList> = {
   action: Zap,
 };
 
+const TASK_STATUS_CLASS: Record<string, string> = {
+  pending: 'bg-muted text-muted-foreground',
+  in_progress: 'bg-blue-100 text-blue-800 dark:bg-neutral-800 dark:text-blue-400',
+};
+
 interface IntrayItemCardProps {
   item: IntrayItem;
   showAssignedTo?: boolean;
@@ -65,9 +70,16 @@ export function IntrayItemCard({ item, showAssignedTo = false }: IntrayItemCardP
         <div className="min-w-0 flex-1 space-y-1">
           <div className="flex items-center justify-between gap-2">
             <p className="text-sm font-medium text-foreground truncate">{title}</p>
-            <Badge variant="outline" className="text-[10px] shrink-0">
-              {t(`intray.itemTypes.${item.item_type}`)}
-            </Badge>
+            <div className="flex items-center gap-1.5 shrink-0">
+              {item.item_type === 'task' && item.item_status && (
+                <Badge variant="secondary" className={`text-[10px] px-1.5 py-0 ${TASK_STATUS_CLASS[item.item_status] || ''}`}>
+                  {t(`intray.taskStatus.${item.item_status}`)}
+                </Badge>
+              )}
+              <Badge variant="outline" className="text-[10px] shrink-0">
+                {t(`intray.itemTypes.${item.item_type}`)}
+              </Badge>
+            </div>
           </div>
           <p className="text-xs text-muted-foreground truncate">
             {item.system_name} — {item.system_identifier}

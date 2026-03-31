@@ -1044,6 +1044,10 @@
       "profile_signoff": "Firma de perfil",
       "action": "Acción requerida"
     },
+    "taskStatus": {
+      "pending": "Pendiente",
+      "in_progress": "En Progreso"
+    },
     "empty": {
       "title": "¡Todo al día!",
       "description": "No tienes tareas, firmas ni acciones pendientes en este momento."
