@@ -220,7 +220,7 @@ export function TaskDetailPanel({ task, open, onClose, reviewCaseId, reviewCaseS
             <span className="text-muted-foreground text-xs">{t('tasks.detail.executionType')}</span>
             <div className="flex items-center gap-1">
               {task.execution_type === 'ai_assisted' ? (
-                <><Sparkles className="h-3.5 w-3.5 text-amber-500" /> <span>{t('tasks.detail.aiAssisted')}</span></>
+                <><ClipboardCheck className="h-3.5 w-3.5 text-muted-foreground" /> <span>{t('tasks.detail.aiAssisted')}</span></>
               ) : (
                 <><User className="h-3.5 w-3.5 text-muted-foreground" /> <span>{t('tasks.detail.manual')}</span></>
               )}

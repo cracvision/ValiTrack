@@ -245,7 +245,7 @@ function TaskRow({ task, onClick, isPhaseBlocked }: { task: ReviewTask; onClick:
 
       {/* Execution type icon */}
       {task.execution_type === 'ai_assisted' ? (
-        <Sparkles className="h-3.5 w-3.5 text-amber-500 shrink-0" />
+        <ClipboardCheck className="h-3.5 w-3.5 text-muted-foreground shrink-0" />
       ) : (
         <User className="h-3.5 w-3.5 text-muted-foreground shrink-0" />
       )}
