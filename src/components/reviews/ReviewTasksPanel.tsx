@@ -157,7 +157,7 @@ export function ReviewTasksPanel({ reviewCaseId, reviewLevel, reviewCaseStatus, 
               <AccordionItem key={group} value={group} className="border rounded-md mb-2 last:mb-0">
                 <AccordionTrigger className="px-3 py-2 hover:no-underline text-sm">
                   <div className="flex items-center gap-2 flex-1 min-w-0">
-                    <span className="font-semibold text-xs font-mono text-muted-foreground">{group}</span>
+                    <span className="font-semibold text-xs font-mono text-muted-foreground">{group === 'AI_EVAL' ? 'ANALYSIS' : group}</span>
                     <span className="font-medium truncate">{t(`reviews.tasks.groups.${group}`)}</span>
                     <span className="ml-auto mr-2 text-xs text-muted-foreground whitespace-nowrap">
                       {completedInGroup}/{groupTasks.length} {t('tasks.resolved')}
