@@ -497,7 +497,7 @@
       "overdue": "Overdue",
       "executionType": "Execution type",
       "manual": "Manual",
-      "aiAssisted": "AI-Assisted",
+      "aiAssisted": "Evaluation",
       "templateId": "Template ID",
       "reviewLevelMin": "Review level minimum",
       "taskGroup": "Task group",

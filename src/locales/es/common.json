@@ -496,7 +496,7 @@
       "overdue": "Vencida",
       "executionType": "Tipo de ejecución",
       "manual": "Manual",
-      "aiAssisted": "Asistida por IA",
+      "aiAssisted": "Evaluación",
       "templateId": "ID de plantilla",
       "reviewLevelMin": "Nivel de revisión mínimo",
       "taskGroup": "Grupo de tarea",
