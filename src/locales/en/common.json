@@ -1014,6 +1014,9 @@
     "dark": "Dark",
     "system": "Auto"
   },
+  "preferences": {
+    "languageLocked": "Language preference is locked by administrator"
+  },
   "intray": {
     "title": "Intray",
     "subtitle": "Your personal task center — all pending items in one place",

@@ -1013,6 +1013,9 @@
     "dark": "Oscuro",
     "system": "Automático"
   },
+  "preferences": {
+    "languageLocked": "La preferencia de idioma está bloqueada por el administrador"
+  },
   "intray": {
     "title": "Bandeja",
     "subtitle": "Tu centro personal de tareas — todos los pendientes en un solo lugar",

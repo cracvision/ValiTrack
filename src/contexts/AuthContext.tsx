@@ -60,6 +60,9 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         supabase.rpc('get_user_roles', { _user_id: userId }),
       ]);
 
+      // Don't update state if signing out or unmounted
+      if (signingOutRef.current || !isMounted.current) return;
+
       safeSetState((prev) => ({
         ...prev,
         profile: profileRes.data ?? null,
