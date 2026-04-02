@@ -29,10 +29,6 @@ const ROLE_OPTIONS = [
   { value: 'it_manager', label: 'IT Manager' },
 ] as const;
 
-const LANGUAGE_OPTIONS = [
-  { value: 'es', label: 'Español' },
-  { value: 'en', label: 'English' },
-];
 
 interface UserEditDialogProps {
   open: boolean;
