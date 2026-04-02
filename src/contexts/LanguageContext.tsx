@@ -57,36 +57,19 @@ export function LanguageProvider({ children }: { children: React.ReactNode }) {
     i18n.changeLanguage(newLang);
 
     // Try update first
-    const { error: updateError, count } = await supabase
+    const { error: updateError } = await supabase
       .from('user_language_preference')
       .update({ language_code: newLang, updated_at: new Date().toISOString() })
-      .eq('user_id', user.id)
-      .select('user_id', { count: 'exact', head: true });
+      .eq('user_id', user.id);
 
     if (updateError) {
-      // If update fails, try insert (legacy user with no row)
+      // Update failed — try insert for legacy users with no row
       const { error: insertError } = await supabase
         .from('user_language_preference')
         .insert({ user_id: user.id, language_code: newLang });
 
       if (insertError) {
         console.error('[LanguageContext] Failed to persist language:', insertError);
-        // Rollback
-        setLang(prevLang);
-        i18n.changeLanguage(prevLang);
-        toast.error(prevLang === 'es' ? 'Error al cambiar idioma' : 'Failed to change language');
-        return;
-      }
-    }
-
-    // If count is 0 (no row matched), insert
-    if (!updateError && count === 0) {
-      const { error: insertError } = await supabase
-        .from('user_language_preference')
-        .insert({ user_id: user.id, language_code: newLang });
-
-      if (insertError && !insertError.message?.includes('duplicate')) {
-        console.error('[LanguageContext] Failed to insert language:', insertError);
         setLang(prevLang);
         i18n.changeLanguage(prevLang);
         toast.error(prevLang === 'es' ? 'Error al cambiar idioma' : 'Failed to change language');
