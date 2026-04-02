@@ -50,7 +50,7 @@ Deno.serve(async (req) => {
     }
 
     const body = await req.json();
-    const { email, password, full_name, username, language_code = 'es',
+    const { email, password, full_name, username,
             account_expires_at, role = 'system_administrator' } = body;
 
     // Validate required fields
@@ -111,12 +111,11 @@ Deno.serve(async (req) => {
       console.error('Error updating app_users:', updateError);
     }
 
-    // Create language preference (locked)
+    // Create language preference (unlocked — user controls their own language)
     await supabaseAdmin.from('user_language_preference').insert({
       user_id: newUserId,
-      language_code,
-      locked: true,
-      locked_at: new Date().toISOString(),
+      language_code: 'en',
+      locked: false,
     });
 
     // Assign role
@@ -131,7 +130,7 @@ Deno.serve(async (req) => {
       action: 'user_created',
       resource_type: 'user',
       resource_id: newUserId,
-      details: { created_email: email, created_full_name: full_name, role, language_code, account_expires_at },
+      details: { created_email: email, created_full_name: full_name, role, account_expires_at },
     });
 
     return new Response(JSON.stringify({
