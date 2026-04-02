@@ -29,10 +29,6 @@ const ROLE_OPTIONS = [
   { value: 'it_manager', label: 'IT Manager' },
 ] as const;
 
-const LANGUAGE_OPTIONS = [
-  { value: 'es', label: 'Español' },
-  { value: 'en', label: 'English' },
-];
 
 interface UserEditDialogProps {
   open: boolean;
@@ -51,7 +47,7 @@ export function UserEditDialog({ open, onOpenChange, user, onSuccess }: UserEdit
   const [username, setUsername] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
-  const [languageCode, setLanguageCode] = useState('es');
+  
   const [role, setRole] = useState('');
   const [expiresAt, setExpiresAt] = useState<Date | undefined>();
 
@@ -61,7 +57,6 @@ export function UserEditDialog({ open, onOpenChange, user, onSuccess }: UserEdit
       setUsername(user.username || '');
       setEmail(user.email);
       setPassword('');
-      setLanguageCode(user.language_code || 'es');
       setRole(user.roles?.split(',')[0] || '');
       setExpiresAt(user.account_expires_at ? new Date(user.account_expires_at) : undefined);
       setShowPassword(false);
@@ -80,7 +75,7 @@ export function UserEditDialog({ open, onOpenChange, user, onSuccess }: UserEdit
       const body: Record<string, unknown> = {
         action: 'update_user', user_id: user.user_id,
         full_name: fullName, username: username || undefined,
-        role, language_code: languageCode,
+        role,
         account_expires_at: expiresAt ? expiresAt.toISOString() : null,
       };
       if (email !== user.email) body.email = email;
@@ -135,16 +130,6 @@ export function UserEditDialog({ open, onOpenChange, user, onSuccess }: UserEdit
           </div>
 
           {password.length > 0 && <PasswordRequirements password={password} email={email} username={username} />}
-
-          <div className="space-y-2">
-            <Label>{t('userForm.language')} *</Label>
-            <Select value={languageCode} onValueChange={setLanguageCode}>
-              <SelectTrigger><SelectValue /></SelectTrigger>
-              <SelectContent>
-                {LANGUAGE_OPTIONS.map((l) => <SelectItem key={l.value} value={l.value}>{l.label}</SelectItem>)}
-              </SelectContent>
-            </Select>
-          </div>
 
           <div className="space-y-2">
             <Label>{t('userForm.userRole')} *</Label>

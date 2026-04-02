@@ -1,0 +1,1 @@
+UPDATE public.user_language_preference SET locked = false WHERE locked = true;

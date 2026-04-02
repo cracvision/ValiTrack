@@ -28,10 +28,6 @@ const ROLE_OPTIONS = [
   { value: 'it_manager', label: 'IT Manager' },
 ] as const;
 
-const LANGUAGE_OPTIONS = [
-  { value: 'es', label: 'Español' },
-  { value: 'en', label: 'English' },
-];
 
 interface UserFormDialogProps {
   open: boolean;
@@ -49,13 +45,13 @@ export function UserFormDialog({ open, onOpenChange, onSuccess }: UserFormDialog
   const [username, setUsername] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
-  const [languageCode, setLanguageCode] = useState('es');
+  
   const [role, setRole] = useState('');
   const [expiresAt, setExpiresAt] = useState<Date | undefined>();
 
   const resetForm = () => {
     setFullName(''); setUsername(''); setEmail(''); setPassword('');
-    setLanguageCode('es'); setRole(''); setExpiresAt(undefined); setShowPassword(false);
+    setRole(''); setExpiresAt(undefined); setShowPassword(false);
   };
 
   const passwordValid = isPasswordValid(password, email, username);
@@ -70,8 +66,7 @@ export function UserFormDialog({ open, onOpenChange, onSuccess }: UserFormDialog
       const { data, error } = await supabase.functions.invoke('admin-create-user', {
         body: {
           email, password, full_name: fullName,
-          username: username || undefined,
-          language_code: languageCode, role,
+          username: username || undefined, role,
           account_expires_at: expiresAt ? expiresAt.toISOString() : undefined,
         },
       });
@@ -124,16 +119,6 @@ export function UserFormDialog({ open, onOpenChange, onSuccess }: UserFormDialog
           </div>
 
           {password.length > 0 && <PasswordRequirements password={password} email={email} username={username} />}
-
-          <div className="space-y-2">
-            <Label>{t('userForm.language')} *</Label>
-            <Select value={languageCode} onValueChange={setLanguageCode}>
-              <SelectTrigger><SelectValue placeholder={t('userForm.selectLanguage')} /></SelectTrigger>
-              <SelectContent>
-                {LANGUAGE_OPTIONS.map((l) => <SelectItem key={l.value} value={l.value}>{l.label}</SelectItem>)}
-              </SelectContent>
-            </Select>
-          </div>
 
           <div className="space-y-2">
             <Label>{t('userForm.userRole')} *</Label>

@@ -17,7 +17,7 @@ const LanguageContext = createContext<LanguageContextValue | null>(null);
 
 export function LanguageProvider({ children }: { children: React.ReactNode }) {
   const { user } = useAuth();
-  const [language, setLang] = useState<LanguageCode>('es');
+  const [language, setLang] = useState<LanguageCode>('en');
   const [locked, setLocked] = useState(false);
   const loadedUserIdRef = useRef<string | null>(null);
 
@@ -26,8 +26,8 @@ export function LanguageProvider({ children }: { children: React.ReactNode }) {
     if (!user) {
       loadedUserIdRef.current = null;
       // Reset to Spanish on logout (app default)
-      i18n.changeLanguage('es');
-      setLang('es');
+      i18n.changeLanguage('en');
+      setLang('en');
       setLocked(false);
       return;
     }
@@ -40,7 +40,7 @@ export function LanguageProvider({ children }: { children: React.ReactNode }) {
       .eq('user_id', user.id)
       .single()
       .then(({ data }) => {
-        const lang = (data?.language_code as LanguageCode) ?? 'es';
+        const lang = (data?.language_code as LanguageCode) ?? 'en';
         const isLocked = data?.locked ?? false;
         setLang(lang);
         setLocked(isLocked);

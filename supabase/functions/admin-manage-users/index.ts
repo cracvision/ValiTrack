@@ -144,7 +144,7 @@ Deno.serve(async (req) => {
 
       // ───────── UPDATE USER ─────────
       case "update_user": {
-        const { user_id, full_name, username, email, role, language_code, account_expires_at, password } = payload;
+        const { user_id, full_name, username, email, role, account_expires_at, password } = payload;
         if (!user_id) return json({ error: "user_id is required" }, 400);
 
         // Update app_users fields
@@ -185,23 +185,12 @@ Deno.serve(async (req) => {
           await admin.from("user_roles").insert({ user_id, role, created_by: callerId });
         }
 
-        // Update language if provided
-        if (language_code) {
-          await admin.from("user_language_preference").upsert({
-            user_id,
-            language_code,
-            locked: true,
-            locked_at: new Date().toISOString(),
-            updated_at: new Date().toISOString(),
-          });
-        }
-
         await admin.from("audit_log").insert({
           user_id: callerId,
           action: "user_updated",
           resource_type: "user",
           resource_id: user_id,
-          details: { updated_fields: Object.keys({ ...updateFields, ...(email ? { email } : {}), ...(role ? { role } : {}), ...(password ? { password: "***" } : {}), ...(language_code ? { language_code } : {}) }) },
+          details: { updated_fields: Object.keys({ ...updateFields, ...(email ? { email } : {}), ...(role ? { role } : {}), ...(password ? { password: "***" } : {}) }) },
         });
 
         return json({ success: true });
