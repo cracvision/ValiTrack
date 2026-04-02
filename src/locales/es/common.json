@@ -16,7 +16,8 @@
     "reports": "Reportes",
     "auditLog": "Registro de Auditoría",
     "userManagement": "Gestión de Usuarios",
-    "intray": "Bandeja"
+    "intray": "Bandeja",
+    "language": "Idioma"
   },
   "sidebar": {
     "signOut": "Cerrar sesión",
@@ -1011,6 +1012,9 @@
     "light": "Claro",
     "dark": "Oscuro",
     "system": "Automático"
+  },
+  "preferences": {
+    "languageLocked": "La preferencia de idioma está bloqueada por el administrador"
   },
   "intray": {
     "title": "Bandeja",

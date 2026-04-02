@@ -16,7 +16,8 @@
     "reports": "Reports",
     "auditLog": "Audit Log",
     "userManagement": "User Management",
-    "intray": "Intray"
+    "intray": "Intray",
+    "language": "Language"
   },
   "sidebar": {
     "signOut": "Sign out",
@@ -1012,6 +1013,9 @@
     "light": "Light",
     "dark": "Dark",
     "system": "Auto"
+  },
+  "preferences": {
+    "languageLocked": "Language preference is locked by administrator"
   },
   "intray": {
     "title": "Intray",

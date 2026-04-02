@@ -55,19 +55,13 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     if (signingOutRef.current) return;
 
     try {
-      const [profileRes, rolesRes, langRes] = await Promise.all([
+      const [profileRes, rolesRes] = await Promise.all([
         supabase.from('app_users').select('full_name, email, must_change_password, theme_preference').eq('id', userId).single(),
         supabase.rpc('get_user_roles', { _user_id: userId }),
-        supabase.from('user_language_preference').select('language_code').eq('user_id', userId).single(),
       ]);
 
       // Don't update state if signing out or unmounted
       if (signingOutRef.current || !isMounted.current) return;
-
-      const langCode = langRes.data?.language_code;
-      if (langCode && ['es', 'en'].includes(langCode)) {
-        i18n.changeLanguage(langCode);
-      }
 
       safeSetState((prev) => ({
         ...prev,
