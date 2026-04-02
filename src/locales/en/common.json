@@ -16,7 +16,8 @@
     "reports": "Reports",
     "auditLog": "Audit Log",
     "userManagement": "User Management",
-    "intray": "Intray"
+    "intray": "Intray",
+    "language": "Language"
   },
   "sidebar": {
     "signOut": "Sign out",

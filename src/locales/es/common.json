@@ -16,7 +16,8 @@
     "reports": "Reportes",
     "auditLog": "Registro de Auditoría",
     "userManagement": "Gestión de Usuarios",
-    "intray": "Bandeja"
+    "intray": "Bandeja",
+    "language": "Idioma"
   },
   "sidebar": {
     "signOut": "Cerrar sesión",

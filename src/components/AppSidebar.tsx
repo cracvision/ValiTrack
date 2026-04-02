@@ -14,6 +14,7 @@ const LOGO_URL = `${import.meta.env.VITE_SUPABASE_URL}/storage/v1/object/public/
 import { useTranslation } from 'react-i18next';
 import { NavLink } from '@/components/NavLink';
 import { ThemeSwitcher } from '@/components/ThemeSwitcher';
+import { LanguageSwitcher } from '@/components/LanguageSwitcher';
 import { useLocation } from 'react-router-dom';
 import { useAuth } from '@/hooks/useAuth';
 import {
@@ -163,6 +164,7 @@ export function AppSidebar() {
 
       <SidebarFooter className="border-t border-sidebar-border">
         <ThemeSwitcher />
+        <LanguageSwitcher />
         <div className="flex items-center gap-2 px-2 py-2">
           <div className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-primary text-[11px] font-semibold text-primary-foreground">
             {initials}
