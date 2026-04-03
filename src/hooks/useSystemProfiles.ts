@@ -3,6 +3,7 @@ import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/hooks/useAuth';
 import { toast } from '@/hooks/use-toast';
+import { notifySignoffRequested } from '@/lib/notificationWiring';
 import type { SystemProfile, ProfileApprovalStatus } from '@/types';
 
 interface UseSystemProfilesReturn {
