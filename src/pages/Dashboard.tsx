@@ -10,6 +10,41 @@ import { FindingsAlertSection } from '@/components/dashboard/FindingsAlertSectio
 import { PlatformHealthSection } from '@/components/dashboard/PlatformHealthSection';
 import { ComplianceSnapshotSection } from '@/components/dashboard/ComplianceSnapshotSection';
 import { RecentActivitySection } from '@/components/dashboard/RecentActivitySection';
+import { Button } from '@/components/ui/button';
+import { sendNotification } from '@/lib/notifications';
+import { toast } from 'sonner';
+import { useState } from 'react';
+
+function TestEmailButton() {
+  const [sending, setSending] = useState(false);
+  const handleTest = async () => {
+    setSending(true);
+    try {
+      await sendNotification({
+        notification_type: "task_assigned",
+        recipient_user_id: "da267724-f9cc-4690-b8d4-09dd51552fdf",
+        data: {
+          task_title: "Test Notification",
+          task_group: "ITSM",
+          system_name: "PI Data Historian",
+          due_date: "2026-05-15",
+          review_case_id: "test-uuid",
+          task_id: "test-uuid",
+        },
+      });
+      toast.success("Test email sent — check notification_log and inbox");
+    } catch (err: any) {
+      toast.error(`Test email failed: ${err.message}`);
+    } finally {
+      setSending(false);
+    }
+  };
+  return (
+    <Button variant="outline" size="sm" onClick={handleTest} disabled={sending}>
+      {sending ? "Sending…" : "Test Email"}
+    </Button>
+  );
+}
 
 function getGreetingKey(): string {
   const hour = new Date().getHours();
@@ -87,11 +122,14 @@ export default function Dashboard() {
   return (
     <div className="space-y-8">
       {/* Header */}
-      <div>
-        <h1 className="text-2xl font-semibold text-foreground">
-          {t(greetingKey, { name: firstName })}
-        </h1>
-        <p className="text-sm text-muted-foreground">{t(subtitleKey)}</p>
+      <div className="flex items-start justify-between">
+        <div>
+          <h1 className="text-2xl font-semibold text-foreground">
+            {t(greetingKey, { name: firstName })}
+          </h1>
+          <p className="text-sm text-muted-foreground">{t(subtitleKey)}</p>
+        </div>
+        {isSuperUser && <TestEmailButton />}
       </div>
 
       {/* Super User: Platform Health KPIs */}
