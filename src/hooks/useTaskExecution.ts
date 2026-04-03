@@ -11,6 +11,7 @@ interface UseTaskExecutionOptions {
   reviewCaseId: string;
   reviewCaseStatus: string;
   systemOwnerId?: string;
+  systemName?: string;
 }
 
 const MODIFIABLE_STATUSES = ['in_progress', 'approved_for_execution'];
