@@ -160,10 +160,10 @@ export function useReviewCaseTransition() {
 
       // Create/reset signoffs when entering plan_review or execution_review
       if (input.toStatus === 'plan_review' || input.toStatus === 'execution_review') {
-        // Fetch the review case to get role user IDs
+        // Fetch the review case to get role user IDs + system name
         const { data: rc } = await supabase
           .from('review_cases')
-          .select('system_admin_id, qa_id')
+          .select('system_admin_id, qa_id, frozen_system_snapshot')
           .eq('id', input.reviewCaseId)
           .single();
 
@@ -186,6 +186,7 @@ export function useReviewCaseTransition() {
             { role: 'quality_assurance', userId: rc.qa_id },
           ];
 
+          const signoffUserIds: string[] = [];
           for (const { role, userId: requestedUserId } of signoffRoles) {
             if (requestedUserId && String(requestedUserId).trim() !== '') {
               await supabase.from('review_signoffs').upsert({
@@ -199,8 +200,25 @@ export function useReviewCaseTransition() {
                 onConflict: 'review_case_id,phase,requested_user_id',
                 ignoreDuplicates: true,
               });
+              signoffUserIds.push(requestedUserId);
             }
           }
+
+          // 🔔 Notify signoff_requested
+          const systemName = (rc.frozen_system_snapshot as any)?.name || '';
+          const phaseLabels: Record<string, { en: string; es: string }> = {
+            plan_review: { en: 'Plan Review', es: 'Revisión del Plan' },
+            execution_review: { en: 'Execution Review', es: 'Revisión de Ejecución' },
+          };
+          const phaseLabel = phaseLabels[input.toStatus] || { en: input.toStatus, es: input.toStatus };
+          notifySignoffRequested({
+            signoffUserIds,
+            systemName,
+            signoffPhase: phaseLabel.en,
+            signoffPhaseEs: phaseLabel.es,
+            resourceType: 'review_case',
+            resourceId: input.reviewCaseId,
+          });
         }
       }
 
