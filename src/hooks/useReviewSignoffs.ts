@@ -13,7 +13,7 @@ interface UseReviewSignoffsOptions {
   systemName?: string;
 }
 
-export function useReviewSignoffs({ reviewCaseId, phase, systemOwnerId, initiatedBy }: UseReviewSignoffsOptions) {
+export function useReviewSignoffs({ reviewCaseId, phase, systemOwnerId, initiatedBy, qaId, systemName }: UseReviewSignoffsOptions) {
   const { user } = useAuth();
   const userId = user?.id;
   const queryClient = useQueryClient();
