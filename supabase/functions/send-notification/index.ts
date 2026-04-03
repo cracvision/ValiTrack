@@ -589,6 +589,7 @@ serve(async (req) => {
     // Send via Resend SDK
     let resendResult: any;
     let success = false;
+    let resendId: string | null = null;
     try {
       resendResult = await resend.emails.send({
         from: RESEND_FROM_EMAIL,
@@ -596,7 +597,17 @@ serve(async (req) => {
         subject,
         html,
       });
-      success = !!resendResult?.id;
+      // Resend SDK returns { data: { id: "..." }, error: null } on success
+      if (resendResult?.error) {
+        success = false;
+      } else if (resendResult?.data?.id) {
+        success = true;
+        resendId = resendResult.data.id;
+      } else {
+        // Fallback: check legacy shape { id: "..." }
+        success = !!resendResult?.id;
+        resendId = resendResult?.id || null;
+      }
     } catch (resendError: any) {
       resendResult = { error: resendError.message || String(resendError) };
       success = false;
@@ -610,7 +621,7 @@ serve(async (req) => {
       subject,
       status: success ? "sent" : "failed",
       error_message: success ? null : JSON.stringify(resendResult),
-      resend_id: success ? resendResult.id : null,
+      resend_id: resendId,
       metadata: data || {},
       triggered_by: triggered_by || callerUserId || null,
     });
