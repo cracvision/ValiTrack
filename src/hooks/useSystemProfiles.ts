@@ -251,12 +251,13 @@ export function useSystemProfiles(): UseSystemProfilesReturn {
 
       // 4. If transitioning to 'in_review': create sign-off requests
       if (toStatus === 'in_review') {
+        // Soft-delete ALL existing signoffs for this profile to avoid stale entries
         await supabase
           .from('profile_signoffs')
           .update({
-            status: 'pending',
-            completed_at: null,
-            comments: '',
+            is_deleted: true,
+            deleted_at: new Date().toISOString(),
+            deleted_by: user.id,
             updated_by: user.id,
           } as any)
           .eq('system_profile_id', profileId)
@@ -274,16 +275,13 @@ export function useSystemProfiles(): UseSystemProfilesReturn {
           const validSignoffs = signoffRoles.filter(s => s.userId && s.userId.trim() !== '');
 
           for (const { role, userId: requestedUserId } of validSignoffs) {
-            await supabase.from('profile_signoffs').upsert({
+            await supabase.from('profile_signoffs').insert({
               system_profile_id: profileId,
               requested_role: role,
               requested_user_id: requestedUserId,
               status: 'pending',
               created_by: user.id,
-            } as any, {
-              onConflict: 'system_profile_id,requested_user_id',
-              ignoreDuplicates: true,
-            });
+            } as any);
           }
 
           // 🔔 Notify signoff_requested for profile review
@@ -304,9 +302,9 @@ export function useSystemProfiles(): UseSystemProfilesReturn {
         await supabase
           .from('profile_signoffs')
           .update({
-            status: 'pending',
-            completed_at: null,
-            comments: '',
+            is_deleted: true,
+            deleted_at: new Date().toISOString(),
+            deleted_by: user.id,
             updated_by: user.id,
           } as any)
           .eq('system_profile_id', profileId)
