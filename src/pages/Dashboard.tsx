@@ -91,11 +91,14 @@ export default function Dashboard() {
   return (
     <div className="space-y-8">
       {/* Header */}
-      <div>
-        <h1 className="text-2xl font-semibold text-foreground">
-          {t(greetingKey, { name: firstName })}
-        </h1>
-        <p className="text-sm text-muted-foreground">{t(subtitleKey)}</p>
+      <div className="flex items-start justify-between">
+        <div>
+          <h1 className="text-2xl font-semibold text-foreground">
+            {t(greetingKey, { name: firstName })}
+          </h1>
+          <p className="text-sm text-muted-foreground">{t(subtitleKey)}</p>
+        </div>
+        {isSuperUser && <TestEmailButton />}
       </div>
 
       {/* Super User: Platform Health KPIs */}
