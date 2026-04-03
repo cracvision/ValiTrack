@@ -48,6 +48,15 @@ function rowToSystemProfile(row: any): SystemProfile {
   };
 }
 
+const UUID_TEXT_PATTERN = /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
+
+function normalizeRoleUserId(value?: string | null): string | null {
+  if (!value) return null;
+
+  const normalized = value.trim().toLowerCase();
+  return UUID_TEXT_PATTERN.test(normalized) ? normalized : null;
+}
+
 async function fetchSystemProfiles(): Promise<SystemProfile[]> {
   const { data, error } = await supabase
     .from('system_profiles')
@@ -260,15 +269,29 @@ export function useSystemProfiles(): UseSystemProfilesReturn {
         const profile = systems.find(s => s.id === profileId);
         if (profile) {
           const signoffRoles = [
-            { role: 'system_administrator', userId: profile.system_admin_id },
-            { role: 'quality_assurance', userId: profile.qa_id },
-            { role: 'business_owner', userId: profile.business_owner_id },
-            { role: 'it_manager', userId: profile.it_manager_id },
+            { role: 'system_administrator', sourceUserId: profile.system_admin_id },
+            { role: 'quality_assurance', sourceUserId: profile.qa_id },
+            { role: 'business_owner', sourceUserId: profile.business_owner_id },
+            { role: 'it_manager', sourceUserId: profile.it_manager_id },
           ];
 
-          const validSignoffs = signoffRoles.filter(s => s.userId && s.userId.trim() !== '');
+          const invalidSignoffRoles = signoffRoles.filter(({ sourceUserId }) => {
+            if (!sourceUserId || sourceUserId.trim() === '') return false;
+            return !normalizeRoleUserId(sourceUserId);
+          });
 
-          for (const { role, userId: requestedUserId } of validSignoffs) {
+          if (invalidSignoffRoles.length > 0) {
+            throw new Error(`Invalid sign-off assignee ID(s): ${invalidSignoffRoles.map(({ role }) => role).join(', ')}`);
+          }
+
+          const validSignoffs = signoffRoles
+            .map(({ role, sourceUserId }) => ({
+              role,
+              requestedUserId: normalizeRoleUserId(sourceUserId),
+            }))
+            .filter((signoff): signoff is { role: string; requestedUserId: string } => signoff.requestedUserId !== null);
+
+          for (const { role, requestedUserId } of validSignoffs) {
             const { error: insertError } = await supabase.from('profile_signoffs').insert({
               system_profile_id: profileId,
               requested_role: role,
@@ -280,7 +303,7 @@ export function useSystemProfiles(): UseSystemProfilesReturn {
           }
 
           // 🔔 Notify signoff_requested for profile review
-          const signoffUserIds = validSignoffs.map(s => s.userId!);
+          const signoffUserIds = validSignoffs.map(s => s.requestedUserId);
           notifySignoffRequested({
             signoffUserIds,
             systemName: profile.name,
