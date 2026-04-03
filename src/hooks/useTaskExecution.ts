@@ -3,6 +3,7 @@ import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/hooks/useAuth';
 import { useResolveUserNames } from '@/hooks/useResolveUserNames';
 import { toast } from '@/hooks/use-toast';
+import { notifyTaskReassigned } from '@/lib/notificationWiring';
 import type { ReviewTask } from '@/types';
 
 interface UseTaskExecutionOptions {
