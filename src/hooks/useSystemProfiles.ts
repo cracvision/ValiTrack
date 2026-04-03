@@ -300,7 +300,7 @@ export function useSystemProfiles(): UseSystemProfilesReturn {
 
       // 5. If transitioning to 'draft' from 'in_review': reset all signoffs
       if (toStatus === 'draft' && fromStatus === 'in_review') {
-        await supabase
+        const { error: draftCleanupError } = await supabase
           .from('profile_signoffs')
           .update({
             is_deleted: true,
@@ -310,6 +310,7 @@ export function useSystemProfiles(): UseSystemProfilesReturn {
           } as any)
           .eq('system_profile_id', profileId)
           .eq('is_deleted', false);
+        if (draftCleanupError) throw new Error(`Failed to clean up sign-offs on return to draft: ${draftCleanupError.message}`);
       }
 
       invalidate();

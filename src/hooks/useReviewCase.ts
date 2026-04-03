@@ -170,7 +170,7 @@ export function useReviewCaseTransition() {
         if (rc) {
           // Soft-delete all existing active signoffs for this phase (clean slate)
           const now = new Date().toISOString();
-          await supabase
+          const { error: cleanupError } = await supabase
             .from('review_signoffs')
             .update({
               is_deleted: true,
@@ -181,6 +181,7 @@ export function useReviewCaseTransition() {
             .eq('review_case_id', input.reviewCaseId)
             .eq('phase', input.toStatus)
             .eq('is_deleted', false);
+          if (cleanupError) throw new Error(`Failed to clean up old sign-offs: ${cleanupError.message}`);
 
           // Insert fresh signoff requests for current SA and QA
           const signoffRoles = [
@@ -191,7 +192,7 @@ export function useReviewCaseTransition() {
           const signoffUserIds: string[] = [];
           for (const { role, userId: requestedUserId } of signoffRoles) {
             if (requestedUserId && String(requestedUserId).trim() !== '') {
-              await supabase.from('review_signoffs').insert({
+              const { error: insertError } = await supabase.from('review_signoffs').insert({
                 review_case_id: input.reviewCaseId,
                 phase: input.toStatus,
                 requested_role: role,
@@ -199,6 +200,7 @@ export function useReviewCaseTransition() {
                 status: 'pending',
                 created_by: user.id,
               } as any);
+              if (insertError) throw new Error(`Failed to create sign-off for ${role}: ${insertError.message}`);
               signoffUserIds.push(requestedUserId);
             }
           }
