@@ -1,70 +1,76 @@
 
+Goal: make System Profile sign-off cleanup actually work, and remove the same failure mode from Review Case sign-offs.
 
-# Global Audit: Clean Slate Pattern for Stale Sign-offs and Task Assignments
+What I verified:
+- In `src/hooks/useSystemProfiles.ts`, the cleanup is already attempted in both places:
+  1. before inserting new `profile_signoffs` on `draft -> in_review`
+  2. on `in_review -> draft`
+- But the cleanup is failing in practice because:
+  - the `profile_signoffs` RLS update policy requires `is_deleted = false` in `WITH CHECK`, so an update that sets `is_deleted = true` is rejected
+  - the hook does not check the returned `error` from that update, so the flow continues and inserts new sign-offs anyway
+- I also verified the same hidden failure pattern still exists for `review_signoffs`:
+  - `useReviewCase.ts` attempts soft-delete
+  - but there is no SO/SU reset policy for `review_signoffs`
+  - and that hook also ignores Supabase errors for cleanup/inserts
 
-## Audit Results
+Implementation plan:
 
-### 1. System Profile sign-offs (profile_signoffs) — ✅ Already fixed
-Soft-delete before insert on `in_review` transition. Return to `draft` also soft-deletes. No action needed.
+1. Database/RLS fix via migration
+- Replace the current `profile_signoffs` SO/SU update policy with one that allows soft-delete updates on managed profiles.
+- Add an equivalent SO/SU update policy for `review_signoffs` so the owner/super user can soft-delete stale phase sign-offs on managed review cases.
+- Keep reviewer self-update policies intact, so reviewers can still only act on their own active sign-offs.
+- No schema change needed; this is a policy correction.
 
-### 2. Review Case plan_review sign-offs — ❌ Bug exists
-**Current behavior:** Lines 171-202 of `useReviewCase.ts` reset existing signoffs to `pending` and use `upsert` with `ignoreDuplicates`. If SA or QA changed on the system profile while the case was in `draft` or `rejected`, the old user's signoff persists, and the new user may not get one (if `ignoreDuplicates` skips the insert).
+2. Harden `useSystemProfiles.ts`
+- In `transitionApprovalStatus`, capture and validate the result of:
+  - soft-delete before `in_review`
+  - insert of each fresh `profile_signoff`
+  - soft-delete on `return to draft`
+- If cleanup fails, stop the transition flow and surface an error toast instead of continuing.
+- If any insert fails, stop and surface the error.
+- Keep the order as:
+  1. cleanup stale sign-offs
+  2. insert fresh sign-offs for current SA/QA/BO/IT Manager
+  3. trigger notifications only for successfully created fresh sign-offs
 
-**Expected behavior:** Soft-delete all existing active signoffs for this phase, then insert fresh records for the current SA and QA from the review case.
+3. Harden `useReviewCase.ts`
+- Apply the same explicit error handling to review sign-off cleanup/inserts for:
+  - `plan_review`
+  - `execution_review`
+- This prevents the same stale-signoff bug from remaining hidden there.
 
-**Fix needed:** Yes — replace the reset+upsert with soft-delete+insert pattern.
+4. Behavior to guarantee after fix
+- System Profile `draft -> in_review`:
+  - all active old `profile_signoffs` for that profile are soft-deleted first
+  - only current role assignees get fresh active sign-offs
+- System Profile `in_review -> draft`:
+  - all active sign-offs for that profile are soft-deleted immediately
+- Old objections from removed reviewers no longer appear in the active banner/state because all reads already filter `is_deleted = false`.
 
-### 3. Review Case execution_review sign-offs — ❌ Same bug
-The same code block at line 162 handles both `plan_review` and `execution_review` transitions identically. Same reset+upsert pattern applies. If QA returned the case to `in_progress` (from `execution_review`), SO made changes, and resubmitted to `execution_review`, old signoffs persist.
+Impact evaluation:
+- RLS / role visibility:
+  - needed change: allow SO/SU cleanup updates on managed sign-offs
+  - select visibility stays unchanged for all roles
+- Shared consumers:
+  - `useProfileSignoffs` and `SystemProfileDetailDialog` will automatically behave correctly once stale rows are truly soft-deleted
+  - review sign-off consumers benefit from the same fix
+- Audit / compliance:
+  - preserves soft-delete model and historical traceability
+  - avoids duplicate active sign-off records, which is critical for inspection integrity
+- i18n:
+  - no new user-facing strings required unless we improve specific error toasts
+- TypeScript/types:
+  - no type changes required
+- Role-based UI:
+  - no conditional UI change required; this is data integrity + RLS correction
 
-**Fix needed:** Yes — same fix as #2 (both phases handled in the same `if` block).
+Files affected:
+- `supabase/migrations/<new_migration>.sql`
+- `src/hooks/useSystemProfiles.ts`
+- `src/hooks/useReviewCase.ts`
 
-### 4. Sign-offs after objections — ❌ Same bug
-When SO receives objections during `plan_review`, the SO can return to `draft` (or QA can return to `plan_review` from `plan_approval`). On resubmission, the same reset+upsert code runs. Objected signoffs get reset to `pending` for the OLD users, not recreated for the CURRENT users.
-
-**Fix needed:** Yes — covered by the same fix as #2/#3.
-
-### 5. Task assignments after role changes — ⚠️ Partially covered, edge case exists
-**Current behavior:** Task generation (line 226-293) has an idempotency guard: `if (existingTaskCount === 0)`. This means if tasks already exist from a previous `approved_for_execution` cycle, they will NOT be regenerated with new role assignments.
-
-**Scenario:** Review case reaches `approved_for_execution` → tasks generated → case is rejected → goes back to `draft` → SO changes roles on system profile → case re-progresses to `approved_for_execution` → **old tasks with old assignees remain, no new tasks generated**.
-
-**However**, the review case's `frozen_system_snapshot` and role IDs (`system_admin_id`, `qa_id`, etc.) are set at creation time and are immutable. The workflow currently does NOT update these when resubmitting from `rejected → draft → plan_review`. The role assignments on the review case itself don't change — only the system profile's roles change.
-
-**This is a design decision, not a bug in the current architecture.** The `frozen_system_snapshot` pattern intentionally freezes roles at review creation time. If the user wants updated roles, they would need to delete the draft and create a new review case.
-
-**Fix needed:** No — this is by design. The frozen snapshot preserves the audit trail. Documenting this as a known limitation. If role changes mid-review are needed, task reassignment (which already exists) is the correct mechanism.
-
-### 6. Intray items — ✅ Already correct
-Both `get_user_intray_items` and `get_user_intray_count` filter `rs.is_deleted = false` and `ps.is_deleted = false` in all sections. Soft-deleted signoffs will be automatically excluded. No fix needed.
-
-### 7. Notification recipients — ✅ Already correct
-The notification wiring in `useReviewCase.ts` (lines 207-221) sends `notifySignoffRequested` to `signoffUserIds`, which is built from the newly inserted signoffs. After the fix, since we soft-delete old records first and only insert fresh ones, only the current assignees will be in `signoffUserIds`. No fix needed.
-
----
-
-## Changes Required
-
-### File: `src/hooks/useReviewCase.ts`
-
-**Lines 161-222 — Replace the sign-off creation block:**
-
-Replace the current pattern:
-1. ~~`update` existing signoffs to `pending`~~ → **Soft-delete** all existing active signoffs for this phase (`is_deleted = true`, `deleted_at`, `deleted_by`)
-2. ~~`upsert` with `ignoreDuplicates`~~ → **Insert** fresh signoff records
-
-Specifically:
-- Replace lines 171-181 (the `update` that resets to `pending`) with a soft-delete update: `is_deleted: true, deleted_at: now, deleted_by: user.id, updated_by: user.id` filtered by `review_case_id`, `phase`, and `is_deleted = false`
-- Replace lines 192-202 (the `upsert` with `ignoreDuplicates`) with a simple `insert` (no upsert needed since old records are now soft-deleted)
-
-No other files need changes. No database migration required — `review_signoffs` already has `is_deleted`, `deleted_at`, `deleted_by` columns.
-
-## Impact Assessment
-
-- **RLS:** No impact — existing UPDATE policies allow SO/SU to manage signoffs via the "System can insert signoffs" and update policies
-- **Intray/RPCs:** Already filter `is_deleted = false` — will automatically reflect changes
-- **Notifications:** Already scoped to newly inserted signoffs — no stale recipients
-- **Audit trail:** Soft-delete preserves all historical sign-off records
-- **i18n:** No new user-facing strings
-- **Types:** No changes needed
-
+Validation checklist after implementation:
+- Return a profile to draft, change SA/QA/BO, resubmit: only current reviewers appear as active sign-offs
+- Old objection no longer drives the “Objections have been raised” banner
+- Return profile to draft: active sign-offs immediately disappear
+- Repeat equivalent test for review case `plan_review` and `execution_review`
