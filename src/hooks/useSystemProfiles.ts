@@ -266,53 +266,79 @@ export function useSystemProfiles(): UseSystemProfilesReturn {
         });
         if (cleanupError) throw new Error(`Failed to clean up old sign-offs: ${cleanupError.message}`);
 
-        const profile = systems.find(s => s.id === profileId);
-        if (profile) {
-          const signoffRoles = [
-            { role: 'system_administrator', sourceUserId: profile.system_admin_id },
-            { role: 'quality_assurance', sourceUserId: profile.qa_id },
-            { role: 'business_owner', sourceUserId: profile.business_owner_id },
-            { role: 'it_manager', sourceUserId: profile.it_manager_id },
-          ];
+        // Fetch fresh profile from DB — never rely on stale cache
+        const { data: freshProfile, error: fetchError } = await supabase
+          .from('system_profiles')
+          .select('*')
+          .eq('id', profileId)
+          .eq('is_deleted', false)
+          .single();
 
-          const invalidSignoffRoles = signoffRoles.filter(({ sourceUserId }) => {
-            if (!sourceUserId || sourceUserId.trim() === '') return false;
-            return !normalizeRoleUserId(sourceUserId);
-          });
-
-          if (invalidSignoffRoles.length > 0) {
-            throw new Error(`Invalid sign-off assignee ID(s): ${invalidSignoffRoles.map(({ role }) => role).join(', ')}`);
-          }
-
-          const validSignoffs = signoffRoles
-            .map(({ role, sourceUserId }) => ({
-              role,
-              requestedUserId: normalizeRoleUserId(sourceUserId),
-            }))
-            .filter((signoff): signoff is { role: string; requestedUserId: string } => signoff.requestedUserId !== null);
-
-          for (const { role, requestedUserId } of validSignoffs) {
-            const { error: insertError } = await supabase.from('profile_signoffs').insert({
-              system_profile_id: profileId,
-              requested_role: role,
-              requested_user_id: requestedUserId,
-              status: 'pending',
-              created_by: user.id,
-            } as any);
-            if (insertError) throw new Error(`Failed to create sign-off for ${role}: ${insertError.message}`);
-          }
-
-          // 🔔 Notify signoff_requested for profile review
-          const signoffUserIds = validSignoffs.map(s => s.requestedUserId);
-          notifySignoffRequested({
-            signoffUserIds,
-            systemName: profile.name,
-            signoffPhase: 'Profile Review',
-            signoffPhaseEs: 'Revisión del Perfil',
-            resourceType: 'system_profile',
-            resourceId: profileId,
-          });
+        if (fetchError || !freshProfile) {
+          console.error('[signoff-creation] Failed to fetch profile for signoff creation:', fetchError);
+          throw new Error(`Could not load profile for sign-off creation: ${fetchError?.message ?? 'profile not found'}`);
         }
+
+        const profile = rowToSystemProfile(freshProfile);
+        console.log('[signoff-creation] Profile loaded:', { id: profile.id, name: profile.name, sa: profile.system_admin_id, qa: profile.qa_id, bo: profile.business_owner_id, it: profile.it_manager_id });
+
+        const signoffRoles = [
+          { role: 'system_administrator', sourceUserId: profile.system_admin_id },
+          { role: 'quality_assurance', sourceUserId: profile.qa_id },
+          { role: 'business_owner', sourceUserId: profile.business_owner_id },
+          { role: 'it_manager', sourceUserId: profile.it_manager_id },
+        ];
+
+        const invalidSignoffRoles = signoffRoles.filter(({ sourceUserId }) => {
+          if (!sourceUserId || sourceUserId.trim() === '') return false;
+          return !normalizeRoleUserId(sourceUserId);
+        });
+
+        if (invalidSignoffRoles.length > 0) {
+          console.error('[signoff-creation] Invalid role IDs detected:', invalidSignoffRoles);
+          throw new Error(`Invalid sign-off assignee ID(s): ${invalidSignoffRoles.map(({ role }) => role).join(', ')}`);
+        }
+
+        const validSignoffs = signoffRoles
+          .map(({ role, sourceUserId }) => ({
+            role,
+            requestedUserId: normalizeRoleUserId(sourceUserId),
+          }))
+          .filter((signoff): signoff is { role: string; requestedUserId: string } => signoff.requestedUserId !== null);
+
+        console.log('[signoff-creation] Valid signoffs to insert:', validSignoffs);
+
+        if (validSignoffs.length === 0) {
+          console.error('[signoff-creation] No valid signoffs to insert! Role IDs:', signoffRoles.map(r => ({ role: r.role, id: r.sourceUserId })));
+          throw new Error('No valid sign-off assignees found. Ensure SA, QA, and BO are assigned.');
+        }
+
+        for (const { role, requestedUserId } of validSignoffs) {
+          console.log('[signoff-creation] Inserting signoff:', { role, requestedUserId, profileId });
+          const { error: insertError } = await supabase.from('profile_signoffs').insert({
+            system_profile_id: profileId,
+            requested_role: role,
+            requested_user_id: requestedUserId,
+            status: 'pending',
+            created_by: user.id,
+          } as any);
+          if (insertError) {
+            console.error('[signoff-creation] INSERT failed for role:', role, 'error:', insertError);
+            throw new Error(`Failed to create sign-off for ${role}: ${insertError.message}`);
+          }
+          console.log('[signoff-creation] INSERT succeeded for role:', role);
+        }
+
+        // 🔔 Notify signoff_requested for profile review
+        const signoffUserIds = validSignoffs.map(s => s.requestedUserId);
+        notifySignoffRequested({
+          signoffUserIds,
+          systemName: profile.name,
+          signoffPhase: 'Profile Review',
+          signoffPhaseEs: 'Revisión del Perfil',
+          resourceType: 'system_profile',
+          resourceId: profileId,
+        });
       }
 
       // 5. If transitioning to 'draft' from 'in_review': reset all signoffs
@@ -334,7 +360,7 @@ export function useSystemProfiles(): UseSystemProfilesReturn {
       });
       return false;
     }
-  }, [user, invalidate, systems]);
+  }, [user, invalidate]);
 
   return { systems, loading: isLoading, addSystem, updateSystem, deleteSystem, transitionApprovalStatus, refetch: invalidate };
 }
