@@ -95,6 +95,63 @@ export type Database = {
         }
         Relationships: []
       }
+      notification_log: {
+        Row: {
+          created_at: string
+          error_message: string | null
+          id: string
+          metadata: Json | null
+          notification_type: string
+          recipient_email: string
+          recipient_user_id: string
+          resend_id: string | null
+          status: string
+          subject: string
+          triggered_by: string | null
+        }
+        Insert: {
+          created_at?: string
+          error_message?: string | null
+          id?: string
+          metadata?: Json | null
+          notification_type: string
+          recipient_email: string
+          recipient_user_id: string
+          resend_id?: string | null
+          status: string
+          subject: string
+          triggered_by?: string | null
+        }
+        Update: {
+          created_at?: string
+          error_message?: string | null
+          id?: string
+          metadata?: Json | null
+          notification_type?: string
+          recipient_email?: string
+          recipient_user_id?: string
+          resend_id?: string | null
+          status?: string
+          subject?: string
+          triggered_by?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "notification_log_recipient_user_id_fkey"
+            columns: ["recipient_user_id"]
+            isOneToOne: false
+            referencedRelation: "app_users"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "notification_log_triggered_by_fkey"
+            columns: ["triggered_by"]
+            isOneToOne: false
+            referencedRelation: "app_users"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       password_history: {
         Row: {
           created_at: string
