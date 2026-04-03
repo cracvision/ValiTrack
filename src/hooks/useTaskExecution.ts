@@ -16,7 +16,7 @@ interface UseTaskExecutionOptions {
 
 const MODIFIABLE_STATUSES = ['in_progress', 'approved_for_execution'];
 
-export function useTaskExecution({ task, reviewCaseId, reviewCaseStatus, systemOwnerId }: UseTaskExecutionOptions) {
+export function useTaskExecution({ task, reviewCaseId, reviewCaseStatus, systemOwnerId, systemName }: UseTaskExecutionOptions) {
   const { user, roles } = useAuth();
   const queryClient = useQueryClient();
   const userId = user?.id;
