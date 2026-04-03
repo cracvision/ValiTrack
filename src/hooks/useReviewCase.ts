@@ -280,6 +280,16 @@ export function useReviewCaseTransition() {
               triggered_by_transition: 'plan_approval → approved_for_execution',
             },
           });
+
+          // 🔔 Notify review_initiated to all unique assignees
+          const snapshot = reviewCaseData.frozen_system_snapshot as any;
+          notifyReviewInitiated({
+            reviewCaseId: input.reviewCaseId,
+            systemName: snapshot?.name || '',
+            periodStart: reviewCaseData.review_period_start,
+            periodEnd: reviewCaseData.review_period_end,
+            dueDate: reviewCaseData.due_date,
+          });
         }
       }
 
