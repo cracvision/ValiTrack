@@ -360,7 +360,7 @@ export function useSystemProfiles(): UseSystemProfilesReturn {
       });
       return false;
     }
-  }, [user, invalidate, systems]);
+  }, [user, invalidate]);
 
   return { systems, loading: isLoading, addSystem, updateSystem, deleteSystem, transitionApprovalStatus, refetch: invalidate };
 }
