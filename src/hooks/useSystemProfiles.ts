@@ -302,9 +302,9 @@ export function useSystemProfiles(): UseSystemProfilesReturn {
         await supabase
           .from('profile_signoffs')
           .update({
-            status: 'pending',
-            completed_at: null,
-            comments: '',
+            is_deleted: true,
+            deleted_at: new Date().toISOString(),
+            deleted_by: user.id,
             updated_by: user.id,
           } as any)
           .eq('system_profile_id', profileId)
