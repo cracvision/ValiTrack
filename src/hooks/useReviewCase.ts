@@ -168,19 +168,21 @@ export function useReviewCaseTransition() {
           .single();
 
         if (rc) {
-          // Reset existing signoffs for this phase to pending
+          // Soft-delete all existing active signoffs for this phase (clean slate)
+          const now = new Date().toISOString();
           await supabase
             .from('review_signoffs')
             .update({
-              status: 'pending',
-              completed_at: null,
-              comments: '',
+              is_deleted: true,
+              deleted_at: now,
+              deleted_by: user.id,
               updated_by: user.id,
             } as any)
             .eq('review_case_id', input.reviewCaseId)
-            .eq('phase', input.toStatus);
+            .eq('phase', input.toStatus)
+            .eq('is_deleted', false);
 
-          // Create signoff requests for SA and QA
+          // Insert fresh signoff requests for current SA and QA
           const signoffRoles = [
             { role: 'system_administrator', userId: rc.system_admin_id },
             { role: 'quality_assurance', userId: rc.qa_id },
@@ -189,17 +191,14 @@ export function useReviewCaseTransition() {
           const signoffUserIds: string[] = [];
           for (const { role, userId: requestedUserId } of signoffRoles) {
             if (requestedUserId && String(requestedUserId).trim() !== '') {
-              await supabase.from('review_signoffs').upsert({
+              await supabase.from('review_signoffs').insert({
                 review_case_id: input.reviewCaseId,
                 phase: input.toStatus,
                 requested_role: role,
                 requested_user_id: requestedUserId,
                 status: 'pending',
                 created_by: user.id,
-              } as any, {
-                onConflict: 'review_case_id,phase,requested_user_id',
-                ignoreDuplicates: true,
-              });
+              } as any);
               signoffUserIds.push(requestedUserId);
             }
           }
