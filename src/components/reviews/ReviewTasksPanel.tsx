@@ -20,6 +20,7 @@ interface ReviewTasksPanelProps {
   reviewLevel: ReviewLevel;
   reviewCaseStatus: string;
   systemOwnerId?: string;
+  systemName?: string;
   autoOpenTaskId?: string | null;
   onAutoOpenHandled?: () => void;
 }
