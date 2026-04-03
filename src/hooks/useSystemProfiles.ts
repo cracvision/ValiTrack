@@ -251,17 +251,10 @@ export function useSystemProfiles(): UseSystemProfilesReturn {
 
       // 4. If transitioning to 'in_review': create sign-off requests
       if (toStatus === 'in_review') {
-        // Soft-delete ALL existing signoffs for this profile to avoid stale entries
-        const { error: cleanupError } = await supabase
-          .from('profile_signoffs')
-          .update({
-            is_deleted: true,
-            deleted_at: new Date().toISOString(),
-            deleted_by: user.id,
-            updated_by: user.id,
-          } as any)
-          .eq('system_profile_id', profileId)
-          .eq('is_deleted', false);
+        // Soft-delete ALL existing signoffs for this profile via SECURITY DEFINER RPC
+        const { error: cleanupError } = await supabase.rpc('cleanup_profile_signoffs', {
+          p_system_profile_id: profileId,
+        });
         if (cleanupError) throw new Error(`Failed to clean up old sign-offs: ${cleanupError.message}`);
 
         const profile = systems.find(s => s.id === profileId);
@@ -301,16 +294,9 @@ export function useSystemProfiles(): UseSystemProfilesReturn {
 
       // 5. If transitioning to 'draft' from 'in_review': reset all signoffs
       if (toStatus === 'draft' && fromStatus === 'in_review') {
-        const { error: draftCleanupError } = await supabase
-          .from('profile_signoffs')
-          .update({
-            is_deleted: true,
-            deleted_at: new Date().toISOString(),
-            deleted_by: user.id,
-            updated_by: user.id,
-          } as any)
-          .eq('system_profile_id', profileId)
-          .eq('is_deleted', false);
+        const { error: draftCleanupError } = await supabase.rpc('cleanup_profile_signoffs', {
+          p_system_profile_id: profileId,
+        });
         if (draftCleanupError) throw new Error(`Failed to clean up sign-offs on return to draft: ${draftCleanupError.message}`);
       }
 
