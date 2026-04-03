@@ -252,7 +252,7 @@ export function useSystemProfiles(): UseSystemProfilesReturn {
       // 4. If transitioning to 'in_review': create sign-off requests
       if (toStatus === 'in_review') {
         // Soft-delete ALL existing signoffs for this profile to avoid stale entries
-        await supabase
+        const { error: cleanupError } = await supabase
           .from('profile_signoffs')
           .update({
             is_deleted: true,
@@ -262,6 +262,7 @@ export function useSystemProfiles(): UseSystemProfilesReturn {
           } as any)
           .eq('system_profile_id', profileId)
           .eq('is_deleted', false);
+        if (cleanupError) throw new Error(`Failed to clean up old sign-offs: ${cleanupError.message}`);
 
         const profile = systems.find(s => s.id === profileId);
         if (profile) {
