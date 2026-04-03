@@ -616,7 +616,7 @@ serve(async (req) => {
     });
 
     if (!success) {
-      console.error("Resend API error:", resendResult);
+      console.error("Resend SDK error:", resendResult);
       return new Response(JSON.stringify({ error: "Failed to send email", details: resendResult }), {
         status: 502,
         headers: { ...corsHeaders, "Content-Type": "application/json" },
