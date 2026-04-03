@@ -9,6 +9,8 @@ interface UseReviewSignoffsOptions {
   phase: string;
   systemOwnerId?: string;
   initiatedBy?: string;
+  qaId?: string;
+  systemName?: string;
 }
 
 export function useReviewSignoffs({ reviewCaseId, phase, systemOwnerId, initiatedBy }: UseReviewSignoffsOptions) {
