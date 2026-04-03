@@ -333,7 +333,7 @@ export function useReviewCaseTransition() {
         }
       }
     },
-    onSuccess: (_, input) => {
+    onSuccess: async (_, input) => {
       queryClient.invalidateQueries({ queryKey: ['review-case', input.reviewCaseId] });
       queryClient.invalidateQueries({ queryKey: ['review-cases'] });
       queryClient.invalidateQueries({ queryKey: ['review-transitions', input.reviewCaseId] });
@@ -344,6 +344,40 @@ export function useReviewCaseTransition() {
         queryClient.invalidateQueries({ queryKey: ['system-profiles'] });
         queryClient.invalidateQueries({ queryKey: ['systems-for-review'] });
         queryClient.invalidateQueries({ queryKey: ['active-review-cases-guard'] });
+      }
+
+      // 🔔 Notify review_status_changed for key transitions
+      const notifyStatuses = ['in_progress', 'approved', 'rejected', 'cancelled'];
+      if (notifyStatuses.includes(input.toStatus)) {
+        try {
+          const { data: rc } = await supabase
+            .from('review_cases')
+            .select('system_owner_id, system_admin_id, qa_id, business_owner_id, it_manager_id, frozen_system_snapshot')
+            .eq('id', input.reviewCaseId)
+            .single();
+
+          if (rc) {
+            const systemName = (rc.frozen_system_snapshot as any)?.name || '';
+            let recipientIds: string[];
+
+            if (input.toStatus === 'rejected') {
+              recipientIds = [rc.system_owner_id];
+            } else {
+              recipientIds = getReviewCaseStakeholders(rc);
+            }
+
+            notifyReviewStatusChanged({
+              reviewCaseId: input.reviewCaseId,
+              systemName,
+              fromStatus: input.fromStatus,
+              toStatus: input.toStatus,
+              reason: input.reason,
+              recipientUserIds: recipientIds,
+            });
+          }
+        } catch (err) {
+          console.error('[notifyReviewStatusChanged] failed:', err);
+        }
       }
     },
   });

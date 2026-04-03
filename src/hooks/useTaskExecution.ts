@@ -307,6 +307,19 @@ export function useTaskExecution({ task, reviewCaseId, reviewCaseStatus, systemO
           reason: reason.trim(),
         },
       } as any);
+
+      // 🔔 Notify both old and new assignee
+      notifyTaskReassigned({
+        taskTitle: task.title,
+        taskId: task.id,
+        reviewCaseId,
+        systemName: systemName || '',
+        previousAssigneeId: task.assigned_to,
+        previousAssigneeName: oldAssigneeName,
+        newAssigneeId,
+        newAssigneeName,
+        reason: reason.trim(),
+      });
     },
     onSuccess: () => {
       invalidateQueries();
