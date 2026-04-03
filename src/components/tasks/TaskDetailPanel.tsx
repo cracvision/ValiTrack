@@ -65,9 +65,10 @@ interface TaskDetailPanelProps {
   reviewCaseId: string;
   reviewCaseStatus: string;
   systemOwnerId?: string;
+  systemName?: string;
 }
 
-export function TaskDetailPanel({ task, open, onClose, reviewCaseId, reviewCaseStatus, systemOwnerId }: TaskDetailPanelProps) {
+export function TaskDetailPanel({ task, open, onClose, reviewCaseId, reviewCaseStatus, systemOwnerId, systemName }: TaskDetailPanelProps) {
   const { t, i18n } = useTranslation();
   const [highlightSections, setHighlightSections] = useState(false);
 
@@ -85,6 +86,7 @@ export function TaskDetailPanel({ task, open, onClose, reviewCaseId, reviewCaseS
     reviewCaseId,
     reviewCaseStatus,
     systemOwnerId,
+    systemName,
   });
 
   const workNotes = useTaskWorkNotes(task?.id);

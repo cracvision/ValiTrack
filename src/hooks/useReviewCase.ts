@@ -2,6 +2,12 @@ import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/hooks/useAuth';
 import { buildTaskPayloads } from '@/lib/taskGeneration';
+import {
+  notifyReviewInitiated,
+  notifyReviewStatusChanged,
+  notifySignoffRequested,
+  getReviewCaseStakeholders,
+} from '@/lib/notificationWiring';
 import type { ReviewCase, ReviewStatus, ReviewConclusion } from '@/types';
 
 export function useReviewCase(id: string | undefined) {
@@ -154,10 +160,10 @@ export function useReviewCaseTransition() {
 
       // Create/reset signoffs when entering plan_review or execution_review
       if (input.toStatus === 'plan_review' || input.toStatus === 'execution_review') {
-        // Fetch the review case to get role user IDs
+        // Fetch the review case to get role user IDs + system name
         const { data: rc } = await supabase
           .from('review_cases')
-          .select('system_admin_id, qa_id')
+          .select('system_admin_id, qa_id, frozen_system_snapshot')
           .eq('id', input.reviewCaseId)
           .single();
 
@@ -180,6 +186,7 @@ export function useReviewCaseTransition() {
             { role: 'quality_assurance', userId: rc.qa_id },
           ];
 
+          const signoffUserIds: string[] = [];
           for (const { role, userId: requestedUserId } of signoffRoles) {
             if (requestedUserId && String(requestedUserId).trim() !== '') {
               await supabase.from('review_signoffs').upsert({
@@ -193,8 +200,25 @@ export function useReviewCaseTransition() {
                 onConflict: 'review_case_id,phase,requested_user_id',
                 ignoreDuplicates: true,
               });
+              signoffUserIds.push(requestedUserId);
             }
           }
+
+          // 🔔 Notify signoff_requested
+          const systemName = (rc.frozen_system_snapshot as any)?.name || '';
+          const phaseLabels: Record<string, { en: string; es: string }> = {
+            plan_review: { en: 'Plan Review', es: 'Revisión del Plan' },
+            execution_review: { en: 'Execution Review', es: 'Revisión de Ejecución' },
+          };
+          const phaseLabel = phaseLabels[input.toStatus] || { en: input.toStatus, es: input.toStatus };
+          notifySignoffRequested({
+            signoffUserIds,
+            systemName,
+            signoffPhase: phaseLabel.en,
+            signoffPhaseEs: phaseLabel.es,
+            resourceType: 'review_case',
+            resourceId: input.reviewCaseId,
+          });
         }
       }
 
@@ -256,6 +280,16 @@ export function useReviewCaseTransition() {
               triggered_by_transition: 'plan_approval → approved_for_execution',
             },
           });
+
+          // 🔔 Notify review_initiated to all unique assignees
+          const snapshot = reviewCaseData.frozen_system_snapshot as any;
+          notifyReviewInitiated({
+            reviewCaseId: input.reviewCaseId,
+            systemName: snapshot?.name || '',
+            periodStart: reviewCaseData.review_period_start,
+            periodEnd: reviewCaseData.review_period_end,
+            dueDate: reviewCaseData.due_date,
+          });
         }
       }
 
@@ -299,7 +333,7 @@ export function useReviewCaseTransition() {
         }
       }
     },
-    onSuccess: (_, input) => {
+    onSuccess: async (_, input) => {
       queryClient.invalidateQueries({ queryKey: ['review-case', input.reviewCaseId] });
       queryClient.invalidateQueries({ queryKey: ['review-cases'] });
       queryClient.invalidateQueries({ queryKey: ['review-transitions', input.reviewCaseId] });
@@ -310,6 +344,40 @@ export function useReviewCaseTransition() {
         queryClient.invalidateQueries({ queryKey: ['system-profiles'] });
         queryClient.invalidateQueries({ queryKey: ['systems-for-review'] });
         queryClient.invalidateQueries({ queryKey: ['active-review-cases-guard'] });
+      }
+
+      // 🔔 Notify review_status_changed for key transitions
+      const notifyStatuses = ['in_progress', 'approved', 'rejected', 'cancelled'];
+      if (notifyStatuses.includes(input.toStatus)) {
+        try {
+          const { data: rc } = await supabase
+            .from('review_cases')
+            .select('system_owner_id, system_admin_id, qa_id, business_owner_id, it_manager_id, frozen_system_snapshot')
+            .eq('id', input.reviewCaseId)
+            .single();
+
+          if (rc) {
+            const systemName = (rc.frozen_system_snapshot as any)?.name || '';
+            let recipientIds: string[];
+
+            if (input.toStatus === 'rejected') {
+              recipientIds = [rc.system_owner_id];
+            } else {
+              recipientIds = getReviewCaseStakeholders(rc);
+            }
+
+            notifyReviewStatusChanged({
+              reviewCaseId: input.reviewCaseId,
+              systemName,
+              fromStatus: input.fromStatus,
+              toStatus: input.toStatus,
+              reason: input.reason,
+              recipientUserIds: recipientIds,
+            });
+          }
+        } catch (err) {
+          console.error('[notifyReviewStatusChanged] failed:', err);
+        }
       }
     },
   });

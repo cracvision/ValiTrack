@@ -3,6 +3,7 @@ import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/hooks/useAuth';
 import { useResolveUserNames } from '@/hooks/useResolveUserNames';
 import { toast } from '@/hooks/use-toast';
+import { notifyTaskReassigned } from '@/lib/notificationWiring';
 import type { ReviewTask } from '@/types';
 
 interface UseTaskExecutionOptions {
@@ -10,11 +11,12 @@ interface UseTaskExecutionOptions {
   reviewCaseId: string;
   reviewCaseStatus: string;
   systemOwnerId?: string;
+  systemName?: string;
 }
 
 const MODIFIABLE_STATUSES = ['in_progress', 'approved_for_execution'];
 
-export function useTaskExecution({ task, reviewCaseId, reviewCaseStatus, systemOwnerId }: UseTaskExecutionOptions) {
+export function useTaskExecution({ task, reviewCaseId, reviewCaseStatus, systemOwnerId, systemName }: UseTaskExecutionOptions) {
   const { user, roles } = useAuth();
   const queryClient = useQueryClient();
   const userId = user?.id;
@@ -305,6 +307,19 @@ export function useTaskExecution({ task, reviewCaseId, reviewCaseStatus, systemO
           reason: reason.trim(),
         },
       } as any);
+
+      // 🔔 Notify both old and new assignee
+      notifyTaskReassigned({
+        taskTitle: task.title,
+        taskId: task.id,
+        reviewCaseId,
+        systemName: systemName || '',
+        previousAssigneeId: task.assigned_to,
+        previousAssigneeName: oldAssigneeName,
+        newAssigneeId,
+        newAssigneeName,
+        reason: reason.trim(),
+      });
     },
     onSuccess: () => {
       invalidateQueries();

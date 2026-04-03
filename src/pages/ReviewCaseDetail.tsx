@@ -63,6 +63,8 @@ export default function ReviewCaseDetail() {
     phase: reviewCase?.status || '',
     systemOwnerId: reviewCase?.system_owner_id,
     initiatedBy: reviewCase?.initiated_by,
+    qaId: reviewCase?.qa_id,
+    systemName: reviewCase?.system_name,
   });
 
   const { data: templateCount = 0 } = useQuery({
@@ -387,6 +389,7 @@ export default function ReviewCaseDetail() {
           reviewLevel={reviewCase.review_level as any}
           reviewCaseStatus={reviewCase.status}
           systemOwnerId={reviewCase.system_owner_id}
+          systemName={reviewCase.system_name}
           autoOpenTaskId={autoOpenTaskId}
           onAutoOpenHandled={() => setAutoOpenTaskId(null)}
         />
