@@ -275,13 +275,14 @@ export function useSystemProfiles(): UseSystemProfilesReturn {
           const validSignoffs = signoffRoles.filter(s => s.userId && s.userId.trim() !== '');
 
           for (const { role, userId: requestedUserId } of validSignoffs) {
-            await supabase.from('profile_signoffs').insert({
+            const { error: insertError } = await supabase.from('profile_signoffs').insert({
               system_profile_id: profileId,
               requested_role: role,
               requested_user_id: requestedUserId,
               status: 'pending',
               created_by: user.id,
             } as any);
+            if (insertError) throw new Error(`Failed to create sign-off for ${role}: ${insertError.message}`);
           }
 
           // 🔔 Notify signoff_requested for profile review
