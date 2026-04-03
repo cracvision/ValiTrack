@@ -10,6 +10,10 @@ import { FindingsAlertSection } from '@/components/dashboard/FindingsAlertSectio
 import { PlatformHealthSection } from '@/components/dashboard/PlatformHealthSection';
 import { ComplianceSnapshotSection } from '@/components/dashboard/ComplianceSnapshotSection';
 import { RecentActivitySection } from '@/components/dashboard/RecentActivitySection';
+import { Button } from '@/components/ui/button';
+import { sendNotification } from '@/lib/notifications';
+import { toast } from 'sonner';
+import { useState } from 'react';
 
 function getGreetingKey(): string {
   const hour = new Date().getHours();
