@@ -634,7 +634,7 @@ serve(async (req) => {
       });
     }
 
-    return new Response(JSON.stringify({ success: true, resend_id: resendResult.id }), {
+    return new Response(JSON.stringify({ success: true, resend_id: resendId }), {
       status: 200,
       headers: { ...corsHeaders, "Content-Type": "application/json" },
     });
