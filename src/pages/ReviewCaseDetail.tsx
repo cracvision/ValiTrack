@@ -389,6 +389,7 @@ export default function ReviewCaseDetail() {
           reviewLevel={reviewCase.review_level as any}
           reviewCaseStatus={reviewCase.status}
           systemOwnerId={reviewCase.system_owner_id}
+          systemName={reviewCase.system_name}
           autoOpenTaskId={autoOpenTaskId}
           onAutoOpenHandled={() => setAutoOpenTaskId(null)}
         />
