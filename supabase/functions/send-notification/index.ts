@@ -586,23 +586,21 @@ serve(async (req) => {
       app_url: VALITRACK_APP_URL,
     }, lang);
 
-    // Send via Resend
-    const resendResponse = await fetch("https://api.resend.com/emails", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        "Authorization": `Bearer ${RESEND_API_KEY}`,
-      },
-      body: JSON.stringify({
+    // Send via Resend SDK
+    let resendResult: any;
+    let success = false;
+    try {
+      resendResult = await resend.emails.send({
         from: RESEND_FROM_EMAIL,
         to: [recipientData.email],
         subject,
         html,
-      }),
-    });
-
-    const resendResult = await resendResponse.json();
-    const success = resendResponse.ok;
+      });
+      success = !!resendResult?.id;
+    } catch (resendError: any) {
+      resendResult = { error: resendError.message || String(resendError) };
+      success = false;
+    }
 
     // Log to notification_log (service_role bypasses RLS)
     await supabaseClient.from("notification_log").insert({
