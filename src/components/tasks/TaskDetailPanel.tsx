@@ -86,6 +86,7 @@ export function TaskDetailPanel({ task, open, onClose, reviewCaseId, reviewCaseS
     reviewCaseId,
     reviewCaseStatus,
     systemOwnerId,
+    systemName,
   });
 
   const workNotes = useTaskWorkNotes(task?.id);

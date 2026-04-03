@@ -204,6 +204,7 @@ export function ReviewTasksPanel({ reviewCaseId, reviewLevel, reviewCaseStatus, 
         reviewCaseId={reviewCaseId}
         reviewCaseStatus={reviewCaseStatus}
         systemOwnerId={systemOwnerId}
+        systemName={systemName}
       />
     </>
   );
