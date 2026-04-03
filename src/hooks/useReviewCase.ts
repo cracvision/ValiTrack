@@ -168,19 +168,11 @@ export function useReviewCaseTransition() {
           .single();
 
         if (rc) {
-          // Soft-delete all existing active signoffs for this phase (clean slate)
-          const now = new Date().toISOString();
-          const { error: cleanupError } = await supabase
-            .from('review_signoffs')
-            .update({
-              is_deleted: true,
-              deleted_at: now,
-              deleted_by: user.id,
-              updated_by: user.id,
-            } as any)
-            .eq('review_case_id', input.reviewCaseId)
-            .eq('phase', input.toStatus)
-            .eq('is_deleted', false);
+          // Soft-delete all existing active signoffs for this phase via SECURITY DEFINER RPC
+          const { error: cleanupError } = await supabase.rpc('cleanup_review_signoffs', {
+            p_review_case_id: input.reviewCaseId,
+            p_phase: input.toStatus,
+          });
           if (cleanupError) throw new Error(`Failed to clean up old sign-offs: ${cleanupError.message}`);
 
           // Insert fresh signoff requests for current SA and QA
