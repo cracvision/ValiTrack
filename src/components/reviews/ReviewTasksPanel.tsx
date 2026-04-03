@@ -34,7 +34,7 @@ const STATUS_STYLES: Record<string, string> = {
 
 type TaskFilter = 'all' | 'mine';
 
-export function ReviewTasksPanel({ reviewCaseId, reviewLevel, reviewCaseStatus, systemOwnerId, autoOpenTaskId, onAutoOpenHandled }: ReviewTasksPanelProps) {
+export function ReviewTasksPanel({ reviewCaseId, reviewLevel, reviewCaseStatus, systemOwnerId, systemName, autoOpenTaskId, onAutoOpenHandled }: ReviewTasksPanelProps) {
   const { t } = useTranslation();
   const { user } = useAuth();
   const { data: tasks, isLoading } = useReviewTasks(reviewCaseId);
