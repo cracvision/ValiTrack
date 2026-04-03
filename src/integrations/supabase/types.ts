@@ -1090,6 +1090,14 @@ export type Database = {
     }
     Functions: {
       check_task_phase_unlocked: { Args: { p_task_id: string }; Returns: Json }
+      cleanup_profile_signoffs: {
+        Args: { p_system_profile_id: string }
+        Returns: number
+      }
+      cleanup_review_signoffs: {
+        Args: { p_phase: string; p_review_case_id: string }
+        Returns: number
+      }
       get_admin_users_list: {
         Args: never
         Returns: {
