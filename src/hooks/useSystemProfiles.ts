@@ -285,6 +285,17 @@ export function useSystemProfiles(): UseSystemProfilesReturn {
               ignoreDuplicates: true,
             });
           }
+
+          // 🔔 Notify signoff_requested for profile review
+          const signoffUserIds = validSignoffs.map(s => s.userId!);
+          notifySignoffRequested({
+            signoffUserIds,
+            systemName: profile.name,
+            signoffPhase: 'Profile Review',
+            signoffPhaseEs: 'Revisión del Perfil',
+            resourceType: 'system_profile',
+            resourceId: profileId,
+          });
         }
       }
 

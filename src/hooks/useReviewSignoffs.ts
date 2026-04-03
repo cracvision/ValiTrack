@@ -89,6 +89,35 @@ export function useReviewSignoffs({ reviewCaseId, phase, systemOwnerId, initiate
       queryClient.invalidateQueries({ queryKey: ['review-signoffs'] });
       queryClient.invalidateQueries({ queryKey: ['review-case', reviewCaseId] });
       queryClient.invalidateQueries({ queryKey: ['dashboard-systems'] });
+
+      // 🔔 Check if all signoffs are now approved → notify approval_pending
+      if (qaId && reviewCaseId && systemName) {
+        (async () => {
+          try {
+            const { data: summary } = await supabase.rpc('get_signoff_summary', {
+              p_review_case_id: reviewCaseId,
+              p_phase: phase,
+            });
+            const row = Array.isArray(summary) ? summary[0] : summary;
+            if (row && row.total_completed === row.total_required && !row.has_objections) {
+              const transitionLabels: Record<string, { en: string; es: string }> = {
+                plan_review: { en: 'Plan Approval', es: 'Aprobación del Plan' },
+                execution_review: { en: 'Final Approval', es: 'Aprobación Final' },
+              };
+              const labels = transitionLabels[phase] || { en: phase, es: phase };
+              notifyApprovalPending({
+                recipientUserId: qaId,
+                systemName,
+                transitionLabel: labels.en,
+                transitionLabelEs: labels.es,
+                reviewCaseId,
+              });
+            }
+          } catch (err) {
+            console.error('[approval_pending check] failed:', err);
+          }
+        })();
+      }
     },
   });
 
