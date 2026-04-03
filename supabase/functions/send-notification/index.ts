@@ -1,11 +1,14 @@
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
+import { Resend } from "npm:resend@2.0.0";
 
 const RESEND_API_KEY = Deno.env.get("RESEND_API_KEY")!;
 const RESEND_FROM_EMAIL = Deno.env.get("RESEND_FROM_EMAIL")!;
 const VALITRACK_APP_URL = Deno.env.get("VALITRACK_APP_URL")!;
 const SUPABASE_URL = Deno.env.get("SUPABASE_URL")!;
 const SUPABASE_SERVICE_ROLE_KEY = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
+
+const resend = new Resend(RESEND_API_KEY);
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
@@ -583,23 +586,21 @@ serve(async (req) => {
       app_url: VALITRACK_APP_URL,
     }, lang);
 
-    // Send via Resend
-    const resendResponse = await fetch("https://api.resend.com/emails", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        "Authorization": `Bearer ${RESEND_API_KEY}`,
-      },
-      body: JSON.stringify({
+    // Send via Resend SDK
+    let resendResult: any;
+    let success = false;
+    try {
+      resendResult = await resend.emails.send({
         from: RESEND_FROM_EMAIL,
         to: [recipientData.email],
         subject,
         html,
-      }),
-    });
-
-    const resendResult = await resendResponse.json();
-    const success = resendResponse.ok;
+      });
+      success = !!resendResult?.id;
+    } catch (resendError: any) {
+      resendResult = { error: resendError.message || String(resendError) };
+      success = false;
+    }
 
     // Log to notification_log (service_role bypasses RLS)
     await supabaseClient.from("notification_log").insert({
@@ -615,7 +616,7 @@ serve(async (req) => {
     });
 
     if (!success) {
-      console.error("Resend API error:", resendResult);
+      console.error("Resend SDK error:", resendResult);
       return new Response(JSON.stringify({ error: "Failed to send email", details: resendResult }), {
         status: 502,
         headers: { ...corsHeaders, "Content-Type": "application/json" },
