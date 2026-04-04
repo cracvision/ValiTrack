@@ -329,6 +329,9 @@ export function useSystemProfiles(): UseSystemProfilesReturn {
           console.log('[signoff-creation] INSERT succeeded for role:', role);
         }
 
+        // Immediately invalidate profile-signoffs cache so UI shows new sign-offs
+        await queryClient.invalidateQueries({ queryKey: ['profile-signoffs', profileId] });
+
         // 🔔 Notify signoff_requested for profile review
         const signoffUserIds = validSignoffs.map(s => s.requestedUserId);
         notifySignoffRequested({
