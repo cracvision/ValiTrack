@@ -14,6 +14,102 @@ export type Database = {
   }
   public: {
     Tables: {
+      ai_task_results: {
+        Row: {
+          analysis_result: Json | null
+          created_at: string
+          created_by: string
+          deleted_at: string | null
+          deleted_by: string | null
+          error_message: string | null
+          evidence_files_used: Json
+          execution_status: string
+          id: string
+          is_deleted: boolean
+          model_digest: string
+          model_name: string
+          processing_completed_at: string | null
+          processing_duration_sec: number | null
+          processing_started_at: string | null
+          prompt_template_id: string
+          review_case_id: string
+          reviewed_at: string | null
+          reviewed_by: string | null
+          reviewer_notes: string | null
+          task_id: string
+          triggered_by: string
+          updated_at: string
+          updated_by: string | null
+        }
+        Insert: {
+          analysis_result?: Json | null
+          created_at?: string
+          created_by: string
+          deleted_at?: string | null
+          deleted_by?: string | null
+          error_message?: string | null
+          evidence_files_used?: Json
+          execution_status: string
+          id?: string
+          is_deleted?: boolean
+          model_digest: string
+          model_name: string
+          processing_completed_at?: string | null
+          processing_duration_sec?: number | null
+          processing_started_at?: string | null
+          prompt_template_id: string
+          review_case_id: string
+          reviewed_at?: string | null
+          reviewed_by?: string | null
+          reviewer_notes?: string | null
+          task_id: string
+          triggered_by: string
+          updated_at?: string
+          updated_by?: string | null
+        }
+        Update: {
+          analysis_result?: Json | null
+          created_at?: string
+          created_by?: string
+          deleted_at?: string | null
+          deleted_by?: string | null
+          error_message?: string | null
+          evidence_files_used?: Json
+          execution_status?: string
+          id?: string
+          is_deleted?: boolean
+          model_digest?: string
+          model_name?: string
+          processing_completed_at?: string | null
+          processing_duration_sec?: number | null
+          processing_started_at?: string | null
+          prompt_template_id?: string
+          review_case_id?: string
+          reviewed_at?: string | null
+          reviewed_by?: string | null
+          reviewer_notes?: string | null
+          task_id?: string
+          triggered_by?: string
+          updated_at?: string
+          updated_by?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "ai_task_results_review_case_id_fkey"
+            columns: ["review_case_id"]
+            isOneToOne: false
+            referencedRelation: "review_cases"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "ai_task_results_task_id_fkey"
+            columns: ["task_id"]
+            isOneToOne: false
+            referencedRelation: "review_tasks"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       app_users: {
         Row: {
           account_expires_at: string | null
@@ -1198,6 +1294,10 @@ export type Database = {
           _user_id: string
         }
         Returns: boolean
+      }
+      queue_ai_task: {
+        Args: { p_task_id: string; p_user_id: string }
+        Returns: Json
       }
       resolve_user_names: {
         Args: { user_ids: string[] }
