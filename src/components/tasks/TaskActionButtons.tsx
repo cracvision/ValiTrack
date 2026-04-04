@@ -29,16 +29,19 @@ interface TaskActionButtonsProps {
   canComplete: boolean;
   canReopen: boolean;
   canMarkNA: boolean;
+  canQueueAi?: boolean;
   isInProgress: boolean;
   isPhaseBlocked: boolean;
   onStart: () => void;
   onComplete: () => void;
   onReopen: (reason: string) => void;
   onMarkNA: (justification: string) => void;
+  onQueueAi?: () => void;
   isStarting?: boolean;
   isCompleting?: boolean;
   isReopening?: boolean;
   isMarkingNA?: boolean;
+  isQueueingAi?: boolean;
   completionBlocked?: string | null;
   onValidationError?: (blocked: boolean) => void;
 }
