@@ -28,6 +28,8 @@ import { TaskReassignDialog } from '@/components/tasks/TaskReassignDialog';
 import { TaskWorkLog } from '@/components/tasks/TaskWorkLog';
 import { TaskEvidenceSection } from '@/components/tasks/TaskEvidenceSection';
 import { TaskInstructionsSection } from '@/components/tasks/TaskInstructionsSection';
+import { AiResultPanel } from '@/components/tasks/AiResultPanel';
+import { useAiTaskResult } from '@/hooks/useAiTaskResult';
 import { parseSteps } from '@/lib/parseInstructionSteps';
 import type { ReviewTask, TaskGroup } from '@/types';
 
