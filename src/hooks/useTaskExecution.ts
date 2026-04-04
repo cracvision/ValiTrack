@@ -338,16 +338,44 @@ export function useTaskExecution({ task, reviewCaseId, reviewCaseStatus, systemO
     },
   });
 
+  const queueAiTask = useMutation({
+    mutationFn: async () => {
+      if (!task || !userId) throw new Error('Missing task or user');
+
+      const { data, error } = await supabase.rpc('queue_ai_task', {
+        p_task_id: task.id,
+        p_user_id: userId,
+      } as any);
+
+      if (error) throw error;
+      const result = data as unknown as { success: boolean; error?: string };
+      if (!result?.success) {
+        throw new Error(result?.error || 'Failed to queue task for AI analysis');
+      }
+    },
+    onSuccess: () => {
+      invalidateQueries();
+      queryClient.invalidateQueries({ queryKey: ['ai-task-result', task?.id] });
+      toast({ title: 'Task queued for AI analysis' });
+    },
+    onError: (err: any) => {
+      console.error('Failed to queue AI task:', err);
+      toast({ title: 'Error', description: err.message, variant: 'destructive' });
+    },
+  });
+
   return {
     startTask,
     completeTask,
     reopenTask,
     reassignTask,
     markTaskNA,
+    queueAiTask,
     canStart,
     canComplete,
     canReopen,
     canMarkNA,
+    canQueueAi,
     canAddNotes,
     canReassign,
     isReadOnly,
