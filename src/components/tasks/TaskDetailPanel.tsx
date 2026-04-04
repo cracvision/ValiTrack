@@ -314,16 +314,19 @@ export function TaskDetailPanel({ task, open, onClose, reviewCaseId, reviewCaseS
               canComplete={execution.canComplete}
               canReopen={execution.canReopen}
               canMarkNA={execution.canMarkNA}
+              canQueueAi={execution.canQueueAi}
               isInProgress={execution.isInProgress}
               isPhaseBlocked={!!isPhaseBlocked}
               onStart={() => execution.startTask.mutate()}
               onComplete={handleComplete}
               onReopen={(reason) => execution.reopenTask.mutate(reason)}
               onMarkNA={(justification) => execution.markTaskNA.mutate(justification)}
+              onQueueAi={() => execution.queueAiTask.mutate()}
               isStarting={execution.startTask.isPending}
               isCompleting={execution.completeTask.isPending}
               isReopening={execution.reopenTask.isPending}
               isMarkingNA={execution.markTaskNA.isPending}
+              isQueueingAi={execution.queueAiTask.isPending}
               completionBlocked={completionBlocked}
               onValidationError={handleValidationError}
             />
