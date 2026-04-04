@@ -1,7 +1,7 @@
-// build v4 — N/A support
+// build v5 — AI_EVAL support
 import { useState, useCallback, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
-import { AlertTriangle, User, ClipboardCheck, Calendar, Info, Lock, Ban } from 'lucide-react';
+import { AlertTriangle, User, ClipboardCheck, Calendar, Info, Lock, Ban, Sparkles, Loader2 } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
 import { Separator } from '@/components/ui/separator';
 import { Alert, AlertDescription } from '@/components/ui/alert';
@@ -28,6 +28,8 @@ import { TaskReassignDialog } from '@/components/tasks/TaskReassignDialog';
 import { TaskWorkLog } from '@/components/tasks/TaskWorkLog';
 import { TaskEvidenceSection } from '@/components/tasks/TaskEvidenceSection';
 import { TaskInstructionsSection } from '@/components/tasks/TaskInstructionsSection';
+import { AiResultPanel } from '@/components/tasks/AiResultPanel';
+import { useAiTaskResult } from '@/hooks/useAiTaskResult';
 import { parseSteps } from '@/lib/parseInstructionSteps';
 import type { ReviewTask, TaskGroup } from '@/types';
 
@@ -36,6 +38,9 @@ const STATUS_BADGE: Record<string, string> = {
   in_progress: 'bg-blue-100 text-blue-800 border-blue-200 dark:bg-neutral-800 dark:text-blue-400 dark:border-neutral-700',
   completed: 'bg-emerald-100 text-emerald-800 border-emerald-200 dark:bg-neutral-800 dark:text-emerald-400 dark:border-neutral-700',
   not_applicable: 'bg-muted text-muted-foreground border-border',
+  ai_queued: 'bg-amber-100 text-amber-800 border-amber-200 dark:bg-neutral-800 dark:text-amber-400 dark:border-neutral-700',
+  ai_processing: 'bg-blue-100 text-blue-800 border-blue-200 dark:bg-neutral-800 dark:text-blue-400 dark:border-neutral-700',
+  ai_complete: 'bg-emerald-100 text-emerald-800 border-emerald-200 dark:bg-neutral-800 dark:text-emerald-400 dark:border-neutral-700',
 };
 
 const GROUP_COLORS: Record<string, string> = {
@@ -92,6 +97,7 @@ export function TaskDetailPanel({ task, open, onClose, reviewCaseId, reviewCaseS
   const workNotes = useTaskWorkNotes(task?.id);
   const evidenceFiles = useTaskEvidenceFiles({ taskId: task?.id, reviewCaseId });
   const checkoffs = useTaskCheckoffs(task?.id);
+  const { data: aiResult } = useAiTaskResult(task?.id || null, task?.status || '');
 
   // Phase lock check via RPC (backend source of truth)
   const { data: phaseStatus } = useTaskPhaseUnlocked(
@@ -153,6 +159,8 @@ export function TaskDetailPanel({ task, open, onClose, reviewCaseId, reviewCaseS
               {task.task_group === 'AI_EVAL' ? 'ANALYSIS' : task.task_group}
             </Badge>
             <Badge variant="outline" className={`text-[10px] ${STATUS_BADGE[task.status] || ''}`}>
+              {task.status === 'ai_queued' && <Sparkles className="h-3 w-3 mr-0.5 animate-pulse" />}
+              {task.status === 'ai_processing' && <Loader2 className="h-3 w-3 mr-0.5 animate-spin" />}
               {t(`tasks.status.${task.status}`)}
             </Badge>
           </div>
@@ -181,6 +189,24 @@ export function TaskDetailPanel({ task, open, onClose, reviewCaseId, reviewCaseS
             <Info className="h-4 w-4 text-blue-700 dark:text-blue-400" />
             <AlertDescription className="text-blue-700 dark:text-blue-400 text-xs">
               {t('tasks.actions.readOnlyMessage', { assignee: assigneeName })}
+            </AlertDescription>
+          </Alert>
+        )}
+
+        {/* AI status banners */}
+        {task.status === 'ai_queued' && (
+          <Alert className="mb-4 bg-amber-50 dark:bg-neutral-800 border-amber-200 dark:border-neutral-700">
+            <Sparkles className="h-4 w-4 text-amber-700 dark:text-amber-400" />
+            <AlertDescription className="text-amber-700 dark:text-amber-400 text-xs">
+              {t('tasks.aiQueuedBanner')}
+            </AlertDescription>
+          </Alert>
+        )}
+        {task.status === 'ai_processing' && (
+          <Alert className="mb-4 bg-blue-50 dark:bg-neutral-800 border-blue-200 dark:border-neutral-700">
+            <Loader2 className="h-4 w-4 text-blue-700 dark:text-blue-400 animate-spin" />
+            <AlertDescription className="text-blue-700 dark:text-blue-400 text-xs">
+              {t('tasks.aiProcessingBanner')}
             </AlertDescription>
           </Alert>
         )}
@@ -288,16 +314,19 @@ export function TaskDetailPanel({ task, open, onClose, reviewCaseId, reviewCaseS
               canComplete={execution.canComplete}
               canReopen={execution.canReopen}
               canMarkNA={execution.canMarkNA}
+              canQueueAi={execution.canQueueAi}
               isInProgress={execution.isInProgress}
               isPhaseBlocked={!!isPhaseBlocked}
               onStart={() => execution.startTask.mutate()}
               onComplete={handleComplete}
               onReopen={(reason) => execution.reopenTask.mutate(reason)}
               onMarkNA={(justification) => execution.markTaskNA.mutate(justification)}
+              onQueueAi={() => execution.queueAiTask.mutate()}
               isStarting={execution.startTask.isPending}
               isCompleting={execution.completeTask.isPending}
               isReopening={execution.reopenTask.isPending}
               isMarkingNA={execution.markTaskNA.isPending}
+              isQueueingAi={execution.queueAiTask.isPending}
               completionBlocked={completionBlocked}
               onValidationError={handleValidationError}
             />
@@ -321,6 +350,11 @@ export function TaskDetailPanel({ task, open, onClose, reviewCaseId, reviewCaseS
               canExecuteTask={execution.isAssignee || execution.isSystemOwner || execution.isSuperUser}
             />
           </>
+        )}
+
+        {/* AI Result Panel — shown when AI analysis is complete */}
+        {task.status === 'ai_complete' && aiResult && (
+          <AiResultPanel result={aiResult} />
         )}
 
         <Separator className="my-4" />
