@@ -36,9 +36,16 @@ export function useTaskExecution({ task, reviewCaseId, reviewCaseStatus, systemO
   const isInProgress = reviewCaseStatus === 'in_progress';
   const isModifiable = MODIFIABLE_STATUSES.includes(reviewCaseStatus);
 
-  const canStart = canExecute && task?.status === 'pending' && isInProgress;
-  const canComplete = canExecute && task?.status === 'in_progress' && isInProgress;
+  const canStart = canExecute && task?.status === 'pending' && isInProgress && task?.task_group !== 'AI_EVAL';
+  const canComplete = canExecute && (task?.status === 'in_progress' || task?.status === 'ai_complete') && isInProgress;
   const canReopen = canReopen_ && (task?.status === 'completed' || task?.status === 'not_applicable') && isInProgress;
+
+  // AI queue: only for AI_EVAL tasks in pending status
+  const canQueueAi = !!task && !!userId
+    && task.task_group === 'AI_EVAL'
+    && task.status === 'pending'
+    && isInProgress
+    && (isAssignee || isSystemOwner || isSuperUser);
 
   // N/A can be marked from pending or in_progress, by assignee/SO/SU, when review case allows modification
   const canMarkNA = !!task && !!userId
