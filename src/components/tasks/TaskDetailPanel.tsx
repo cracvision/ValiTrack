@@ -97,6 +97,7 @@ export function TaskDetailPanel({ task, open, onClose, reviewCaseId, reviewCaseS
   const workNotes = useTaskWorkNotes(task?.id);
   const evidenceFiles = useTaskEvidenceFiles({ taskId: task?.id, reviewCaseId });
   const checkoffs = useTaskCheckoffs(task?.id);
+  const { data: aiResult } = useAiTaskResult(task?.id || null, task?.status || '');
 
   // Phase lock check via RPC (backend source of truth)
   const { data: phaseStatus } = useTaskPhaseUnlocked(
