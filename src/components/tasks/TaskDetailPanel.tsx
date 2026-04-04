@@ -352,6 +352,11 @@ export function TaskDetailPanel({ task, open, onClose, reviewCaseId, reviewCaseS
           </>
         )}
 
+        {/* AI Result Panel — shown when AI analysis is complete */}
+        {task.status === 'ai_complete' && aiResult && (
+          <AiResultPanel result={aiResult} />
+        )}
+
         <Separator className="my-4" />
 
         {/* Work Log — visible but input hidden for N/A tasks */}
