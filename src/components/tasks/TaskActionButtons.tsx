@@ -132,8 +132,36 @@ export function TaskActionButtons({
             </Button>
           )}
 
-          {/* Start Task — hidden when phase blocked */}
-          {!isPhaseBlocked && task.status === 'pending' && (
+          {/* Queue for AI Analysis — AI_EVAL tasks only, pending status */}
+          {!isPhaseBlocked && canQueueAi && task.status === 'pending' && (
+            <Button
+              size="sm"
+              onClick={onQueueAi}
+              disabled={isQueueingAi}
+            >
+              <Sparkles className="h-3.5 w-3.5 mr-1" />
+              {t('tasks.queueForAi')}
+            </Button>
+          )}
+
+          {/* AI Queued — disabled status indicator */}
+          {task.status === 'ai_queued' && (
+            <Button size="sm" disabled className="animate-pulse">
+              <Sparkles className="h-3.5 w-3.5 mr-1" />
+              {t('tasks.aiQueued')}
+            </Button>
+          )}
+
+          {/* AI Processing — disabled status indicator */}
+          {task.status === 'ai_processing' && (
+            <Button size="sm" disabled>
+              <Loader2 className="h-3.5 w-3.5 mr-1 animate-spin" />
+              {t('tasks.aiProcessing')}
+            </Button>
+          )}
+
+          {/* Start Task — hidden when phase blocked, hidden for AI_EVAL tasks */}
+          {!isPhaseBlocked && task.status === 'pending' && task.task_group !== 'AI_EVAL' && (
             <Tooltip>
               <TooltipTrigger asChild>
                 <span>
@@ -155,8 +183,8 @@ export function TaskActionButtons({
             </Tooltip>
           )}
 
-          {/* Complete Task — hidden when phase blocked */}
-          {!isPhaseBlocked && task.status === 'in_progress' && (
+          {/* Complete Task — visible for in_progress AND ai_complete */}
+          {!isPhaseBlocked && (task.status === 'in_progress' || task.status === 'ai_complete') && (
             <Tooltip>
               <TooltipTrigger asChild>
                 <span>
