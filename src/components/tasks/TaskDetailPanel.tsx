@@ -159,6 +159,8 @@ export function TaskDetailPanel({ task, open, onClose, reviewCaseId, reviewCaseS
               {task.task_group === 'AI_EVAL' ? 'ANALYSIS' : task.task_group}
             </Badge>
             <Badge variant="outline" className={`text-[10px] ${STATUS_BADGE[task.status] || ''}`}>
+              {task.status === 'ai_queued' && <Sparkles className="h-3 w-3 mr-0.5 animate-pulse" />}
+              {task.status === 'ai_processing' && <Loader2 className="h-3 w-3 mr-0.5 animate-spin" />}
               {t(`tasks.status.${task.status}`)}
             </Badge>
           </div>
