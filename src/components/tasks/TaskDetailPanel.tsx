@@ -193,6 +193,24 @@ export function TaskDetailPanel({ task, open, onClose, reviewCaseId, reviewCaseS
           </Alert>
         )}
 
+        {/* AI status banners */}
+        {task.status === 'ai_queued' && (
+          <Alert className="mb-4 bg-amber-50 dark:bg-neutral-800 border-amber-200 dark:border-neutral-700">
+            <Sparkles className="h-4 w-4 text-amber-700 dark:text-amber-400" />
+            <AlertDescription className="text-amber-700 dark:text-amber-400 text-xs">
+              {t('tasks.aiQueuedBanner')}
+            </AlertDescription>
+          </Alert>
+        )}
+        {task.status === 'ai_processing' && (
+          <Alert className="mb-4 bg-blue-50 dark:bg-neutral-800 border-blue-200 dark:border-neutral-700">
+            <Loader2 className="h-4 w-4 text-blue-700 dark:text-blue-400 animate-spin" />
+            <AlertDescription className="text-blue-700 dark:text-blue-400 text-xs">
+              {t('tasks.aiProcessingBanner')}
+            </AlertDescription>
+          </Alert>
+        )}
+
         {/* Meta info */}
         <div className="grid grid-cols-2 gap-2 text-sm mb-4">
           <div>
