@@ -1,7 +1,7 @@
-// build v4 — N/A support
+// build v5 — AI_EVAL support
 import { useState, useCallback, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
-import { AlertTriangle, User, ClipboardCheck, Calendar, Info, Lock, Ban } from 'lucide-react';
+import { AlertTriangle, User, ClipboardCheck, Calendar, Info, Lock, Ban, Sparkles, Loader2 } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
 import { Separator } from '@/components/ui/separator';
 import { Alert, AlertDescription } from '@/components/ui/alert';
