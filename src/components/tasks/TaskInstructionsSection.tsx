@@ -111,6 +111,13 @@ export function TaskInstructionsSection({
                 </div>
               );
             })
+          ) : isAiEval && steps.length > 0 ? (
+            // Read-only numbered steps for AI_EVAL tasks
+            steps.map((step) => (
+              <p key={step.index} className="text-sm leading-relaxed text-gray-700 dark:text-gray-300">
+                {step.index}. {step.text}
+              </p>
+            ))
           ) : (
             // Plain text mode for pending/blocked tasks
             <div className="text-sm text-gray-700 dark:text-gray-300 whitespace-pre-line leading-relaxed">
