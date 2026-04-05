@@ -36,9 +36,27 @@ interface AiResultPanelProps {
 export function AiResultPanel({ result }: AiResultPanelProps) {
   const { t } = useTranslation();
 
-  const analysis = typeof result.analysis_result === 'string'
+  const rawAnalysis = typeof result.analysis_result === 'string'
     ? JSON.parse(result.analysis_result)
     : result.analysis_result ?? null;
+
+  // Normalize: support both flat legacy shape and nested DB shape
+  const analysis = rawAnalysis ? {
+    overall_verdict: rawAnalysis.phase5_conclusions?.overall_verdict?.status ?? rawAnalysis.overall_verdict ?? null,
+    summary: rawAnalysis.phase5_conclusions?.overall_verdict?.summary ?? rawAnalysis.summary ?? null,
+    sme_review_notes: rawAnalysis.phase5_conclusions?.smr_review_notes ?? rawAnalysis.sme_review_notes ?? null,
+    metrics: rawAnalysis.phase2_metrics ? {
+      total_incidents: rawAnalysis.phase2_metrics.total_incidents,
+      p1_critical: rawAnalysis.phase2_metrics.by_priority?.p1_critical,
+      p2_high: rawAnalysis.phase2_metrics.by_priority?.p2_high,
+      p3_medium: rawAnalysis.phase2_metrics.by_priority?.p3_medium,
+      p4_low: rawAnalysis.phase2_metrics.by_priority?.p4_low,
+      sla_compliance_pct: rawAnalysis.phase2_metrics.sla_compliance?.compliance_rate_percent,
+    } : rawAnalysis.metrics ?? null,
+    data_quality: rawAnalysis.data_quality ?? null,
+    critical_findings: rawAnalysis.critical_findings ?? null,
+    recommendations: rawAnalysis.recommendations ?? null,
+  } : null;
 
   const evidenceFiles: Array<{ file_id: string; file_name: string; storage_path: string; sha256_hash: string }> =
     typeof result.evidence_files_used === 'string'
