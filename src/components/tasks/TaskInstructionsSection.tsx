@@ -3,12 +3,13 @@ import { useTranslation } from 'react-i18next';
 import { ClipboardList, ChevronDown, ChevronUp } from 'lucide-react';
 import { Checkbox } from '@/components/ui/checkbox';
 import { parseSteps } from '@/lib/parseInstructionSteps';
-import type { TaskStatus } from '@/types';
+import type { TaskStatus, TaskGroup } from '@/types';
 import type { CheckoffDetail } from '@/hooks/useTaskCheckoffs';
 
 interface TaskInstructionsSectionProps {
   instructions: string;
   taskStatus: TaskStatus;
+  taskGroup?: TaskGroup;
   canInteract: boolean;
   checkedSteps: Set<number>;
   checkoffDetails: Map<number, CheckoffDetail>;
@@ -25,6 +26,7 @@ function formatDate(iso: string): string {
 export function TaskInstructionsSection({
   instructions,
   taskStatus,
+  taskGroup,
   canInteract,
   checkedSteps,
   checkoffDetails,
@@ -39,7 +41,8 @@ export function TaskInstructionsSection({
   if (!instructions || instructions.trim() === '') return null;
 
   const steps = parseSteps(instructions);
-  const showCheckboxes = taskStatus === 'in_progress' || taskStatus === 'completed';
+  const isAiEval = taskGroup === 'AI_EVAL';
+  const showCheckboxes = !isAiEval && (taskStatus === 'in_progress' || taskStatus === 'completed');
   const completedCount = checkedSteps.size;
   const totalSteps = steps.length;
   const allComplete = totalSteps > 0 && completedCount >= totalSteps;
@@ -108,6 +111,13 @@ export function TaskInstructionsSection({
                 </div>
               );
             })
+          ) : isAiEval && steps.length > 0 ? (
+            // Read-only numbered steps for AI_EVAL tasks
+            steps.map((step) => (
+              <p key={step.index} className="text-sm leading-relaxed text-gray-700 dark:text-gray-300">
+                {step.index}. {step.text}
+              </p>
+            ))
           ) : (
             // Plain text mode for pending/blocked tasks
             <div className="text-sm text-gray-700 dark:text-gray-300 whitespace-pre-line leading-relaxed">
