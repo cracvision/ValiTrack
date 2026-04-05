@@ -645,7 +645,8 @@
       "evidenceAndNoteRequired": "This task requires at least one evidence file and one work note before it can be completed.",
       "noteRequired": "This task requires at least one work note documenting the evaluation before it can be completed.",
       "approvalNoteRequired": "This task requires at least one work note with your approval statement before it can be completed.",
-      "instructionsIncomplete": "All instruction steps must be checked off before completing this task."
+      "instructionsIncomplete": "All instruction steps must be checked off before completing this task.",
+      "aiReviewNoteRequired": "You must document your review of the AI analysis in a work note before completing this task."
     }
   },
   "pages": {
