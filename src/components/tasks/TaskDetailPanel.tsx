@@ -359,8 +359,8 @@ export function TaskDetailPanel({ task, open, onClose, reviewCaseId, reviewCaseS
           </>
         )}
 
-        {/* AI Result Panel — shown when AI analysis is complete or task completed */}
-        {(task.status === 'ai_complete' || task.status === 'completed') && task.task_group === 'AI_EVAL' && aiResult && (
+        {/* AI Result Panel — shown for AI_EVAL tasks whenever a completed result exists */}
+        {isAiEval && aiResult && aiResult.execution_status === 'complete' && (
           <AiResultPanel result={aiResult} />
         )}
 
