@@ -55,9 +55,10 @@ export interface AiTaskResult {
   created_at: string;
 }
 
-export function useAiTaskResult(taskId: string | null, taskStatus: string) {
+export function useAiTaskResult(taskId: string | null, taskStatus: string, taskGroup?: string) {
   const isPolling = taskStatus === 'ai_queued' || taskStatus === 'ai_processing';
-  const shouldFetch = isPolling || taskStatus === 'ai_complete' || taskStatus === 'completed';
+  const isAiEval = taskGroup === 'AI_EVAL';
+  const shouldFetch = isPolling || taskStatus === 'ai_complete' || taskStatus === 'completed' || (isAiEval && taskStatus === 'in_progress');
 
   return useQuery({
     queryKey: ['ai-task-result', taskId],
