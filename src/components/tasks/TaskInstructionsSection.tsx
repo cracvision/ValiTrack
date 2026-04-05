@@ -41,7 +41,8 @@ export function TaskInstructionsSection({
   if (!instructions || instructions.trim() === '') return null;
 
   const steps = parseSteps(instructions);
-  const showCheckboxes = taskStatus === 'in_progress' || taskStatus === 'completed';
+  const isAiEval = taskGroup === 'AI_EVAL';
+  const showCheckboxes = !isAiEval && (taskStatus === 'in_progress' || taskStatus === 'completed');
   const completedCount = checkedSteps.size;
   const totalSteps = steps.length;
   const allComplete = totalSteps > 0 && completedCount >= totalSteps;
