@@ -1,5 +1,6 @@
 // build v5 — AI_EVAL support
 import { useState, useCallback, useEffect } from 'react';
+import { useAuth } from '@/hooks/useAuth';
 import { useTranslation } from 'react-i18next';
 import { AlertTriangle, User, ClipboardCheck, Calendar, Info, Lock, Ban, Sparkles, Loader2 } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
