@@ -35,7 +35,15 @@ interface AiResultPanelProps {
 
 export function AiResultPanel({ result }: AiResultPanelProps) {
   const { t } = useTranslation();
-  const analysis = result.analysis_result;
+
+  const analysis = typeof result.analysis_result === 'string'
+    ? JSON.parse(result.analysis_result)
+    : result.analysis_result ?? null;
+
+  const evidenceFiles: Array<{ file_id: string; file_name: string; storage_path: string; sha256_hash: string }> =
+    typeof result.evidence_files_used === 'string'
+      ? JSON.parse(result.evidence_files_used)
+      : result.evidence_files_used ?? [];
 
   if (!analysis) {
     return (
