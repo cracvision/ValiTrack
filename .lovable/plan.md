@@ -1,29 +1,79 @@
 
-# AI Agent Integration — Phase 1 (AI-EVAL-001) ✅ IMPLEMENTED
+
+# Plan: Create `get_ai_queued_tasks` RPC Migration
 
 ## Summary
-Implemented database infrastructure and frontend UI for AI-powered execution of AI-EVAL-001 task. External Python worker NOT built by Lovable.
+Single SQL migration to add a SECURITY DEFINER RPC that lets the Worker (via super_user service account) retrieve all `ai_queued` tasks with review case and system profile context, bypassing RLS.
 
-## Changes Made
+## Column Name Corrections Required
+The provided SQL has three mismatches with the actual database schema:
 
-### Part A — Database Migration
-1. Extended `review_tasks.status` CHECK constraint to include: `ai_queued`, `ai_processing`, `ai_complete`
-2. Created `ai_task_results` table with full GxP audit trail (model metadata, analysis_result JSONB, evidence tracking, SME review fields)
-3. Created `queue_ai_task` SECURITY DEFINER RPC (validates permissions, transitions status, creates audit entries)
-4. RLS: SELECT for review case participants, UPDATE for super_user only, NO INSERT policy (worker uses service_role)
+| RPC Reference | Actual Column | Fix |
+|---|---|---|
+| `rc.period_start_date` | `rc.review_period_start` | Rename alias |
+| `rc.period_end_date` | `rc.review_period_end` | Rename alias |
+| `review_level INTEGER` (return type) | `review_level TEXT` (actual type) | Change return type to TEXT |
 
-### Part B — Frontend Changes
-1. **`src/types/index.ts`** — Extended `TaskStatus` type with AI statuses
-2. **`src/hooks/useAiTaskResult.ts`** — New hook with 5s polling for AI results
-3. **`src/hooks/useTaskExecution.ts`** — Added `queueAiTask` mutation, `canQueueAi` permission, adjusted `canStart`/`canComplete` for AI flow
-4. **`src/components/tasks/AiResultPanel.tsx`** — New component rendering structured AI analysis (disclaimer, metadata, verdict, metrics, findings, recommendations, SME notes, evidence)
-5. **`src/components/tasks/TaskDetailPanel.tsx`** — AI status badges, AI banners, AI result panel integration
-6. **`src/components/tasks/TaskActionButtons.tsx`** — "Queue for AI Analysis" button, disabled AI status indicators, Complete from ai_complete
-7. **`src/locales/en/common.json`** + **`es/common.json`** — 18 new i18n keys each
+Also, `has_role` second param needs explicit cast to `app_role`.
 
-### What Was NOT Changed
-- Worker Python script (external)
-- Existing completion validation logic
-- Phase dependency enforcement
-- Task assignment logic
-- No localStorage usage
+## Migration SQL (corrected)
+
+```sql
+CREATE OR REPLACE FUNCTION public.get_ai_queued_tasks()
+RETURNS TABLE (
+  task_id          UUID,
+  task_title       TEXT,
+  task_group       TEXT,
+  review_case_id   UUID,
+  assigned_to      UUID,
+  system_name      TEXT,
+  period_start     DATE,
+  period_end       DATE,
+  risk_level       TEXT,
+  gamp_category    TEXT,
+  review_level     TEXT
+)
+LANGUAGE plpgsql
+SECURITY DEFINER
+SET search_path = public
+AS $$
+BEGIN
+  IF NOT public.has_role(auth.uid(), 'super_user'::app_role) THEN
+    RAISE EXCEPTION 'Insufficient permissions';
+  END IF;
+
+  RETURN QUERY
+  SELECT
+    rt.id                AS task_id,
+    rt.title             AS task_title,
+    rt.task_group,
+    rt.review_case_id,
+    rt.assigned_to,
+    sp.name              AS system_name,
+    rc.review_period_start AS period_start,
+    rc.review_period_end   AS period_end,
+    sp.risk_level,
+    sp.gamp_category,
+    rc.review_level
+  FROM review_tasks rt
+  JOIN review_cases rc ON rc.id = rt.review_case_id
+  JOIN system_profiles sp ON sp.id = rc.system_id
+  WHERE rt.status = 'ai_queued'
+    AND rt.is_deleted = false
+    AND rc.is_deleted = false
+    AND sp.is_deleted = false
+  ORDER BY rt.updated_at ASC;
+END;
+$$;
+```
+
+## Impact Assessment
+- **RLS**: No changes to existing policies. Function uses SECURITY DEFINER to bypass RLS, restricted to super_user via `has_role` check.
+- **Existing components**: No frontend changes. No hooks consume this RPC (it's for the external Python worker).
+- **Audit trail**: N/A — read-only function.
+- **i18n**: No new strings.
+- **TypeScript types**: No changes needed (worker is external Python).
+
+## Files Changed
+- `supabase/migrations/<timestamp>.sql` — new migration (single file)
+
