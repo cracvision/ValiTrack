@@ -74,7 +74,7 @@ export function useAiTaskResult(taskId: string | null, taskStatus: string) {
       if (error) throw error;
       return data as unknown as AiTaskResult | null;
     },
-    enabled: !!taskId,
+    enabled: !!taskId && shouldFetch,
     refetchInterval: isPolling ? 5000 : false,
     staleTime: isPolling ? 0 : 60000,
   });

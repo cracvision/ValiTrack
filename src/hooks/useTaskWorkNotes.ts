@@ -86,5 +86,6 @@ export function useTaskWorkNotes(taskId: string | undefined) {
     isLoading,
     addNote,
     noteCount,
+    humanNoteCount,
   };
 }
