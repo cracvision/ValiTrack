@@ -123,8 +123,10 @@ export function TaskDetailPanel({ task, open, onClose, reviewCaseId, reviewCaseS
   const instructionsIncomplete = !isAiEval && parsedStepCount > 0 && checkoffs.completedCount < parsedStepCount;
 
   const getCompletionBlockedReason = (): string | null => {
-    // AI_EVAL tasks: only gate is human review note (no instruction checkoff)
-    if (isAiEval && (task.status === 'ai_complete' || task.status === 'in_progress')) {
+    // AI_EVAL tasks with a completed AI result: require human review note
+    // This applies regardless of current status (ai_complete, in_progress after reopen)
+    const hasCompletedAiResult = isAiEval && aiResult && aiResult.execution_status === 'complete';
+    if (hasCompletedAiResult) {
       if (workNotes.humanNoteCount < 1) {
         return t('tasks.validation.aiReviewNoteRequired');
       }
