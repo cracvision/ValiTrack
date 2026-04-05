@@ -123,8 +123,8 @@ export function TaskDetailPanel({ task, open, onClose, reviewCaseId, reviewCaseS
   const instructionsIncomplete = !isAiEval && parsedStepCount > 0 && checkoffs.completedCount < parsedStepCount;
 
   const getCompletionBlockedReason = (): string | null => {
-    // AI_EVAL tasks in ai_complete require human review note
-    if (task.status === 'ai_complete' && task.task_group === 'AI_EVAL') {
+    // AI_EVAL tasks: only gate is human review note (no instruction checkoff)
+    if (isAiEval && (task.status === 'ai_complete' || task.status === 'in_progress')) {
       if (workNotes.humanNoteCount < 1) {
         return t('tasks.validation.aiReviewNoteRequired');
       }
@@ -133,7 +133,7 @@ export function TaskDetailPanel({ task, open, onClose, reviewCaseId, reviewCaseS
 
     if (task.status !== 'in_progress') return null;
 
-    // Instruction checkoff gate
+    // Instruction checkoff gate (skipped for AI_EVAL above)
     if (instructionsIncomplete) {
       return t('tasks.validation.instructionsIncomplete');
     }
@@ -144,8 +144,6 @@ export function TaskDetailPanel({ task, open, onClose, reviewCaseId, reviewCaseS
       if (evidenceFiles.fileCount < 1 || workNotes.noteCount < 1) {
         return t('tasks.validation.evidenceAndNoteRequired');
       }
-    } else if (task.task_group === 'AI_EVAL') {
-      if (workNotes.humanNoteCount < 1) return t('tasks.validation.aiReviewNoteRequired');
     } else if (task.task_group === 'APPR') {
       if (workNotes.noteCount < 1) return t('tasks.validation.approvalNoteRequired');
     }
