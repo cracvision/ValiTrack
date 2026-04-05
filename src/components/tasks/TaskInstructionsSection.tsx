@@ -26,6 +26,7 @@ function formatDate(iso: string): string {
 export function TaskInstructionsSection({
   instructions,
   taskStatus,
+  taskGroup,
   canInteract,
   checkedSteps,
   checkoffDetails,
