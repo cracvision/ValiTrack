@@ -184,16 +184,16 @@ export function AiResultPanel({ result }: AiResultPanelProps) {
       )}
 
       {/* Evidence Processed */}
-      {result.evidence_files_used && (result.evidence_files_used as any[]).length > 0 && (
+      {evidenceFiles.length > 0 && (
         <Collapsible>
           <CollapsibleTrigger className="flex items-center gap-1 text-xs font-semibold text-foreground hover:underline">
             <FileText className="h-3.5 w-3.5" />
-            {t('tasks.aiEvidenceProcessed')} ({(result.evidence_files_used as any[]).length})
+            {t('tasks.aiEvidenceProcessed')} ({evidenceFiles.length})
             <ChevronDown className="h-3 w-3" />
           </CollapsibleTrigger>
           <CollapsibleContent className="pt-2">
             <ul className="space-y-1">
-              {(result.evidence_files_used as any[]).map((ef: any) => (
+              {evidenceFiles.map((ef) => (
                 <li key={ef.file_id} className="text-[10px] text-muted-foreground font-mono flex items-center gap-2">
                   <FileText className="h-3 w-3 shrink-0" />
                   {ef.file_name}
