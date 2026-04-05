@@ -1,5 +1,6 @@
 // build v5 — AI_EVAL support
 import { useState, useCallback, useEffect } from 'react';
+import { useAuth } from '@/hooks/useAuth';
 import { useTranslation } from 'react-i18next';
 import { AlertTriangle, User, ClipboardCheck, Calendar, Info, Lock, Ban, Sparkles, Loader2 } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
@@ -75,6 +76,7 @@ interface TaskDetailPanelProps {
 
 export function TaskDetailPanel({ task, open, onClose, reviewCaseId, reviewCaseStatus, systemOwnerId, systemName }: TaskDetailPanelProps) {
   const { t, i18n } = useTranslation();
+  const { user } = useAuth();
   const [highlightSections, setHighlightSections] = useState(false);
 
   // Reset validation highlights when task changes or panel opens/closes
@@ -124,10 +126,16 @@ export function TaskDetailPanel({ task, open, onClose, reviewCaseId, reviewCaseS
 
   const getCompletionBlockedReason = (): string | null => {
     // AI_EVAL tasks with a completed AI result: require human review note
-    // This applies regardless of current status (ai_complete, in_progress after reopen)
+    // posted AFTER the last reopen (if any)
     const hasCompletedAiResult = isAiEval && aiResult && aiResult.execution_status === 'complete';
     if (hasCompletedAiResult) {
-      if (workNotes.humanNoteCount < 1) {
+      const reopenedAt = task.reopened_at ? new Date(task.reopened_at).getTime() : null;
+      const relevantNotes = workNotes.notes.filter(n =>
+        n.note_type === 'work_note' &&
+        n.created_by === user?.id &&
+        (reopenedAt === null || new Date(n.created_at).getTime() > reopenedAt)
+      );
+      if (relevantNotes.length < 1) {
         return t('tasks.validation.aiReviewNoteRequired');
       }
       return null;
