@@ -57,6 +57,7 @@ export interface AiTaskResult {
 
 export function useAiTaskResult(taskId: string | null, taskStatus: string) {
   const isPolling = taskStatus === 'ai_queued' || taskStatus === 'ai_processing';
+  const shouldFetch = isPolling || taskStatus === 'ai_complete' || taskStatus === 'completed';
 
   return useQuery({
     queryKey: ['ai-task-result', taskId],
@@ -73,7 +74,7 @@ export function useAiTaskResult(taskId: string | null, taskStatus: string) {
       if (error) throw error;
       return data as unknown as AiTaskResult | null;
     },
-    enabled: !!taskId,
+    enabled: !!taskId && shouldFetch,
     refetchInterval: isPolling ? 5000 : false,
     staleTime: isPolling ? 0 : 60000,
   });

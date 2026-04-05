@@ -122,6 +122,14 @@ export function TaskDetailPanel({ task, open, onClose, reviewCaseId, reviewCaseS
   const instructionsIncomplete = parsedStepCount > 0 && checkoffs.completedCount < parsedStepCount;
 
   const getCompletionBlockedReason = (): string | null => {
+    // AI_EVAL tasks in ai_complete require human review note
+    if (task.status === 'ai_complete' && task.task_group === 'AI_EVAL') {
+      if (workNotes.humanNoteCount < 1) {
+        return t('tasks.validation.aiReviewNoteRequired');
+      }
+      return null;
+    }
+
     if (task.status !== 'in_progress') return null;
 
     // Instruction checkoff gate
@@ -136,7 +144,7 @@ export function TaskDetailPanel({ task, open, onClose, reviewCaseId, reviewCaseS
         return t('tasks.validation.evidenceAndNoteRequired');
       }
     } else if (task.task_group === 'AI_EVAL') {
-      if (workNotes.noteCount < 1) return t('tasks.validation.noteRequired');
+      if (workNotes.humanNoteCount < 1) return t('tasks.validation.aiReviewNoteRequired');
     } else if (task.task_group === 'APPR') {
       if (workNotes.noteCount < 1) return t('tasks.validation.approvalNoteRequired');
     }
@@ -352,8 +360,8 @@ export function TaskDetailPanel({ task, open, onClose, reviewCaseId, reviewCaseS
           </>
         )}
 
-        {/* AI Result Panel — shown when AI analysis is complete */}
-        {task.status === 'ai_complete' && aiResult && (
+        {/* AI Result Panel — shown when AI analysis is complete or task completed */}
+        {(task.status === 'ai_complete' || task.status === 'completed') && task.task_group === 'AI_EVAL' && aiResult && (
           <AiResultPanel result={aiResult} />
         )}
 
