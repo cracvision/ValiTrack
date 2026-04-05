@@ -97,7 +97,7 @@ export function TaskDetailPanel({ task, open, onClose, reviewCaseId, reviewCaseS
   const workNotes = useTaskWorkNotes(task?.id);
   const evidenceFiles = useTaskEvidenceFiles({ taskId: task?.id, reviewCaseId });
   const checkoffs = useTaskCheckoffs(task?.id);
-  const { data: aiResult } = useAiTaskResult(task?.id || null, task?.status || '');
+  const { data: aiResult } = useAiTaskResult(task?.id || null, task?.status || '', task?.task_group);
 
   // Phase lock check via RPC (backend source of truth)
   const { data: phaseStatus } = useTaskPhaseUnlocked(
@@ -119,11 +119,12 @@ export function TaskDetailPanel({ task, open, onClose, reviewCaseId, reviewCaseS
     ? task.execution_instructions_es
     : task.execution_instructions;
   const parsedStepCount = parseSteps(langInstructions).length;
-  const instructionsIncomplete = parsedStepCount > 0 && checkoffs.completedCount < parsedStepCount;
+  const isAiEval = task.task_group === 'AI_EVAL';
+  const instructionsIncomplete = !isAiEval && parsedStepCount > 0 && checkoffs.completedCount < parsedStepCount;
 
   const getCompletionBlockedReason = (): string | null => {
-    // AI_EVAL tasks in ai_complete require human review note
-    if (task.status === 'ai_complete' && task.task_group === 'AI_EVAL') {
+    // AI_EVAL tasks: only gate is human review note (no instruction checkoff)
+    if (isAiEval && (task.status === 'ai_complete' || task.status === 'in_progress')) {
       if (workNotes.humanNoteCount < 1) {
         return t('tasks.validation.aiReviewNoteRequired');
       }
@@ -132,7 +133,7 @@ export function TaskDetailPanel({ task, open, onClose, reviewCaseId, reviewCaseS
 
     if (task.status !== 'in_progress') return null;
 
-    // Instruction checkoff gate
+    // Instruction checkoff gate (skipped for AI_EVAL above)
     if (instructionsIncomplete) {
       return t('tasks.validation.instructionsIncomplete');
     }
@@ -143,8 +144,6 @@ export function TaskDetailPanel({ task, open, onClose, reviewCaseId, reviewCaseS
       if (evidenceFiles.fileCount < 1 || workNotes.noteCount < 1) {
         return t('tasks.validation.evidenceAndNoteRequired');
       }
-    } else if (task.task_group === 'AI_EVAL') {
-      if (workNotes.humanNoteCount < 1) return t('tasks.validation.aiReviewNoteRequired');
     } else if (task.task_group === 'APPR') {
       if (workNotes.noteCount < 1) return t('tasks.validation.approvalNoteRequired');
     }
@@ -360,8 +359,8 @@ export function TaskDetailPanel({ task, open, onClose, reviewCaseId, reviewCaseS
           </>
         )}
 
-        {/* AI Result Panel — shown when AI analysis is complete or task completed */}
-        {(task.status === 'ai_complete' || task.status === 'completed') && task.task_group === 'AI_EVAL' && aiResult && (
+        {/* AI Result Panel — shown for AI_EVAL tasks whenever a completed result exists */}
+        {isAiEval && aiResult && aiResult.execution_status === 'complete' && (
           <AiResultPanel result={aiResult} />
         )}
 
