@@ -119,7 +119,8 @@ export function TaskDetailPanel({ task, open, onClose, reviewCaseId, reviewCaseS
     ? task.execution_instructions_es
     : task.execution_instructions;
   const parsedStepCount = parseSteps(langInstructions).length;
-  const instructionsIncomplete = parsedStepCount > 0 && checkoffs.completedCount < parsedStepCount;
+  const isAiEval = task.task_group === 'AI_EVAL';
+  const instructionsIncomplete = !isAiEval && parsedStepCount > 0 && checkoffs.completedCount < parsedStepCount;
 
   const getCompletionBlockedReason = (): string | null => {
     // AI_EVAL tasks in ai_complete require human review note
