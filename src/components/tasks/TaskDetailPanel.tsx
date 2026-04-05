@@ -124,10 +124,16 @@ export function TaskDetailPanel({ task, open, onClose, reviewCaseId, reviewCaseS
 
   const getCompletionBlockedReason = (): string | null => {
     // AI_EVAL tasks with a completed AI result: require human review note
-    // This applies regardless of current status (ai_complete, in_progress after reopen)
+    // posted AFTER the last reopen (if any)
     const hasCompletedAiResult = isAiEval && aiResult && aiResult.execution_status === 'complete';
     if (hasCompletedAiResult) {
-      if (workNotes.humanNoteCount < 1) {
+      const reopenedAt = task.reopened_at ? new Date(task.reopened_at).getTime() : null;
+      const relevantNotes = workNotes.notes.filter(n =>
+        n.note_type === 'work_note' &&
+        n.created_by === user?.id &&
+        (reopenedAt === null || new Date(n.created_at).getTime() > reopenedAt)
+      );
+      if (relevantNotes.length < 1) {
         return t('tasks.validation.aiReviewNoteRequired');
       }
       return null;
