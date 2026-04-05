@@ -274,14 +274,17 @@ export function TaskDetailPanel({ task, open, onClose, reviewCaseId, reviewCaseS
           <TaskInstructionsSection
             instructions={langInstructions}
             taskStatus={task.status}
+            taskGroup={task.task_group as any}
             canInteract={
               isNA
                 ? false
-                : task.status === 'in_progress'
-                  ? (execution.isAssignee || execution.isSystemOwner || execution.isSuperUser)
-                  : task.status === 'completed'
-                    ? (execution.isSystemOwner || execution.isSuperUser)
-                    : false
+                : isAiEval
+                  ? false
+                  : task.status === 'in_progress'
+                    ? (execution.isAssignee || execution.isSystemOwner || execution.isSuperUser)
+                    : task.status === 'completed'
+                      ? (execution.isSystemOwner || execution.isSuperUser)
+                      : false
             }
             checkedSteps={checkoffs.checkedSteps}
             checkoffDetails={checkoffs.checkoffDetails}
