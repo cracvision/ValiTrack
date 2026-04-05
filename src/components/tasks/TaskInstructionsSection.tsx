@@ -9,6 +9,7 @@ import type { CheckoffDetail } from '@/hooks/useTaskCheckoffs';
 interface TaskInstructionsSectionProps {
   instructions: string;
   taskStatus: TaskStatus;
+  taskGroup?: TaskGroup;
   canInteract: boolean;
   checkedSteps: Set<number>;
   checkoffDetails: Map<number, CheckoffDetail>;
