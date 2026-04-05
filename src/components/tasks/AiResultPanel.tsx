@@ -117,23 +117,30 @@ export function AiResultPanel({ result }: AiResultPanelProps) {
         <p className="text-sm text-foreground">{analysis.summary}</p>
       </div>
 
+      {/* Data Quality */}
+      {analysis.data_quality && (
+        <div className="rounded-md border p-2.5 space-y-1">
+          <h4 className="text-xs font-semibold text-foreground mb-1">{t('tasks.aiDataQuality', 'Data Quality')}</h4>
+          <div className="flex gap-4 text-xs text-muted-foreground">
+            <span>Source: <span className="font-mono text-foreground">{analysis.data_quality.source_document}</span></span>
+            <span>Records: <span className="font-semibold text-foreground">{analysis.data_quality.total_records_found}</span></span>
+          </div>
+        </div>
+      )}
+
       {/* Metrics Summary */}
-      {analysis.metrics && (
+      {analysis.metrics ? (
         <div>
           <h4 className="text-xs font-semibold text-foreground mb-2">{t('tasks.aiMetrics')}</h4>
-          <div className="grid grid-cols-5 gap-2">
+          <div className="grid grid-cols-3 sm:grid-cols-6 gap-2">
             {[
               { label: 'Total', value: analysis.metrics.total_incidents },
               { label: 'P1', value: analysis.metrics.p1_critical },
               { label: 'P2', value: analysis.metrics.p2_high },
               { label: 'P3', value: analysis.metrics.p3_medium },
               { label: 'P4', value: analysis.metrics.p4_low },
-              { label: 'GxP-Crit', value: analysis.metrics.gxp_critical },
-              { label: 'GxP-Rel', value: analysis.metrics.gxp_relevant },
-              { label: 'Ops-IT', value: analysis.metrics.operational_it },
-              { label: 'SLA %', value: `${analysis.metrics.sla_compliance_pct}%` },
-              { label: 'Trend', value: analysis.metrics.trend_direction },
-            ].map((m) => (
+              { label: 'SLA %', value: analysis.metrics.sla_compliance_pct != null ? `${analysis.metrics.sla_compliance_pct}%` : '—' },
+            ].filter((m) => m.value != null).map((m) => (
               <div key={m.label} className="text-center rounded-md bg-muted/50 px-2 py-1.5">
                 <div className="text-[10px] text-muted-foreground">{m.label}</div>
                 <div className="text-sm font-semibold text-foreground">{m.value}</div>
@@ -141,14 +148,14 @@ export function AiResultPanel({ result }: AiResultPanelProps) {
             ))}
           </div>
         </div>
-      )}
+      ) : null}
 
       {/* Critical Findings */}
-      {analysis.critical_findings?.length > 0 && (
+      {analysis.critical_findings?.length > 0 ? (
         <div>
           <h4 className="text-xs font-semibold text-foreground mb-2">{t('tasks.aiFindings')}</h4>
           <div className="space-y-2">
-            {analysis.critical_findings.map((f) => (
+            {analysis.critical_findings.map((f: any) => (
               <div key={f.finding_id} className="rounded-md border p-2.5 space-y-1">
                 <div className="flex items-center gap-2">
                   <Badge className={`text-[9px] ${SEVERITY_STYLES[f.severity] || ''}`}>
@@ -169,14 +176,19 @@ export function AiResultPanel({ result }: AiResultPanelProps) {
             ))}
           </div>
         </div>
+      ) : (
+        <div>
+          <h4 className="text-xs font-semibold text-foreground mb-1">{t('tasks.aiFindings')}</h4>
+          <p className="text-xs text-muted-foreground italic">{t('tasks.aiSectionNotIncluded', 'Not included in this analysis run.')}</p>
+        </div>
       )}
 
       {/* Recommendations */}
-      {analysis.recommendations?.length > 0 && (
+      {analysis.recommendations?.length > 0 ? (
         <div>
           <h4 className="text-xs font-semibold text-foreground mb-2">{t('tasks.aiRecommendations')}</h4>
           <ol className="space-y-2 list-decimal list-inside">
-            {analysis.recommendations.map((r, i) => (
+            {analysis.recommendations.map((r: any, i: number) => (
               <li key={i} className="text-xs text-foreground">
                 <Badge className={`text-[9px] mr-1.5 ${PRIORITY_STYLES[r.priority] || ''}`}>
                   {r.priority}
@@ -188,6 +200,11 @@ export function AiResultPanel({ result }: AiResultPanelProps) {
               </li>
             ))}
           </ol>
+        </div>
+      ) : (
+        <div>
+          <h4 className="text-xs font-semibold text-foreground mb-1">{t('tasks.aiRecommendations')}</h4>
+          <p className="text-xs text-muted-foreground italic">{t('tasks.aiSectionNotIncluded', 'Not included in this analysis run.')}</p>
         </div>
       )}
 
