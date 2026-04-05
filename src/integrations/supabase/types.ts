@@ -1210,6 +1210,22 @@ export type Database = {
           username: string
         }[]
       }
+      get_ai_queued_tasks: {
+        Args: never
+        Returns: {
+          assigned_to: string
+          gamp_category: string
+          period_end: string
+          period_start: string
+          review_case_id: string
+          review_level: string
+          risk_level: string
+          system_name: string
+          task_group: string
+          task_id: string
+          task_title: string
+        }[]
+      }
       get_profile_signoff_summary: {
         Args: { p_system_profile_id: string }
         Returns: {
