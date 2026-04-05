@@ -53,6 +53,11 @@ export function useTaskWorkNotes(taskId: string | undefined) {
   // Count only manual work notes (excludes auto-generated)
   const noteCount = notes.filter(n => n.note_type === 'work_note').length;
 
+  // Count work notes authored by human users (excludes AI Agent Worker notes)
+  // A human note is a work_note created by a user who is in the review case roles,
+  // identified by not being the triggered_by of an AI result
+  const humanNoteCount = notes.filter(n => n.note_type === 'work_note' && n.created_by === user?.id).length;
+
   const addNote = useMutation({
     mutationFn: async (content: string) => {
       if (!taskId || !user?.id) throw new Error('Missing task or user');
