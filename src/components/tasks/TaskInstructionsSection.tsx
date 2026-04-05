@@ -3,7 +3,7 @@ import { useTranslation } from 'react-i18next';
 import { ClipboardList, ChevronDown, ChevronUp } from 'lucide-react';
 import { Checkbox } from '@/components/ui/checkbox';
 import { parseSteps } from '@/lib/parseInstructionSteps';
-import type { TaskStatus } from '@/types';
+import type { TaskStatus, TaskGroup } from '@/types';
 import type { CheckoffDetail } from '@/hooks/useTaskCheckoffs';
 
 interface TaskInstructionsSectionProps {
