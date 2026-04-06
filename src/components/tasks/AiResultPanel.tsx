@@ -351,7 +351,7 @@ export function AiResultPanel({ result }: AiResultPanelProps) {
               <div className="flex items-center gap-2 mt-1">
                 <span className="text-xs text-muted-foreground">{t('tasks.aiRiskProfileChange')}:</span>
                 <Badge className={`text-[9px] ${RISK_STYLES[validatedState.risk_profile_change] || ''}`}>
-                  {t(`tasks.risk${validatedState.risk_profile_change?.charAt(0)}${validatedState.risk_profile_change?.slice(1).toLowerCase()}`, validatedState.risk_profile_change)}
+                  {String(t(`tasks.risk${validatedState.risk_profile_change?.charAt(0)}${validatedState.risk_profile_change?.slice(1).toLowerCase()}`, validatedState.risk_profile_change))}
                 </Badge>
               </div>
             )}
