@@ -295,7 +295,7 @@ export function AiResultPanel({ result }: AiResultPanelProps) {
             <div className="flex items-center gap-2">
               <span className="text-xs text-muted-foreground">{t('tasks.aiOverallTrend')}:</span>
               <Badge className={`text-[9px] ${TREND_STYLES[trendAnalysis.overall_trend] || ''}`}>
-                {t(`tasks.trend${trendAnalysis.overall_trend?.charAt(0)}${trendAnalysis.overall_trend?.slice(1).toLowerCase()}`, trendAnalysis.overall_trend)}
+                {String(t(`tasks.trend${trendAnalysis.overall_trend?.charAt(0)}${trendAnalysis.overall_trend?.slice(1).toLowerCase()}`, trendAnalysis.overall_trend))}
               </Badge>
             </div>
             {trendAnalysis.trend_rationale && (
