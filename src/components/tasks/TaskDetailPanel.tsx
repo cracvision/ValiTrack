@@ -362,8 +362,8 @@ export function TaskDetailPanel({ task, open, onClose, reviewCaseId, reviewCaseS
               taskGroup={task.task_group}
               taskTitle={task.title}
               reviewCaseId={reviewCaseId}
-              canUpload={!execution.isReadOnly && task.status === 'in_progress' && execution.canAddNotes}
-              isReadOnly={execution.isReadOnly || task.status !== 'in_progress'}
+              canUpload={!execution.isReadOnly && (task.status === 'in_progress' || task.status === 'ai_complete') && execution.canAddNotes}
+              isReadOnly={execution.isReadOnly || (task.status !== 'in_progress' && task.status !== 'ai_complete')}
               highlight={highlightSections && evidenceFiles.fileCount < 1}
               isPending={task.status === 'pending'}
               taskStatus={task.status}
