@@ -58,7 +58,7 @@ export function AiResultPanel({ result }: AiResultPanelProps) {
     recommendations: rawAnalysis.recommendations ?? null,
   } : null;
 
-  const evidenceFiles: Array<{ file_id: string; file_name: string; storage_path: string; sha256_hash: string }> =
+  const evidenceFiles: Array<Record<string, any>> =
     typeof result.evidence_files_used === 'string'
       ? JSON.parse(result.evidence_files_used)
       : result.evidence_files_used ?? [];
