@@ -1326,6 +1326,10 @@ export type Database = {
         Args: { p_reason: string; p_review_case_id: string }
         Returns: string
       }
+      soft_delete_system_profile: {
+        Args: { p_reason: string; p_system_profile_id: string }
+        Returns: undefined
+      }
       user_has_assigned_tasks: {
         Args: { _review_case_id: string; _user_id: string }
         Returns: boolean
