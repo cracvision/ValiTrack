@@ -229,10 +229,12 @@ export function AiResultPanel({ result }: AiResultPanelProps) {
           <CollapsibleContent className="pt-2">
             <ul className="space-y-1">
               {evidenceFiles.map((ef) => (
-                <li key={ef.file_id} className="text-[10px] text-muted-foreground font-mono flex items-center gap-2">
+                <li key={ef.file_id ?? ef.source ?? i} className="text-[10px] text-muted-foreground font-mono flex items-center gap-2">
                   <FileText className="h-3 w-3 shrink-0" />
-                  {ef.file_name}
-                  <span className="text-[9px]">({ef.sha256_hash?.substring(0, 8)})</span>
+                  {ef.source ?? ef.file_name ?? ef.name ?? 'Unknown file'}
+                  {ef.sha256_hash && (
+                    <span className="text-[9px]">({ef.sha256_hash.substring(0, 8)})</span>
+                  )}
                 </li>
               ))}
             </ul>
