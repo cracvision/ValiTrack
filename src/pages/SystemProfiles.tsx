@@ -343,7 +343,7 @@ export default function SystemProfiles() {
         editingSystem={editingSystem}
       />
 
-      <AlertDialog open={!!deleteId} onOpenChange={(open) => !open && setDeleteId(null)}>
+      <AlertDialog open={!!deleteId} onOpenChange={(open) => { if (!open) { setDeleteId(null); setDeleteReason(''); } }}>
         <AlertDialogContent>
           <AlertDialogHeader>
             <AlertDialogTitle>{t('systemProfiles.deleteDialog.title')}</AlertDialogTitle>
@@ -351,9 +351,25 @@ export default function SystemProfiles() {
               {t('systemProfiles.deleteDialog.description')}
             </AlertDialogDescription>
           </AlertDialogHeader>
+          <div className="space-y-2 py-2">
+            <Label>{t('systemProfiles.deleteDialog.reasonLabel', { defaultValue: 'Reason for deletion (min 10 characters)' })}</Label>
+            <Textarea
+              value={deleteReason}
+              onChange={(e) => setDeleteReason(e.target.value)}
+              placeholder={t('systemProfiles.deleteDialog.reasonPlaceholder', { defaultValue: 'Explain why this system profile is being deleted...' })}
+              rows={3}
+            />
+            {deleteReason.trim().length > 0 && deleteReason.trim().length < 10 && (
+              <p className="text-xs text-destructive">{t('systemProfiles.deleteDialog.reasonMinLength', { defaultValue: 'Reason must be at least 10 characters.' })}</p>
+            )}
+          </div>
           <AlertDialogFooter>
             <AlertDialogCancel>{t('systemProfiles.deleteDialog.cancel')}</AlertDialogCancel>
-            <AlertDialogAction onClick={handleDelete} className="bg-destructive text-destructive-foreground hover:bg-destructive/90">
+            <AlertDialogAction
+              onClick={handleDelete}
+              disabled={deleteReason.trim().length < 10 || deletePending}
+              className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+            >
               {t('systemProfiles.deleteDialog.confirm')}
             </AlertDialogAction>
           </AlertDialogFooter>
