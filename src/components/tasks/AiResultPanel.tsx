@@ -228,7 +228,7 @@ export function AiResultPanel({ result }: AiResultPanelProps) {
           </CollapsibleTrigger>
           <CollapsibleContent className="pt-2">
             <ul className="space-y-1">
-              {evidenceFiles.map((ef) => (
+              {evidenceFiles.map((ef, i) => (
                 <li key={ef.file_id ?? ef.source ?? i} className="text-[10px] text-muted-foreground font-mono flex items-center gap-2">
                   <FileText className="h-3 w-3 shrink-0" />
                   {ef.source ?? ef.file_name ?? ef.name ?? 'Unknown file'}
