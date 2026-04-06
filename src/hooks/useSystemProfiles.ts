@@ -184,22 +184,24 @@ export function useSystemProfiles(): UseSystemProfilesReturn {
     }
   }, [user, invalidate]);
 
-  const deleteSystem = useCallback(async (id: string): Promise<boolean> => {
+  const deleteSystem = useCallback(async (id: string, reason: string): Promise<boolean> => {
     if (!user) return false;
     try {
-      const { error } = await supabase.from('system_profiles').update({
-        is_deleted: true,
-        deleted_at: new Date().toISOString(),
-        deleted_by: user.id,
-      }).eq('id', id);
+      const { error } = await supabase.rpc('soft_delete_system_profile', {
+        p_system_profile_id: id,
+        p_reason: reason,
+      });
       if (error) throw error;
       invalidate();
       return true;
     } catch (err: any) {
       console.error('Failed to delete system profile:', err);
+      const isActiveReview = err.message?.includes('active review case');
       toastRef.current({
-        title: 'Error deleting system',
-        description: err.message ?? 'Could not delete the system profile.',
+        title: isActiveReview ? 'Cannot delete' : 'Error deleting system',
+        description: isActiveReview
+          ? 'Cannot delete: this system has an active review case. Cancel the review case first.'
+          : (err.message ?? 'Could not delete the system profile.'),
         variant: 'destructive',
       });
       return false;
