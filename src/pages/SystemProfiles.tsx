@@ -98,12 +98,17 @@ export default function SystemProfiles() {
     setFormOpen(true);
   };
 
+  const [deletePending, setDeletePending] = useState(false);
+
   const handleDelete = async () => {
-    if (!deleteId) return;
+    if (!deleteId || deleteReason.trim().length < 10) return;
+    setDeletePending(true);
     const system = systems.find((s) => s.id === deleteId);
-    const success = await deleteSystem(deleteId);
-    setDeleteId(null);
+    const success = await deleteSystem(deleteId, deleteReason.trim());
+    setDeletePending(false);
     if (success) {
+      setDeleteId(null);
+      setDeleteReason('');
       toast({
         title: t('systemProfiles.toast.systemDeleted'),
         description: t('systemProfiles.toast.systemRemoved', { name: system?.name }),
