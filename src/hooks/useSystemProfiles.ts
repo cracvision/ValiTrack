@@ -11,7 +11,7 @@ interface UseSystemProfilesReturn {
   loading: boolean;
   addSystem: (system: SystemProfile) => Promise<boolean>;
   updateSystem: (system: SystemProfile) => Promise<boolean>;
-  deleteSystem: (id: string) => Promise<boolean>;
+  deleteSystem: (id: string, reason: string) => Promise<boolean>;
   transitionApprovalStatus: (profileId: string, fromStatus: ProfileApprovalStatus, toStatus: ProfileApprovalStatus, reason?: string) => Promise<boolean>;
   refetch: () => void;
 }
