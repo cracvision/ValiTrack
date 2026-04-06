@@ -386,8 +386,8 @@ export function TaskDetailPanel({ task, open, onClose, reviewCaseId, reviewCaseS
           taskStatus={task.status}
           onAddNote={(content) => workNotes.addNote.mutate(content)}
           isAdding={workNotes.addNote.isPending}
-          canAddNotes={execution.canAddNotes && task.status === 'in_progress'}
-          isReadOnly={execution.isReadOnly || task.status !== 'in_progress' || isNA}
+          canAddNotes={execution.canAddNotes && (task.status === 'in_progress' || task.status === 'ai_complete')}
+          isReadOnly={execution.isReadOnly || (task.status !== 'in_progress' && task.status !== 'ai_complete') || isNA}
           highlight={highlightSections && workNotes.noteCount < 1}
           isPending={task.status === 'pending'}
         />
