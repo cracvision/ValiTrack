@@ -341,7 +341,7 @@ export function AiResultPanel({ result }: AiResultPanelProps) {
           <div className="space-y-2">
             <div className="flex items-center gap-2">
               <Badge className={`text-[9px] ${ASSESSMENT_STYLES[validatedState.assessment] || ''}`}>
-                {t(`tasks.assess${validatedState.assessment?.split('_').map((w: string) => w.charAt(0) + w.slice(1).toLowerCase()).join('')}`, validatedState.assessment)}
+                {String(t(`tasks.assess${validatedState.assessment?.split('_').map((w: string) => w.charAt(0) + w.slice(1).toLowerCase()).join('')}`, validatedState.assessment))}
               </Badge>
             </div>
             {validatedState.assessment_rationale && (
