@@ -829,7 +829,10 @@
       "title": "Delete System Profile",
       "description": "This action cannot be undone. This will permanently delete the system profile and all associated data.",
       "cancel": "Cancel",
-      "confirm": "Delete"
+      "confirm": "Delete",
+      "reasonLabel": "Reason for deletion (min 10 characters)",
+      "reasonPlaceholder": "Explain why this system profile is being deleted...",
+      "reasonMinLength": "Reason must be at least 10 characters."
     },
     "detail": {
       "systemInfo": "System Information",

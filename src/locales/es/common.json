@@ -828,7 +828,10 @@
       "title": "Eliminar Perfil de Sistema",
       "description": "Esta acción no se puede deshacer. Se eliminará permanentemente el perfil de sistema y todos los datos asociados.",
       "cancel": "Cancelar",
-      "confirm": "Eliminar"
+      "confirm": "Eliminar",
+      "reasonLabel": "Motivo de eliminación (mín. 10 caracteres)",
+      "reasonPlaceholder": "Explique por qué se está eliminando este perfil de sistema...",
+      "reasonMinLength": "El motivo debe tener al menos 10 caracteres."
     },
     "detail": {
       "systemInfo": "Información del Sistema",

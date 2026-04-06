@@ -1,6 +1,8 @@
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Plus, Pencil, Trash2, Server } from 'lucide-react';
+import { Textarea } from '@/components/ui/textarea';
+import { Label } from '@/components/ui/label';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -62,6 +64,7 @@ export default function SystemProfiles() {
   const [formOpen, setFormOpen] = useState(false);
   const [editingSystem, setEditingSystem] = useState<SystemProfile | null>(null);
   const [deleteId, setDeleteId] = useState<string | null>(null);
+  const [deleteReason, setDeleteReason] = useState('');
   const [filterEnvironment, setFilterEnvironment] = useState<string>('all');
   const [filterStatus, setFilterStatus] = useState<string>('all');
   const [filterApproval, setFilterApproval] = useState<string>('all');
@@ -95,12 +98,17 @@ export default function SystemProfiles() {
     setFormOpen(true);
   };
 
+  const [deletePending, setDeletePending] = useState(false);
+
   const handleDelete = async () => {
-    if (!deleteId) return;
+    if (!deleteId || deleteReason.trim().length < 10) return;
+    setDeletePending(true);
     const system = systems.find((s) => s.id === deleteId);
-    const success = await deleteSystem(deleteId);
-    setDeleteId(null);
+    const success = await deleteSystem(deleteId, deleteReason.trim());
+    setDeletePending(false);
     if (success) {
+      setDeleteId(null);
+      setDeleteReason('');
       toast({
         title: t('systemProfiles.toast.systemDeleted'),
         description: t('systemProfiles.toast.systemRemoved', { name: system?.name }),
@@ -335,7 +343,7 @@ export default function SystemProfiles() {
         editingSystem={editingSystem}
       />
 
-      <AlertDialog open={!!deleteId} onOpenChange={(open) => !open && setDeleteId(null)}>
+      <AlertDialog open={!!deleteId} onOpenChange={(open) => { if (!open) { setDeleteId(null); setDeleteReason(''); } }}>
         <AlertDialogContent>
           <AlertDialogHeader>
             <AlertDialogTitle>{t('systemProfiles.deleteDialog.title')}</AlertDialogTitle>
@@ -343,9 +351,25 @@ export default function SystemProfiles() {
               {t('systemProfiles.deleteDialog.description')}
             </AlertDialogDescription>
           </AlertDialogHeader>
+          <div className="space-y-2 py-2">
+            <Label>{t('systemProfiles.deleteDialog.reasonLabel', { defaultValue: 'Reason for deletion (min 10 characters)' })}</Label>
+            <Textarea
+              value={deleteReason}
+              onChange={(e) => setDeleteReason(e.target.value)}
+              placeholder={t('systemProfiles.deleteDialog.reasonPlaceholder', { defaultValue: 'Explain why this system profile is being deleted...' })}
+              rows={3}
+            />
+            {deleteReason.trim().length > 0 && deleteReason.trim().length < 10 && (
+              <p className="text-xs text-destructive">{t('systemProfiles.deleteDialog.reasonMinLength', { defaultValue: 'Reason must be at least 10 characters.' })}</p>
+            )}
+          </div>
           <AlertDialogFooter>
             <AlertDialogCancel>{t('systemProfiles.deleteDialog.cancel')}</AlertDialogCancel>
-            <AlertDialogAction onClick={handleDelete} className="bg-destructive text-destructive-foreground hover:bg-destructive/90">
+            <AlertDialogAction
+              onClick={handleDelete}
+              disabled={deleteReason.trim().length < 10 || deletePending}
+              className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+            >
               {t('systemProfiles.deleteDialog.confirm')}
             </AlertDialogAction>
           </AlertDialogFooter>
