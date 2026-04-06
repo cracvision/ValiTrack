@@ -64,6 +64,7 @@ export default function SystemProfiles() {
   const [formOpen, setFormOpen] = useState(false);
   const [editingSystem, setEditingSystem] = useState<SystemProfile | null>(null);
   const [deleteId, setDeleteId] = useState<string | null>(null);
+  const [deleteReason, setDeleteReason] = useState('');
   const [filterEnvironment, setFilterEnvironment] = useState<string>('all');
   const [filterStatus, setFilterStatus] = useState<string>('all');
   const [filterApproval, setFilterApproval] = useState<string>('all');
