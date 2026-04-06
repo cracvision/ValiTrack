@@ -56,7 +56,7 @@ export function TaskWorkLog({ notes, isLoading, taskStatus, onAddNote, isAdding,
     setNoteContent('');
   };
 
-  const showNoteForm = canAddNotes && taskStatus === 'in_progress' && !isPending;
+  const showNoteForm = canAddNotes && (taskStatus === 'in_progress' || taskStatus === 'ai_complete') && !isPending;
 
   return (
     <div className={`space-y-3 rounded-md p-2 -m-2 transition-colors ${highlight ? 'border border-destructive bg-destructive/5' : ''}`}>
