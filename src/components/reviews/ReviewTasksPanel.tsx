@@ -30,6 +30,9 @@ const STATUS_STYLES: Record<string, string> = {
   in_progress: 'bg-blue-100 text-blue-800 border-blue-200 dark:bg-neutral-800 dark:text-blue-400 dark:border-neutral-700',
   completed: 'bg-emerald-100 text-emerald-800 border-emerald-200 dark:bg-neutral-800 dark:text-emerald-400 dark:border-neutral-700',
   not_applicable: 'bg-muted text-muted-foreground border-border',
+  ai_queued: 'bg-amber-100 text-amber-800 border-amber-200 dark:bg-neutral-800 dark:text-amber-400 dark:border-neutral-700',
+  ai_processing: 'bg-blue-100 text-blue-800 border-blue-200 dark:bg-neutral-800 dark:text-blue-400 dark:border-neutral-700',
+  ai_complete: 'bg-emerald-100 text-emerald-800 border-emerald-200 dark:bg-neutral-800 dark:text-emerald-400 dark:border-neutral-700',
 };
 
 type TaskFilter = 'all' | 'mine';
