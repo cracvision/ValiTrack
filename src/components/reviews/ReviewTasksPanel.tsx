@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
-import { User, ClipboardCheck, AlertTriangle, CheckCircle2, Lock, Ban } from 'lucide-react';
+import { User, ClipboardCheck, AlertTriangle, CheckCircle2, Lock, Ban, Loader2, Sparkles } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@/components/ui/accordion';
 import { Progress } from '@/components/ui/progress';
@@ -30,6 +30,9 @@ const STATUS_STYLES: Record<string, string> = {
   in_progress: 'bg-blue-100 text-blue-800 border-blue-200 dark:bg-neutral-800 dark:text-blue-400 dark:border-neutral-700',
   completed: 'bg-emerald-100 text-emerald-800 border-emerald-200 dark:bg-neutral-800 dark:text-emerald-400 dark:border-neutral-700',
   not_applicable: 'bg-muted text-muted-foreground border-border',
+  ai_queued: 'bg-amber-100 text-amber-800 border-amber-200 dark:bg-neutral-800 dark:text-amber-400 dark:border-neutral-700',
+  ai_processing: 'bg-blue-100 text-blue-800 border-blue-200 dark:bg-neutral-800 dark:text-blue-400 dark:border-neutral-700',
+  ai_complete: 'bg-emerald-100 text-emerald-800 border-emerald-200 dark:bg-neutral-800 dark:text-emerald-400 dark:border-neutral-700',
 };
 
 type TaskFilter = 'all' | 'mine';
@@ -241,6 +244,8 @@ function TaskRow({ task, onClick, isPhaseBlocked }: { task: ReviewTask; onClick:
           <Ban className="h-4 w-4 text-muted-foreground" />
         ) : (
           <Badge variant="outline" className={`text-[10px] px-1.5 py-0 ${STATUS_STYLES[task.status] || ''}`}>
+            {task.status === 'ai_queued' && <Sparkles className="h-3 w-3 mr-0.5 animate-pulse" />}
+            {task.status === 'ai_processing' && <Loader2 className="h-3 w-3 mr-0.5 animate-spin" />}
             {t(`tasks.status.${task.status}`)}
           </Badge>
         )}
