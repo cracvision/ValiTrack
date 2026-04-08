@@ -34,6 +34,7 @@ const NOTIFICATION_TYPES = {
   DIGEST_QA_WEEKLY: "digest_qa_weekly",
   ACCOUNT_WELCOME: "account_welcome",
   ACCOUNT_PASSWORD_CHANGED: "account_password_changed",
+  PASSWORD_RESET: "password_reset",
 } as const;
 
 // ── Base Email Layout ────────────────────────────────────────────
@@ -630,6 +631,25 @@ const EMAIL_TEMPLATES: Record<string, EmailTemplate> = {
     },
     cta: { en: "Log In to ValiTrack", es: "Iniciar Sesión en ValiTrack" },
     ctaUrl: (d) => `${d.app_url}/auth`,
+  },
+
+  password_reset: {
+    subject: {
+      en: () => "[ValiTrack] Password Reset Instructions",
+      es: () => "[ValiTrack] Instrucciones para Restablecer Contraseña",
+    },
+    body: {
+      en: (d) => `<p style="margin:0 0 16px;font-size:14px;color:#374151;">We received a request to reset your password for your ValiTrack account.</p>
+        <p style="margin:0 0 16px;font-size:14px;color:#374151;">Click the button below to set a new password:</p>
+        <p style="margin:24px 0 8px;font-size:13px;color:#6B7280;">⏱ This link expires in ${d.expires_in_en || "1 hour"}.</p>
+        <p style="margin:0;font-size:13px;color:#6B7280;">If you did not request this, you can safely ignore this email. Your password will not be changed.</p>`,
+      es: (d) => `<p style="margin:0 0 16px;font-size:14px;color:#374151;">Recibimos una solicitud para restablecer tu contraseña de ValiTrack.</p>
+        <p style="margin:0 0 16px;font-size:14px;color:#374151;">Haz clic en el botón a continuación para establecer una nueva contraseña:</p>
+        <p style="margin:24px 0 8px;font-size:13px;color:#6B7280;">⏱ Este enlace expira en ${d.expires_in_es || "1 hora"}.</p>
+        <p style="margin:0;font-size:13px;color:#6B7280;">Si no solicitaste esto, puedes ignorar este correo. Tu contraseña no será cambiada.</p>`,
+    },
+    cta: { en: "Reset Password", es: "Restablecer Contraseña" },
+    ctaUrl: (d) => d.reset_url,
   },
 
   account_password_changed: {
