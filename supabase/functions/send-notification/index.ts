@@ -116,7 +116,39 @@ function detailTable(rows: string): string {
   return `<table role="presentation" cellspacing="0" cellpadding="0" border="0" width="100%" style="border:1px solid #E5E7EB;border-radius:6px;margin:16px 0;border-collapse:collapse;">${rows}</table>`;
 }
 
-// ── Email Templates ──────────────────────────────────────────────
+// ── Urgency Badge Helper (Phase 3 color-coding) ──────────────────
+function urgencyBadge(daysRemaining: number, lang: "en" | "es", isOverdue: boolean): string {
+  let color: string;
+  let bgColor: string;
+  let label: string;
+
+  if (isOverdue || daysRemaining < 0) {
+    color = "#B91C1C"; bgColor = "#FEF2F2";
+    label = lang === "es" ? "⚠️ VENCIDO" : "⚠️ OVERDUE";
+  } else if (daysRemaining <= 3) {
+    color = "#B91C1C"; bgColor = "#FEF2F2";
+    label = lang === "es" ? "🔴 URGENTE" : "🔴 URGENT";
+  } else if (daysRemaining <= 7) {
+    color = "#C2410C"; bgColor = "#FFF7ED";
+    label = lang === "es" ? "🟠 PRONTO" : "🟠 DUE SOON";
+  } else if (daysRemaining <= 30) {
+    color = "#B45309"; bgColor = "#FFFBEB";
+    label = lang === "es" ? "🟡 PRÓXIMO" : "🟡 UPCOMING";
+  } else {
+    color = "#15803D"; bgColor = "#F0FDF4";
+    label = lang === "es" ? "🟢 PROGRAMADO" : "🟢 SCHEDULED";
+  }
+
+  return `<table role="presentation" cellspacing="0" cellpadding="0" border="0" style="margin:0 0 16px;">
+    <tr>
+      <td style="background:${bgColor};border:1px solid ${color}22;border-radius:4px;padding:6px 14px;">
+        <span style="font-size:12px;font-weight:700;color:${color};text-transform:uppercase;letter-spacing:0.5px;">${label}</span>
+      </td>
+    </tr>
+  </table>`;
+}
+
+
 interface EmailTemplate {
   subject: Record<string, (d: any) => string>;
   body: Record<string, (d: any) => string>;
