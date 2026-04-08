@@ -595,7 +595,7 @@ const EMAIL_TEMPLATES: Record<string, EmailTemplate> = {
       en: (d) => `<p style="margin:0 0 16px;font-size:14px;color:#374151;">Your ValiTrack account has been created. You can now log in and begin working on your assigned periodic review tasks.</p>
         ${detailTable(
           detailRow("Email", d.email) +
-          detailRow("Role", d.role)
+          detailRow("Role", ROLE_LABELS[d.role] || d.role)
         )}
         <table role="presentation" cellspacing="0" cellpadding="0" border="0" width="100%" style="margin:16px 0;background:#F0FDF4;border:1px solid #86EFAC;border-radius:6px;">
           <tr><td style="padding:16px;">
@@ -608,7 +608,7 @@ const EMAIL_TEMPLATES: Record<string, EmailTemplate> = {
       es: (d) => `<p style="margin:0 0 16px;font-size:14px;color:#374151;">Su cuenta de ValiTrack ha sido creada. Ya puede iniciar sesión y comenzar a trabajar en sus tareas de revisión periódica asignadas.</p>
         ${detailTable(
           detailRow("Email", d.email) +
-          detailRow("Rol", d.role)
+          detailRow("Rol", ROLE_LABELS[d.role] || d.role)
         )}
         <table role="presentation" cellspacing="0" cellpadding="0" border="0" width="100%" style="margin:16px 0;background:#F0FDF4;border:1px solid #86EFAC;border-radius:6px;">
           <tr><td style="padding:16px;">
