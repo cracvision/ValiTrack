@@ -148,6 +148,15 @@ function urgencyBadge(daysRemaining: number, lang: "en" | "es", isOverdue: boole
   </table>`;
 }
 
+const ROLE_LABELS: Record<string, string> = {
+  super_user: "Super User",
+  system_owner: "System Owner",
+  system_administrator: "System Administrator",
+  business_owner: "Business Owner",
+  quality_assurance: "Quality Assurance",
+  it_manager: "IT Manager",
+};
+
 
 interface EmailTemplate {
   subject: Record<string, (d: any) => string>;
