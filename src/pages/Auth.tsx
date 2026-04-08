@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { Navigate } from 'react-router-dom';
+import { Navigate, Link } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { useAuth } from '@/hooks/useAuth';
 import { Loader2, Lock, Eye, EyeOff, Mail, Globe } from 'lucide-react';
@@ -132,7 +132,15 @@ export default function Auth() {
               {t('signIn')}
             </Button>
           </form>
-          <p className="mt-4 text-center text-xs text-muted-foreground">
+          <div className="mt-4 text-center">
+            <Link
+              to="/forgot-password"
+              className="text-sm text-muted-foreground underline underline-offset-4 hover:text-foreground"
+            >
+              {t('forgotPassword')}
+            </Link>
+          </div>
+          <p className="mt-3 text-center text-xs text-muted-foreground">
             {t('contactAdmin')}
           </p>
         </CardContent>
