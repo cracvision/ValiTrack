@@ -8,8 +8,19 @@ import { createClient, SupabaseClient } from "https://esm.sh/@supabase/supabase-
  * Queries DB for time-based conditions and delegates email sending
  * to the existing send-notification/ Edge Function.
  *
- * Authentication: Validates Authorization header against SUPABASE_SERVICE_ROLE_KEY.
- * This function is NOT meant to be called by end users.
+ * AUTHENTICATION — Dual-key approach:
+ *   Accepts EITHER service_role key OR anon key as invocation credential.
+ *
+ *   WHY: Lovable Cloud's pg_cron does not expose current_setting('supabase.service_role_key'),
+ *   so the cron job uses the anon key (which is publicly available in the frontend bundle).
+ *
+ *   WHY THIS IS SAFE:
+ *   - The function is a batch processor with NO user-specific side effects.
+ *   - All DB queries use the service_role client internally (full access regardless of caller).
+ *   - The notification_log deduplication prevents abuse: repeated invocations simply skip
+ *     already-sent milestones (alreadySent() returns true → skipped++). A malicious caller
+ *     would trigger zero extra emails.
+ *   - Internal calls to send-notification/ use service_role, not the caller's token.
  *
  * CRON SETUP NOTE (for project recreation):
  * This function is scheduled via pg_cron using the Supabase insert tool,
@@ -20,6 +31,7 @@ import { createClient, SupabaseClient } from "https://esm.sh/@supabase/supabase-
 
 const SUPABASE_URL = Deno.env.get("SUPABASE_URL")!;
 const SUPABASE_SERVICE_ROLE_KEY = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
+const SUPABASE_ANON_KEY = Deno.env.get("SUPABASE_ANON_KEY")!;
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
