@@ -116,7 +116,39 @@ function detailTable(rows: string): string {
   return `<table role="presentation" cellspacing="0" cellpadding="0" border="0" width="100%" style="border:1px solid #E5E7EB;border-radius:6px;margin:16px 0;border-collapse:collapse;">${rows}</table>`;
 }
 
-// ── Email Templates ──────────────────────────────────────────────
+// ── Urgency Badge Helper (Phase 3 color-coding) ──────────────────
+function urgencyBadge(daysRemaining: number, lang: "en" | "es", isOverdue: boolean): string {
+  let color: string;
+  let bgColor: string;
+  let label: string;
+
+  if (isOverdue || daysRemaining < 0) {
+    color = "#B91C1C"; bgColor = "#FEF2F2";
+    label = lang === "es" ? "⚠️ VENCIDO" : "⚠️ OVERDUE";
+  } else if (daysRemaining <= 3) {
+    color = "#B91C1C"; bgColor = "#FEF2F2";
+    label = lang === "es" ? "🔴 URGENTE" : "🔴 URGENT";
+  } else if (daysRemaining <= 7) {
+    color = "#C2410C"; bgColor = "#FFF7ED";
+    label = lang === "es" ? "🟠 PRONTO" : "🟠 DUE SOON";
+  } else if (daysRemaining <= 30) {
+    color = "#B45309"; bgColor = "#FFFBEB";
+    label = lang === "es" ? "🟡 PRÓXIMO" : "🟡 UPCOMING";
+  } else {
+    color = "#15803D"; bgColor = "#F0FDF4";
+    label = lang === "es" ? "🟢 PROGRAMADO" : "🟢 SCHEDULED";
+  }
+
+  return `<table role="presentation" cellspacing="0" cellpadding="0" border="0" style="margin:0 0 16px;">
+    <tr>
+      <td style="background:${bgColor};border:1px solid ${color}22;border-radius:4px;padding:6px 14px;">
+        <span style="font-size:12px;font-weight:700;color:${color};text-transform:uppercase;letter-spacing:0.5px;">${label}</span>
+      </td>
+    </tr>
+  </table>`;
+}
+
+
 interface EmailTemplate {
   subject: Record<string, (d: any) => string>;
   body: Record<string, (d: any) => string>;
@@ -259,25 +291,47 @@ const EMAIL_TEMPLATES: Record<string, EmailTemplate> = {
     ctaUrl: (d) => `${d.app_url}/review-cases/${d.review_case_id}`,
   },
 
-  // ── Phase 3: Time-Driven ──────────────────────────────────
+  // ── Phase 3: Time-Driven (with urgency color-coding) ─────
   task_due_approaching: {
     subject: {
-      en: (d) => `Task Due in ${d.days_remaining} Day(s): ${d.task_title}`,
-      es: (d) => `Tarea Vence en ${d.days_remaining} Día(s): ${d.task_title}`,
+      en: (d) => d.days_remaining === 0
+        ? `[ValiTrack] Task due TODAY: ${d.task_title}`
+        : d.days_remaining === 1
+          ? `[ValiTrack] Task due TOMORROW: ${d.task_title}`
+          : `[ValiTrack] Task due in ${d.days_remaining} days: ${d.task_title}`,
+      es: (d) => d.days_remaining === 0
+        ? `[ValiTrack] Tarea vence HOY: ${d.task_title}`
+        : d.days_remaining === 1
+          ? `[ValiTrack] Tarea vence MAÑANA: ${d.task_title}`
+          : `[ValiTrack] Tarea vence en ${d.days_remaining} días: ${d.task_title}`,
     },
     body: {
-      en: (d) => `<p style="margin:0 0 16px;font-size:14px;color:#374151;">Your task <strong>${d.task_title}</strong> for <strong>${d.system_name}</strong> is due in <strong>${d.days_remaining} day(s)</strong>.</p>
-        ${detailTable(
-          detailRow("Due Date", d.due_date) +
-          detailRow("Status", d.task_status)
-        )}
-        <p style="margin:16px 0 0;font-size:14px;color:#374151;">Please complete this task before the due date to avoid delays in the review process.</p>`,
-      es: (d) => `<p style="margin:0 0 16px;font-size:14px;color:#374151;">Su tarea <strong>${d.task_title}</strong> para <strong>${d.system_name}</strong> vence en <strong>${d.days_remaining} día(s)</strong>.</p>
-        ${detailTable(
-          detailRow("Fecha límite", d.due_date) +
-          detailRow("Estado", d.task_status)
-        )}
-        <p style="margin:16px 0 0;font-size:14px;color:#374151;">Complete esta tarea antes de la fecha límite para evitar retrasos en el proceso de revisión.</p>`,
+      en: (d) => {
+        const urgency = urgencyBadge(d.days_remaining, "en", false);
+        const timeLabel = d.days_remaining === 0 ? "today" : d.days_remaining === 1 ? "tomorrow" : `in <strong>${d.days_remaining} day(s)</strong>`;
+        return `${urgency}
+          <p style="margin:0 0 16px;font-size:14px;color:#374151;">Your task <strong>${d.task_title}</strong> for <strong>${d.system_name}</strong> is due ${timeLabel}.</p>
+          ${detailTable(
+            detailRow("Task", d.task_title) +
+            detailRow("System", `${d.system_name} (${d.system_identifier || ""})`) +
+            detailRow("Due Date", d.due_date) +
+            detailRow("Status", d.task_status || d.status || "—")
+          )}
+          <p style="margin:16px 0 0;font-size:14px;color:#374151;">Please complete this task before the due date to avoid delays in the review process.</p>`;
+      },
+      es: (d) => {
+        const urgency = urgencyBadge(d.days_remaining, "es", false);
+        const timeLabel = d.days_remaining === 0 ? "hoy" : d.days_remaining === 1 ? "mañana" : `en <strong>${d.days_remaining} día(s)</strong>`;
+        return `${urgency}
+          <p style="margin:0 0 16px;font-size:14px;color:#374151;">Su tarea <strong>${d.task_title}</strong> para <strong>${d.system_name}</strong> vence ${timeLabel}.</p>
+          ${detailTable(
+            detailRow("Tarea", d.task_title) +
+            detailRow("Sistema", `${d.system_name} (${d.system_identifier || ""})`) +
+            detailRow("Fecha límite", d.due_date) +
+            detailRow("Estado", d.task_status || d.status || "—")
+          )}
+          <p style="margin:16px 0 0;font-size:14px;color:#374151;">Complete esta tarea antes de la fecha límite para evitar retrasos en el proceso de revisión.</p>`;
+      },
     },
     cta: { en: "View Task", es: "Ver Tarea" },
     ctaUrl: (d) => `${d.app_url}/review-cases/${d.review_case_id}?task=${d.task_id}`,
@@ -285,24 +339,28 @@ const EMAIL_TEMPLATES: Record<string, EmailTemplate> = {
 
   task_overdue: {
     subject: {
-      en: (d) => `⚠️ OVERDUE Task: ${d.task_title} — ${d.system_name}`,
-      es: (d) => `⚠️ Tarea VENCIDA: ${d.task_title} — ${d.system_name}`,
+      en: (d) => `[ValiTrack] OVERDUE: ${d.task_title} (${d.days_overdue} days past due)`,
+      es: (d) => `[ValiTrack] VENCIDA: ${d.task_title} (${d.days_overdue} días de retraso)`,
     },
     body: {
-      en: (d) => `<p style="margin:0 0 16px;font-size:14px;color:#B91C1C;font-weight:600;">This task is overdue by ${d.days_overdue} day(s).</p>
+      en: (d) => `${urgencyBadge(-1, "en", true)}
+        <p style="margin:0 0 16px;font-size:14px;color:#B91C1C;font-weight:600;">This task is overdue by ${d.days_overdue} day(s).</p>
         ${detailTable(
           detailRow("Task", d.task_title) +
-          detailRow("System", d.system_name) +
-          detailRow("Due Date", d.due_date) +
-          detailRow("Status", d.task_status)
+          detailRow("System", `${d.system_name} (${d.system_identifier || ""})`) +
+          detailRow("Original Due Date", d.due_date) +
+          detailRow("Days Overdue", `<span style="color:#B91C1C;font-weight:700;">${d.days_overdue}</span>`) +
+          detailRow("Status", d.task_status || d.status || "—")
         )}
         <p style="margin:16px 0 0;font-size:14px;color:#374151;">Please complete this task immediately to avoid impacting the review timeline.</p>`,
-      es: (d) => `<p style="margin:0 0 16px;font-size:14px;color:#B91C1C;font-weight:600;">Esta tarea está vencida por ${d.days_overdue} día(s).</p>
+      es: (d) => `${urgencyBadge(-1, "es", true)}
+        <p style="margin:0 0 16px;font-size:14px;color:#B91C1C;font-weight:600;">Esta tarea está vencida por ${d.days_overdue} día(s).</p>
         ${detailTable(
           detailRow("Tarea", d.task_title) +
-          detailRow("Sistema", d.system_name) +
-          detailRow("Fecha límite", d.due_date) +
-          detailRow("Estado", d.task_status)
+          detailRow("Sistema", `${d.system_name} (${d.system_identifier || ""})`) +
+          detailRow("Fecha límite original", d.due_date) +
+          detailRow("Días vencidos", `<span style="color:#B91C1C;font-weight:700;">${d.days_overdue}</span>`) +
+          detailRow("Estado", d.task_status || d.status || "—")
         )}
         <p style="margin:16px 0 0;font-size:14px;color:#374151;">Complete esta tarea inmediatamente para evitar impactar el cronograma de la revisión.</p>`,
     },
@@ -312,14 +370,38 @@ const EMAIL_TEMPLATES: Record<string, EmailTemplate> = {
 
   review_period_approaching: {
     subject: {
-      en: (d) => `Review Period in ${d.days_remaining} Days: ${d.system_name}`,
-      es: (d) => `Período de Revisión en ${d.days_remaining} Días: ${d.system_name}`,
+      en: (d) => d.days_remaining === 0
+        ? `[ValiTrack] ${d.system_name}: Periodic review due TODAY`
+        : `[ValiTrack] ${d.system_name}: Periodic review due in ${d.days_remaining} days`,
+      es: (d) => d.days_remaining === 0
+        ? `[ValiTrack] ${d.system_name}: Revisión periódica vence HOY`
+        : `[ValiTrack] ${d.system_name}: Revisión periódica vence en ${d.days_remaining} días`,
     },
     body: {
-      en: (d) => `<p style="margin:0 0 16px;font-size:14px;color:#374151;">The next periodic review for <strong>${d.system_name}</strong> is due in <strong>${d.days_remaining} days</strong> (${d.next_review_date}).</p>
-        <p style="margin:0;font-size:14px;color:#374151;">Please initiate the review case to ensure timely completion.</p>`,
-      es: (d) => `<p style="margin:0 0 16px;font-size:14px;color:#374151;">La próxima revisión periódica de <strong>${d.system_name}</strong> vence en <strong>${d.days_remaining} días</strong> (${d.next_review_date}).</p>
-        <p style="margin:0;font-size:14px;color:#374151;">Inicie el caso de revisión para asegurar su completación a tiempo.</p>`,
+      en: (d) => {
+        const urgency = urgencyBadge(d.days_remaining, "en", false);
+        return `${urgency}
+          <p style="margin:0 0 16px;font-size:14px;color:#374151;">The next periodic review for <strong>${d.system_name}</strong> (${d.system_identifier || ""}) is ${d.days_remaining === 0 ? "due <strong>today</strong>" : `due in <strong>${d.days_remaining} days</strong>`} (${d.next_review_date}).</p>
+          ${detailTable(
+            detailRow("System", d.system_name) +
+            detailRow("Identifier", d.system_identifier || "—") +
+            detailRow("Next Review Date", d.next_review_date) +
+            detailRow("Days Remaining", String(d.days_remaining))
+          )}
+          <p style="margin:16px 0 0;font-size:14px;color:#374151;">Please initiate the review case to ensure timely completion.</p>`;
+      },
+      es: (d) => {
+        const urgency = urgencyBadge(d.days_remaining, "es", false);
+        return `${urgency}
+          <p style="margin:0 0 16px;font-size:14px;color:#374151;">La próxima revisión periódica de <strong>${d.system_name}</strong> (${d.system_identifier || ""}) ${d.days_remaining === 0 ? "vence <strong>hoy</strong>" : `vence en <strong>${d.days_remaining} días</strong>`} (${d.next_review_date}).</p>
+          ${detailTable(
+            detailRow("Sistema", d.system_name) +
+            detailRow("Identificador", d.system_identifier || "—") +
+            detailRow("Fecha próxima revisión", d.next_review_date) +
+            detailRow("Días restantes", String(d.days_remaining))
+          )}
+          <p style="margin:16px 0 0;font-size:14px;color:#374151;">Inicie el caso de revisión para asegurar su completación a tiempo.</p>`;
+      },
     },
     cta: { en: "Create Review Case", es: "Crear Caso de Revisión" },
     ctaUrl: (d) => `${d.app_url}/review-cases`,
@@ -327,20 +409,40 @@ const EMAIL_TEMPLATES: Record<string, EmailTemplate> = {
 
   completion_deadline_approaching: {
     subject: {
-      en: (d) => `Completion Deadline in ${d.days_remaining} Days: ${d.system_name}`,
-      es: (d) => `Fecha Límite de Completación en ${d.days_remaining} Días: ${d.system_name}`,
+      en: (d) => d.days_remaining === 0
+        ? `[ValiTrack] ${d.system_name}: Review completion deadline is TODAY`
+        : `[ValiTrack] ${d.system_name}: Review completion deadline in ${d.days_remaining} days`,
+      es: (d) => d.days_remaining === 0
+        ? `[ValiTrack] ${d.system_name}: Fecha límite de revisión es HOY`
+        : `[ValiTrack] ${d.system_name}: Fecha límite de revisión en ${d.days_remaining} días`,
     },
     body: {
-      en: (d) => `<p style="margin:0 0 16px;font-size:14px;color:#374151;">The completion deadline for the periodic review of <strong>${d.system_name}</strong> is in <strong>${d.days_remaining} days</strong> (${d.due_date}).</p>
-        ${detailTable(
-          detailRow("Tasks Resolved", `${d.tasks_resolved} / ${d.tasks_total}`) +
-          detailRow("Review Status", d.review_status)
-        )}`,
-      es: (d) => `<p style="margin:0 0 16px;font-size:14px;color:#374151;">La fecha límite de completación para la revisión periódica de <strong>${d.system_name}</strong> es en <strong>${d.days_remaining} días</strong> (${d.due_date}).</p>
-        ${detailTable(
-          detailRow("Tareas resueltas", `${d.tasks_resolved} / ${d.tasks_total}`) +
-          detailRow("Estado de revisión", d.review_status)
-        )}`,
+      en: (d) => {
+        const urgency = urgencyBadge(d.days_remaining, "en", false);
+        return `${urgency}
+          <p style="margin:0 0 16px;font-size:14px;color:#374151;">The completion deadline for the periodic review of <strong>${d.system_name}</strong> (${d.system_identifier || ""}) is ${d.days_remaining === 0 ? "<strong>today</strong>" : `in <strong>${d.days_remaining} days</strong>`} (${d.due_date}).</p>
+          ${detailTable(
+            detailRow("System", d.system_name) +
+            detailRow("Identifier", d.system_identifier || "—") +
+            detailRow("Deadline", d.due_date) +
+            detailRow("Review Status", d.review_status || "—") +
+            detailRow("Tasks Resolved", `${d.tasks_resolved ?? "—"} / ${d.tasks_total ?? "—"}`)
+          )}
+          <p style="margin:16px 0 0;font-size:14px;color:#374151;">Please ensure all tasks are completed before the deadline.</p>`;
+      },
+      es: (d) => {
+        const urgency = urgencyBadge(d.days_remaining, "es", false);
+        return `${urgency}
+          <p style="margin:0 0 16px;font-size:14px;color:#374151;">La fecha límite de completación para la revisión periódica de <strong>${d.system_name}</strong> (${d.system_identifier || ""}) es ${d.days_remaining === 0 ? "<strong>hoy</strong>" : `en <strong>${d.days_remaining} días</strong>`} (${d.due_date}).</p>
+          ${detailTable(
+            detailRow("Sistema", d.system_name) +
+            detailRow("Identificador", d.system_identifier || "—") +
+            detailRow("Fecha límite", d.due_date) +
+            detailRow("Estado de revisión", d.review_status || "—") +
+            detailRow("Tareas resueltas", `${d.tasks_resolved ?? "—"} / ${d.tasks_total ?? "—"}`)
+          )}
+          <p style="margin:16px 0 0;font-size:14px;color:#374151;">Asegúrese de que todas las tareas estén completadas antes de la fecha límite.</p>`;
+      },
     },
     cta: { en: "View Review Case", es: "Ver Caso de Revisión" },
     ctaUrl: (d) => `${d.app_url}/review-cases/${d.review_case_id}`,
@@ -348,14 +450,28 @@ const EMAIL_TEMPLATES: Record<string, EmailTemplate> = {
 
   review_period_overdue: {
     subject: {
-      en: (d) => `⚠️ OVERDUE: Review Period Passed for ${d.system_name}`,
-      es: (d) => `⚠️ VENCIDO: Período de Revisión Pasado para ${d.system_name}`,
+      en: (d) => `[ValiTrack] OVERDUE: ${d.system_name} periodic review (${d.days_overdue} days past due)`,
+      es: (d) => `[ValiTrack] VENCIDA: Revisión periódica de ${d.system_name} (${d.days_overdue} días de retraso)`,
     },
     body: {
-      en: (d) => `<p style="margin:0 0 16px;font-size:14px;color:#B91C1C;font-weight:600;">The periodic review for <strong>${d.system_name}</strong> is overdue by ${d.days_overdue} day(s).</p>
+      en: (d) => `${urgencyBadge(-1, "en", true)}
+        <p style="margin:0 0 16px;font-size:14px;color:#B91C1C;font-weight:600;">The periodic review for <strong>${d.system_name}</strong> (${d.system_identifier || ""}) is overdue by ${d.days_overdue} day(s).</p>
+        ${detailTable(
+          detailRow("System", d.system_name) +
+          detailRow("Identifier", d.system_identifier || "—") +
+          detailRow("Original Review Date", d.next_review_date) +
+          detailRow("Days Overdue", `<span style="color:#B91C1C;font-weight:700;">${d.days_overdue}</span>`)
+        )}
         <p style="margin:0 0 16px;font-size:14px;color:#374151;">The review was due on ${d.next_review_date} but no review case has been created. This may result in a regulatory non-conformity.</p>
         <p style="margin:0;font-size:14px;color:#374151;font-weight:600;">Please create a review case immediately.</p>`,
-      es: (d) => `<p style="margin:0 0 16px;font-size:14px;color:#B91C1C;font-weight:600;">La revisión periódica de <strong>${d.system_name}</strong> está vencida por ${d.days_overdue} día(s).</p>
+      es: (d) => `${urgencyBadge(-1, "es", true)}
+        <p style="margin:0 0 16px;font-size:14px;color:#B91C1C;font-weight:600;">La revisión periódica de <strong>${d.system_name}</strong> (${d.system_identifier || ""}) está vencida por ${d.days_overdue} día(s).</p>
+        ${detailTable(
+          detailRow("Sistema", d.system_name) +
+          detailRow("Identificador", d.system_identifier || "—") +
+          detailRow("Fecha de revisión original", d.next_review_date) +
+          detailRow("Días vencidos", `<span style="color:#B91C1C;font-weight:700;">${d.days_overdue}</span>`)
+        )}
         <p style="margin:0 0 16px;font-size:14px;color:#374151;">La revisión debía realizarse el ${d.next_review_date} pero no se ha creado un caso de revisión. Esto puede resultar en una no-conformidad regulatoria.</p>
         <p style="margin:0;font-size:14px;color:#374151;font-weight:600;">Cree un caso de revisión inmediatamente.</p>`,
     },
