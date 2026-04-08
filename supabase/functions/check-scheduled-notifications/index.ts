@@ -574,21 +574,23 @@ serve(async (req) => {
   // Robust token extraction: case-insensitive "Bearer" prefix, trim whitespace
   const token = authHeader.replace(/^[Bb]earer\s+/, "").trim();
 
-  // Diagnostic logging (safe — no secrets exposed)
-  const matchType = token === SUPABASE_SERVICE_ROLE_KEY
-    ? "service_role"
-    : VALID_KEYS.has(token)
-      ? "anon/publishable"
-      : "none";
-  console.log(`[auth] token length=${token.length}, match=${matchType}`);
+  // Diagnostic logging — show partial key fingerprints (first 10 + last 5 chars) to debug mismatch
+  const fingerprint = (s: string | undefined) => s ? `${s.substring(0, 10)}...${s.substring(s.length - 5)} (len=${s.length})` : "UNDEFINED";
+  console.log(`[auth] token: ${fingerprint(token)}`);
+  console.log(`[auth] SUPABASE_SERVICE_ROLE_KEY: ${fingerprint(SUPABASE_SERVICE_ROLE_KEY)}`);
+  console.log(`[auth] SUPABASE_ANON_KEY: ${fingerprint(Deno.env.get("SUPABASE_ANON_KEY"))}`);
+  console.log(`[auth] SUPABASE_PUBLISHABLE_KEY: ${fingerprint(Deno.env.get("SUPABASE_PUBLISHABLE_KEY"))}`);
+  console.log(`[auth] VALID_KEYS size: ${VALID_KEYS.size}`);
 
   if (!VALID_KEYS.has(token)) {
-    console.warn(`[auth] Rejected: token length ${token.length} did not match any of ${VALID_KEYS.size} valid keys`);
+    console.warn(`[auth] Rejected: no match found`);
     return new Response(JSON.stringify({ error: "Forbidden: invalid credentials" }), {
       status: 403,
       headers: { ...corsHeaders, "Content-Type": "application/json" },
     });
   }
+  console.log(`[auth] Accepted`);
+
 
   const supabase = createClient(SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY);
 
