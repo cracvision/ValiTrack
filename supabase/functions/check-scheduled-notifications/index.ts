@@ -552,7 +552,8 @@ serve(async (req) => {
     return new Response("ok", { headers: corsHeaders });
   }
 
-  // Authenticate: only service_role key is allowed
+  // Authenticate: accept service_role key (direct) or anon key (cron invocation).
+  // See file header for security rationale (deduplication prevents abuse).
   const authHeader = req.headers.get("Authorization");
   if (!authHeader?.startsWith("Bearer ")) {
     return new Response(JSON.stringify({ error: "Unauthorized: missing Authorization header" }), {
@@ -562,8 +563,8 @@ serve(async (req) => {
   }
 
   const token = authHeader.replace("Bearer ", "");
-  if (token !== SUPABASE_SERVICE_ROLE_KEY) {
-    return new Response(JSON.stringify({ error: "Forbidden: only service_role key is accepted" }), {
+  if (token !== SUPABASE_SERVICE_ROLE_KEY && token !== SUPABASE_ANON_KEY) {
+    return new Response(JSON.stringify({ error: "Forbidden: invalid credentials" }), {
       status: 403,
       headers: { ...corsHeaders, "Content-Type": "application/json" },
     });
