@@ -1,5 +1,6 @@
 import { createContext, useContext, useState, useEffect, useCallback, useRef } from 'react';
 import { supabase } from '@/integrations/supabase/client';
+import { sendNotification } from '@/lib/notifications';
 import i18n from '@/lib/i18n';
 import type { User, Session } from '@supabase/supabase-js';
 import type { Database } from '@/integrations/supabase/types';
@@ -143,6 +144,12 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         ...prev,
         profile: prev.profile ? { ...prev.profile, must_change_password: false } : null,
       }));
+      // Fire-and-forget password changed notification
+      sendNotification({
+        notification_type: 'account_password_changed',
+        recipient_user_id: state.user.id,
+        data: { changed_at: new Date().toISOString() },
+      });
     }
     return { error };
   }, [state.user, safeSetState]);

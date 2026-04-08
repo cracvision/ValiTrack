@@ -133,6 +133,29 @@ Deno.serve(async (req) => {
       details: { created_email: email, created_full_name: full_name, role, account_expires_at },
     });
 
+    // Welcome email — fire-and-forget, never blocks user creation
+    try {
+      await fetch(`${supabaseUrl}/functions/v1/send-notification`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${supabaseServiceKey}`,
+        },
+        body: JSON.stringify({
+          notification_type: 'account_welcome',
+          recipient_user_id: newUserId,
+          data: {
+            email,
+            temporary_password: password,
+            role,
+            full_name,
+          },
+        }),
+      });
+    } catch (e) {
+      console.error('[welcome_email] failed:', e);
+    }
+
     return new Response(JSON.stringify({
       success: true, user_id: newUserId, message: 'User created successfully',
     }), { status: 200, headers: { ...corsHeaders, 'Content-Type': 'application/json' } });
