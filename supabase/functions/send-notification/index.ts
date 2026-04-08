@@ -482,49 +482,75 @@ const EMAIL_TEMPLATES: Record<string, EmailTemplate> = {
   // ── Phase 4: Escalation + Digest + Account ────────────────
   escalation_task_overdue: {
     subject: {
-      en: (d) => `Escalation: Task Overdue >7 Days — ${d.system_name}`,
-      es: (d) => `Escalamiento: Tarea Vencida >7 Días — ${d.system_name}`,
+      en: (d) => `[ValiTrack] ESCALATION: ${d.assignee_name}'s task overdue ${d.days_overdue} days: ${d.task_title}`,
+      es: (d) => `[ValiTrack] ESCALAMIENTO: Tarea de ${d.assignee_name} vencida ${d.days_overdue} días: ${d.task_title}`,
     },
     body: {
-      en: (d) => `<p style="margin:0 0 16px;font-size:14px;color:#374151;">A task assigned to <strong>${d.assignee_name}</strong> has been overdue for more than 7 days and requires your attention as System Owner.</p>
+      en: (d) => `<table role="presentation" cellspacing="0" cellpadding="0" border="0" width="100%" style="margin:0 0 20px;">
+          <tr><td style="background:#B91C1C;border-radius:6px;padding:10px 16px;text-align:center;">
+            <span style="color:#ffffff;font-size:13px;font-weight:700;letter-spacing:1px;text-transform:uppercase;">⚠️ ESCALATION — TASK OVERDUE &gt;7 DAYS</span>
+          </td></tr>
+        </table>
+        <p style="margin:0 0 16px;font-size:14px;color:#374151;">A task assigned to <strong>${d.assignee_name}</strong> has been overdue for <strong style="color:#B91C1C;">${d.days_overdue} days</strong> and requires your attention as System Owner.</p>
         ${detailTable(
           detailRow("Task", d.task_title) +
           detailRow("Assignee", d.assignee_name) +
+          detailRow("System", `${d.system_name} (${d.system_identifier || ""})`) +
           detailRow("Due Date", d.due_date) +
-          detailRow("Days Overdue", d.days_overdue)
+          detailRow("Days Overdue", `<span style="color:#B91C1C;font-weight:700;">${d.days_overdue}</span>`)
         )}
-        <p style="margin:16px 0 0;font-size:14px;color:#374151;">Consider reassigning this task or contacting the assignee directly.</p>`,
-      es: (d) => `<p style="margin:0 0 16px;font-size:14px;color:#374151;">Una tarea asignada a <strong>${d.assignee_name}</strong> ha estado vencida por más de 7 días y requiere su atención como System Owner.</p>
+        <p style="margin:16px 0 0;font-size:14px;color:#374151;">Consider reassigning this task or contacting the assignee directly to prevent further delays.</p>`,
+      es: (d) => `<table role="presentation" cellspacing="0" cellpadding="0" border="0" width="100%" style="margin:0 0 20px;">
+          <tr><td style="background:#B91C1C;border-radius:6px;padding:10px 16px;text-align:center;">
+            <span style="color:#ffffff;font-size:13px;font-weight:700;letter-spacing:1px;text-transform:uppercase;">⚠️ ESCALAMIENTO — TAREA VENCIDA &gt;7 DÍAS</span>
+          </td></tr>
+        </table>
+        <p style="margin:0 0 16px;font-size:14px;color:#374151;">Una tarea asignada a <strong>${d.assignee_name}</strong> ha estado vencida por <strong style="color:#B91C1C;">${d.days_overdue} días</strong> y requiere su atención como System Owner.</p>
         ${detailTable(
           detailRow("Tarea", d.task_title) +
           detailRow("Asignado", d.assignee_name) +
+          detailRow("Sistema", `${d.system_name} (${d.system_identifier || ""})`) +
           detailRow("Fecha límite", d.due_date) +
-          detailRow("Días vencidos", d.days_overdue)
+          detailRow("Días vencidos", `<span style="color:#B91C1C;font-weight:700;">${d.days_overdue}</span>`)
         )}
-        <p style="margin:16px 0 0;font-size:14px;color:#374151;">Considere reasignar esta tarea o contactar al asignado directamente.</p>`,
+        <p style="margin:16px 0 0;font-size:14px;color:#374151;">Considere reasignar esta tarea o contactar al asignado directamente para prevenir más retrasos.</p>`,
     },
-    cta: { en: "View Review Case", es: "Ver Caso de Revisión" },
-    ctaUrl: (d) => `${d.app_url}/review-cases/${d.review_case_id}`,
+    cta: { en: "View Task", es: "Ver Tarea" },
+    ctaUrl: (d) => `${d.app_url}/review-cases/${d.review_case_id}?task=${d.resource_id}`,
   },
 
   escalation_deadline_overdue: {
     subject: {
-      en: (d) => `⚠️ Escalation: Completion Deadline Overdue — ${d.system_name}`,
-      es: (d) => `⚠️ Escalamiento: Fecha Límite de Completación Vencida — ${d.system_name}`,
+      en: (d) => `[ValiTrack] ESCALATION: ${d.system_name} review deadline overdue (${d.days_overdue} days)`,
+      es: (d) => `[ValiTrack] ESCALAMIENTO: Fecha límite de revisión de ${d.system_name} vencida (${d.days_overdue} días)`,
     },
     body: {
-      en: (d) => `<p style="margin:0 0 16px;font-size:14px;color:#B91C1C;font-weight:600;">The completion deadline for the periodic review of <strong>${d.system_name}</strong> has passed.</p>
+      en: (d) => `<table role="presentation" cellspacing="0" cellpadding="0" border="0" width="100%" style="margin:0 0 20px;">
+          <tr><td style="background:#B91C1C;border-radius:6px;padding:10px 16px;text-align:center;">
+            <span style="color:#ffffff;font-size:13px;font-weight:700;letter-spacing:1px;text-transform:uppercase;">⚠️ ESCALATION — REVIEW DEADLINE OVERDUE</span>
+          </td></tr>
+        </table>
+        <p style="margin:0 0 16px;font-size:14px;color:#B91C1C;font-weight:600;">The completion deadline for the periodic review of <strong>${d.system_name}</strong> (${d.system_identifier || ""}) has passed by <strong>${d.days_overdue} days</strong>.</p>
         ${detailTable(
+          detailRow("System", `${d.system_name} (${d.system_identifier || ""})`) +
+          detailRow("System Owner", d.so_name || "—") +
           detailRow("Deadline", d.due_date) +
-          detailRow("Days Overdue", d.days_overdue) +
+          detailRow("Days Overdue", `<span style="color:#B91C1C;font-weight:700;">${d.days_overdue}</span>`) +
           detailRow("Review Status", d.review_status) +
           detailRow("Tasks Resolved", `${d.tasks_resolved} / ${d.tasks_total}`)
         )}
         <p style="margin:16px 0 0;font-size:14px;color:#B91C1C;font-weight:600;">Immediate action is required to prevent a regulatory non-conformity.</p>`,
-      es: (d) => `<p style="margin:0 0 16px;font-size:14px;color:#B91C1C;font-weight:600;">La fecha límite de completación para la revisión periódica de <strong>${d.system_name}</strong> ha pasado.</p>
+      es: (d) => `<table role="presentation" cellspacing="0" cellpadding="0" border="0" width="100%" style="margin:0 0 20px;">
+          <tr><td style="background:#B91C1C;border-radius:6px;padding:10px 16px;text-align:center;">
+            <span style="color:#ffffff;font-size:13px;font-weight:700;letter-spacing:1px;text-transform:uppercase;">⚠️ ESCALAMIENTO — FECHA LÍMITE VENCIDA</span>
+          </td></tr>
+        </table>
+        <p style="margin:0 0 16px;font-size:14px;color:#B91C1C;font-weight:600;">La fecha límite de completación para la revisión periódica de <strong>${d.system_name}</strong> (${d.system_identifier || ""}) ha pasado por <strong>${d.days_overdue} días</strong>.</p>
         ${detailTable(
+          detailRow("Sistema", `${d.system_name} (${d.system_identifier || ""})`) +
+          detailRow("System Owner", d.so_name || "—") +
           detailRow("Fecha límite", d.due_date) +
-          detailRow("Días vencidos", d.days_overdue) +
+          detailRow("Días vencidos", `<span style="color:#B91C1C;font-weight:700;">${d.days_overdue}</span>`) +
           detailRow("Estado de revisión", d.review_status) +
           detailRow("Tareas resueltas", `${d.tasks_resolved} / ${d.tasks_total}`)
         )}
@@ -536,8 +562,8 @@ const EMAIL_TEMPLATES: Record<string, EmailTemplate> = {
 
   digest_so_weekly: {
     subject: {
-      en: (d) => `Weekly Review Summary — ${d.system_count} System(s)`,
-      es: (d) => `Resumen Semanal de Revisiones — ${d.system_count} Sistema(s)`,
+      en: (d) => `[ValiTrack] Weekly Review Summary — ${d.digest_date}`,
+      es: (d) => `[ValiTrack] Resumen Semanal de Revisiones — ${d.digest_date}`,
     },
     body: {
       en: (d) => `<p style="margin:0 0 16px;font-size:14px;color:#374151;">Here is your weekly summary of periodic review activity across your systems.</p>${d.summary_html}`,
@@ -549,8 +575,8 @@ const EMAIL_TEMPLATES: Record<string, EmailTemplate> = {
 
   digest_qa_weekly: {
     subject: {
-      en: (d) => `Weekly QA Summary — ${d.pending_count} Pending Approval(s)`,
-      es: (d) => `Resumen Semanal QA — ${d.pending_count} Aprobación(es) Pendiente(s)`,
+      en: (d) => `[ValiTrack] Weekly QA Summary — ${d.digest_date}`,
+      es: (d) => `[ValiTrack] Resumen Semanal QA — ${d.digest_date}`,
     },
     body: {
       en: (d) => `<p style="margin:0 0 16px;font-size:14px;color:#374151;">Here is your weekly summary of pending approvals and overdue items requiring QA attention.</p>${d.summary_html}`,
@@ -562,8 +588,8 @@ const EMAIL_TEMPLATES: Record<string, EmailTemplate> = {
 
   account_welcome: {
     subject: {
-      en: () => "Welcome to ValiTrack — Your Account is Ready",
-      es: () => "Bienvenido a ValiTrack — Su Cuenta Está Lista",
+      en: () => "Welcome to ValiTrack — Your account has been created",
+      es: () => "Bienvenido a ValiTrack — Tu cuenta ha sido creada",
     },
     body: {
       en: (d) => `<p style="margin:0 0 16px;font-size:14px;color:#374151;">Your ValiTrack account has been created. You can now log in and begin working on your assigned periodic review tasks.</p>
@@ -571,13 +597,27 @@ const EMAIL_TEMPLATES: Record<string, EmailTemplate> = {
           detailRow("Email", d.email) +
           detailRow("Role", d.role)
         )}
-        <p style="margin:16px 0 0;font-size:14px;color:#374151;">You will be asked to change your temporary password on first login.</p>`,
+        <table role="presentation" cellspacing="0" cellpadding="0" border="0" width="100%" style="margin:16px 0;background:#F0FDF4;border:1px solid #86EFAC;border-radius:6px;">
+          <tr><td style="padding:16px;">
+            <p style="margin:0 0 6px;font-size:12px;color:#15803D;font-weight:600;text-transform:uppercase;letter-spacing:0.5px;">Temporary Password</p>
+            <p style="margin:0;font-size:18px;font-family:'Courier New',monospace;color:#1F2937;font-weight:700;letter-spacing:1px;">${d.temporary_password || "—"}</p>
+          </td></tr>
+        </table>
+        <p style="margin:0 0 8px;font-size:14px;color:#B45309;font-weight:600;">⚠️ You will be required to change your password on first login.</p>
+        <p style="margin:0;font-size:13px;color:#6B7280;">Do not share your credentials. If you did not expect this email, contact your system administrator.</p>`,
       es: (d) => `<p style="margin:0 0 16px;font-size:14px;color:#374151;">Su cuenta de ValiTrack ha sido creada. Ya puede iniciar sesión y comenzar a trabajar en sus tareas de revisión periódica asignadas.</p>
         ${detailTable(
           detailRow("Email", d.email) +
           detailRow("Rol", d.role)
         )}
-        <p style="margin:16px 0 0;font-size:14px;color:#374151;">Se le pedirá que cambie su contraseña temporal en el primer inicio de sesión.</p>`,
+        <table role="presentation" cellspacing="0" cellpadding="0" border="0" width="100%" style="margin:16px 0;background:#F0FDF4;border:1px solid #86EFAC;border-radius:6px;">
+          <tr><td style="padding:16px;">
+            <p style="margin:0 0 6px;font-size:12px;color:#15803D;font-weight:600;text-transform:uppercase;letter-spacing:0.5px;">Contraseña Temporal</p>
+            <p style="margin:0;font-size:18px;font-family:'Courier New',monospace;color:#1F2937;font-weight:700;letter-spacing:1px;">${d.temporary_password || "—"}</p>
+          </td></tr>
+        </table>
+        <p style="margin:0 0 8px;font-size:14px;color:#B45309;font-weight:600;">⚠️ Se le pedirá que cambie su contraseña en el primer inicio de sesión.</p>
+        <p style="margin:0;font-size:13px;color:#6B7280;">No comparta sus credenciales. Si no esperaba este correo, contacte a su administrador del sistema.</p>`,
     },
     cta: { en: "Log In to ValiTrack", es: "Iniciar Sesión en ValiTrack" },
     ctaUrl: (d) => `${d.app_url}/auth`,
@@ -585,14 +625,26 @@ const EMAIL_TEMPLATES: Record<string, EmailTemplate> = {
 
   account_password_changed: {
     subject: {
-      en: () => "ValiTrack — Password Changed Successfully",
-      es: () => "ValiTrack — Contraseña Cambiada Exitosamente",
+      en: () => "[ValiTrack] Your password has been changed",
+      es: () => "[ValiTrack] Tu contraseña ha sido cambiada",
     },
     body: {
-      en: () => `<p style="margin:0 0 16px;font-size:14px;color:#374151;">Your ValiTrack password has been changed successfully.</p>
-        <p style="margin:0;font-size:14px;color:#374151;">If you did not make this change, please contact your system administrator immediately.</p>`,
-      es: () => `<p style="margin:0 0 16px;font-size:14px;color:#374151;">Su contraseña de ValiTrack ha sido cambiada exitosamente.</p>
-        <p style="margin:0;font-size:14px;color:#374151;">Si usted no realizó este cambio, contacte a su administrador del sistema inmediatamente.</p>`,
+      en: (d) => `<table role="presentation" cellspacing="0" cellpadding="0" border="0" width="100%" style="margin:0 0 20px;">
+          <tr><td style="background:#F59E0B;border-radius:6px;padding:10px 16px;text-align:center;">
+            <span style="color:#ffffff;font-size:13px;font-weight:700;letter-spacing:1px;text-transform:uppercase;">🔒 PASSWORD CHANGED</span>
+          </td></tr>
+        </table>
+        <p style="margin:0 0 16px;font-size:14px;color:#374151;">Your ValiTrack password has been changed successfully.</p>
+        ${d.changed_at ? detailTable(detailRow("Changed At", new Date(d.changed_at).toLocaleString("en-US", { dateStyle: "medium", timeStyle: "short" }))) : ""}
+        <p style="margin:16px 0 0;font-size:14px;color:#B45309;font-weight:600;">⚠️ If you did not make this change, contact your system administrator immediately.</p>`,
+      es: (d) => `<table role="presentation" cellspacing="0" cellpadding="0" border="0" width="100%" style="margin:0 0 20px;">
+          <tr><td style="background:#F59E0B;border-radius:6px;padding:10px 16px;text-align:center;">
+            <span style="color:#ffffff;font-size:13px;font-weight:700;letter-spacing:1px;text-transform:uppercase;">🔒 CONTRASEÑA CAMBIADA</span>
+          </td></tr>
+        </table>
+        <p style="margin:0 0 16px;font-size:14px;color:#374151;">Su contraseña de ValiTrack ha sido cambiada exitosamente.</p>
+        ${d.changed_at ? detailTable(detailRow("Fecha del cambio", new Date(d.changed_at).toLocaleString("es-ES", { dateStyle: "medium", timeStyle: "short" }))) : ""}
+        <p style="margin:16px 0 0;font-size:14px;color:#B45309;font-weight:600;">⚠️ Si usted no realizó este cambio, contacte a su administrador del sistema inmediatamente.</p>`,
     },
   },
 };
