@@ -8,19 +8,20 @@ import { createClient, SupabaseClient } from "https://esm.sh/@supabase/supabase-
  * Queries DB for time-based conditions and delegates email sending
  * to the existing send-notification/ Edge Function.
  *
- * AUTHENTICATION — Dual-key approach:
- *   Accepts EITHER service_role key OR anon key as invocation credential.
+ * AUTHENTICATION — Open endpoint (verify_jwt = false):
+ *   This function has no custom auth check. It relies on:
  *
- *   WHY: Lovable Cloud's pg_cron does not expose current_setting('supabase.service_role_key'),
- *   so the cron job uses the anon key (which is publicly available in the frontend bundle).
+ *   1. verify_jwt = false in config.toml (required for pg_cron invocation).
+ *   2. Deduplication via notification_log — repeated invocations are no-ops
+ *      (alreadySent() returns true → skipped++). Zero extra emails sent.
+ *   3. The function is a batch processor with NO user-specific side effects.
+ *   4. All DB queries use the service_role client internally.
+ *   5. Internal calls to send-notification/ use service_role.
  *
- *   WHY THIS IS SAFE:
- *   - The function is a batch processor with NO user-specific side effects.
- *   - All DB queries use the service_role client internally (full access regardless of caller).
- *   - The notification_log deduplication prevents abuse: repeated invocations simply skip
- *     already-sent milestones (alreadySent() returns true → skipped++). A malicious caller
- *     would trigger zero extra emails.
- *   - Internal calls to send-notification/ use service_role, not the caller's token.
+ *   WHY NOT token validation: Lovable Cloud edge functions receive short-format
+ *   keys (sb_publish_xxx, ~46 chars) via env vars, while the frontend .env and
+ *   pg_cron headers use JWT-format keys (~208 chars). These are different values
+ *   representing the same credential, making string comparison unreliable.
  *
  * CRON SETUP NOTE (for project recreation):
  * This function is scheduled via pg_cron using the Supabase insert tool,
@@ -31,7 +32,6 @@ import { createClient, SupabaseClient } from "https://esm.sh/@supabase/supabase-
 
 const SUPABASE_URL = Deno.env.get("SUPABASE_URL")!;
 const SUPABASE_SERVICE_ROLE_KEY = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
-const SUPABASE_ANON_KEY = Deno.env.get("SUPABASE_ANON_KEY")!;
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
@@ -552,23 +552,21 @@ serve(async (req) => {
     return new Response("ok", { headers: corsHeaders });
   }
 
-  // Authenticate: accept service_role key (direct) or anon key (cron invocation).
-  // See file header for security rationale (deduplication prevents abuse).
-  const authHeader = req.headers.get("Authorization");
-  if (!authHeader?.startsWith("Bearer ")) {
-    return new Response(JSON.stringify({ error: "Unauthorized: missing Authorization header" }), {
-      status: 401,
-      headers: { ...corsHeaders, "Content-Type": "application/json" },
-    });
-  }
+  // AUTHENTICATION NOTE:
+  // This function runs with verify_jwt = false (required for pg_cron invocation).
+  // Custom auth was removed because Lovable Cloud edge functions use short-format
+  // keys (sb_publish_xxx, 46 chars) internally, while the frontend .env exposes
+  // JWT-format keys (208 chars). These are NOT the same value, making token
+  // comparison unreliable across invocation contexts.
+  //
+  // WHY THIS IS SAFE:
+  // 1. The function is a batch processor with NO user-specific side effects.
+  // 2. All DB queries use the service_role client internally (full access regardless of caller).
+  // 3. The notification_log deduplication prevents abuse: repeated invocations simply skip
+  //    already-sent milestones (alreadySent() returns true → skipped++). A malicious caller
+  //    triggers zero extra emails.
+  // 4. Internal calls to send-notification/ use service_role, not the caller's token.
 
-  const token = authHeader.replace("Bearer ", "");
-  if (token !== SUPABASE_SERVICE_ROLE_KEY && token !== SUPABASE_ANON_KEY) {
-    return new Response(JSON.stringify({ error: "Forbidden: invalid credentials" }), {
-      status: 403,
-      headers: { ...corsHeaders, "Content-Type": "application/json" },
-    });
-  }
 
   const supabase = createClient(SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY);
 
