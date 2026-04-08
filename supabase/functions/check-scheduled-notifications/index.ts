@@ -561,18 +561,29 @@ serve(async (req) => {
     return new Response("ok", { headers: corsHeaders });
   }
 
-  // Authenticate: accept service_role key (direct) or anon key (cron invocation).
+  // Authenticate: accept service_role key (direct) or anon/publishable key (cron invocation).
   // See file header for security rationale (deduplication prevents abuse).
   const authHeader = req.headers.get("Authorization");
-  if (!authHeader?.startsWith("Bearer ")) {
+  if (!authHeader) {
     return new Response(JSON.stringify({ error: "Unauthorized: missing Authorization header" }), {
       status: 401,
       headers: { ...corsHeaders, "Content-Type": "application/json" },
     });
   }
 
-  const token = authHeader.replace("Bearer ", "");
-  if (token !== SUPABASE_SERVICE_ROLE_KEY && token !== SUPABASE_ANON_KEY) {
+  // Robust token extraction: case-insensitive "Bearer" prefix, trim whitespace
+  const token = authHeader.replace(/^[Bb]earer\s+/, "").trim();
+
+  // Diagnostic logging (safe — no secrets exposed)
+  const matchType = token === SUPABASE_SERVICE_ROLE_KEY
+    ? "service_role"
+    : VALID_KEYS.has(token)
+      ? "anon/publishable"
+      : "none";
+  console.log(`[auth] token length=${token.length}, match=${matchType}`);
+
+  if (!VALID_KEYS.has(token)) {
+    console.warn(`[auth] Rejected: token length ${token.length} did not match any of ${VALID_KEYS.size} valid keys`);
     return new Response(JSON.stringify({ error: "Forbidden: invalid credentials" }), {
       status: 403,
       headers: { ...corsHeaders, "Content-Type": "application/json" },
