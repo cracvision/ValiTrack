@@ -31,7 +31,16 @@ import { createClient, SupabaseClient } from "https://esm.sh/@supabase/supabase-
 
 const SUPABASE_URL = Deno.env.get("SUPABASE_URL")!;
 const SUPABASE_SERVICE_ROLE_KEY = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
-const SUPABASE_ANON_KEY = Deno.env.get("SUPABASE_ANON_KEY")!;
+
+// Build set of valid invocation keys (service_role + any anon/publishable variants).
+// Lovable Cloud may expose the anon key under different env var names.
+const VALID_KEYS = new Set<string>(
+  [
+    SUPABASE_SERVICE_ROLE_KEY,
+    Deno.env.get("SUPABASE_ANON_KEY"),
+    Deno.env.get("SUPABASE_PUBLISHABLE_KEY"),
+  ].filter(Boolean) as string[]
+);
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
