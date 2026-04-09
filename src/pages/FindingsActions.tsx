@@ -19,14 +19,14 @@ const SEVERITY_BADGE: Record<string, string> = {
 export default function FindingsActions() {
   const { t } = useTranslation();
   const navigate = useNavigate();
-  const [severity, setSeverity] = useState<FindingSeverity | ''>('');
-  const [status, setStatus] = useState<FindingStatus | ''>('');
-  const [source, setSource] = useState<FindingSource | ''>('');
+  const [severity, setSeverity] = useState<FindingSeverity | 'all'>('all');
+  const [status, setStatus] = useState<FindingStatus | 'all'>('all');
+  const [source, setSource] = useState<FindingSource | 'all'>('all');
 
   const { data: findings = [], isLoading } = useAllFindings({
-    ...(severity ? { severity: severity as FindingSeverity } : {}),
-    ...(status ? { status: status as FindingStatus } : {}),
-    ...(source ? { source: source as FindingSource } : {}),
+    ...(severity !== 'all' ? { severity: severity as FindingSeverity } : {}),
+    ...(status !== 'all' ? { status: status as FindingStatus } : {}),
+    ...(source !== 'all' ? { source: source as FindingSource } : {}),
   });
 
   const totalCount = findings.length;
@@ -61,7 +61,7 @@ export default function FindingsActions() {
         <Select value={severity} onValueChange={(v) => setSeverity(v as any)}>
           <SelectTrigger className="w-40"><SelectValue placeholder={t('findings.page.filters.allSeverities')} /></SelectTrigger>
           <SelectContent>
-            <SelectItem value="">{t('findings.page.filters.allSeverities')}</SelectItem>
+            <SelectItem value="all">{t('findings.page.filters.allSeverities')}</SelectItem>
             {(['critical', 'major', 'minor', 'observation'] as const).map(s => (
               <SelectItem key={s} value={s}>{t(`findings.severity.${s}`)}</SelectItem>
             ))}
@@ -70,7 +70,7 @@ export default function FindingsActions() {
         <Select value={status} onValueChange={(v) => setStatus(v as any)}>
           <SelectTrigger className="w-40"><SelectValue placeholder={t('findings.page.filters.allStatuses')} /></SelectTrigger>
           <SelectContent>
-            <SelectItem value="">{t('findings.page.filters.allStatuses')}</SelectItem>
+            <SelectItem value="all">{t('findings.page.filters.allStatuses')}</SelectItem>
             {(['ai_identified', 'confirmed', 'in_progress', 'closed', 'dismissed'] as const).map(s => (
               <SelectItem key={s} value={s}>{t(`findings.status.${s}`)}</SelectItem>
             ))}
@@ -79,7 +79,7 @@ export default function FindingsActions() {
         <Select value={source} onValueChange={(v) => setSource(v as any)}>
           <SelectTrigger className="w-40"><SelectValue placeholder={t('findings.page.filters.allSources')} /></SelectTrigger>
           <SelectContent>
-            <SelectItem value="">{t('findings.page.filters.allSources')}</SelectItem>
+            <SelectItem value="all">{t('findings.page.filters.allSources')}</SelectItem>
             <SelectItem value="ai_identified">{t('findings.source.ai_identified')}</SelectItem>
             <SelectItem value="manual">{t('findings.source.manual')}</SelectItem>
           </SelectContent>
