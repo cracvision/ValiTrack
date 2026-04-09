@@ -86,6 +86,30 @@ export function useReviewCaseTransition() {
       };
 
       if (input.toStatus === 'approved') {
+        // Approval gate: check for unreviewed findings
+        const { data: unreviewedFindings } = await supabase
+          .from('findings' as any)
+          .select('id')
+          .eq('review_case_id', input.reviewCaseId)
+          .eq('status', 'ai_identified')
+          .eq('is_deleted', false)
+          .limit(1);
+        if (unreviewedFindings && unreviewedFindings.length > 0) {
+          throw new Error('Cannot approve: there are AI-identified findings pending human review.');
+        }
+        // Check open CAPAs
+        const { data: openCapaFindings } = await supabase
+          .from('findings' as any)
+          .select('id')
+          .eq('review_case_id', input.reviewCaseId)
+          .eq('capa_required', true)
+          .in('capa_status', ['pending', 'open'])
+          .eq('is_deleted', false)
+          .limit(1);
+        if (openCapaFindings && openCapaFindings.length > 0) {
+          throw new Error('Cannot approve: there are findings with open CAPAs that must be resolved first.');
+        }
+
         updatePayload.conclusion = input.conclusion;
         updatePayload.conclusion_notes = input.conclusionNotes || null;
         updatePayload.completed_at = new Date().toISOString();
