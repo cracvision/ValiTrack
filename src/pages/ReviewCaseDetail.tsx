@@ -4,6 +4,7 @@ import { useParams, useNavigate, useSearchParams } from 'react-router-dom';
 import { useQuery } from '@tanstack/react-query';
 import { ArrowLeft, AlertTriangle, Info, ShieldCheck, Pencil, Trash2, Ban } from 'lucide-react';
 import { ReviewTasksPanel } from '@/components/reviews/ReviewTasksPanel';
+import { FindingsSection } from '@/components/findings/FindingsSection';
 import { DeleteReviewDraftDialog } from '@/components/reviews/DeleteReviewDraftDialog';
 import { EditReviewDraftDialog } from '@/components/reviews/EditReviewDraftDialog';
 import { supabase } from '@/integrations/supabase/client';
@@ -392,6 +393,16 @@ export default function ReviewCaseDetail() {
           systemName={reviewCase.system_name}
           autoOpenTaskId={autoOpenTaskId}
           onAutoOpenHandled={() => setAutoOpenTaskId(null)}
+        />
+      )}
+
+      {/* Findings & Actions — visible during execution and beyond */}
+      {(['in_progress', 'execution_review', 'approved', 'rejected'] as const).includes(reviewCase.status as any) && (
+        <FindingsSection
+          reviewCaseId={reviewCase.id}
+          reviewCaseStatus={reviewCase.status}
+          systemOwnerId={reviewCase.system_owner_id}
+          qaId={reviewCase.qa_id}
         />
       )}
 
