@@ -146,9 +146,86 @@ export function useTaskExecution({ task, reviewCaseId, reviewCaseStatus, systemO
         resource_id: task.id,
         details: { review_case_id: reviewCaseId, task_title: task.title },
       } as any);
+      // AI auto-population: if completing an AI_EVAL task, extract findings
+      if (task.task_group === 'AI_EVAL') {
+        try {
+          const { data: aiResult } = await supabase
+            .from('ai_task_results' as any)
+            .select('*')
+            .eq('task_id', task.id)
+            .eq('is_deleted', false)
+            .order('created_at', { ascending: false })
+            .limit(1)
+            .maybeSingle();
+
+          if (aiResult) {
+            // Check for duplicates
+            const { count: existingCount } = await supabase
+              .from('findings' as any)
+              .select('id', { count: 'exact', head: true })
+              .eq('ai_task_result_id', (aiResult as any).id)
+              .eq('is_deleted', false);
+
+            if ((existingCount || 0) === 0) {
+              const analysis = (aiResult as any).analysis_result as any;
+              const criticalFindings = analysis?.critical_findings || [];
+
+              const severityMap: Record<string, string> = {
+                'CRITICAL': 'critical', 'MAJOR': 'major', 'MINOR': 'minor', 'OBSERVATION': 'observation',
+              };
+
+              const categoryFromTask = (title: string): string => {
+                const lower = title.toLowerCase();
+                if (lower.includes('incident')) return 'incident_trend';
+                if (lower.includes('change')) return 'change_control';
+                if (lower.includes('access') || lower.includes('user')) return 'access_control';
+                if (lower.includes('audit')) return 'audit_trail';
+                if (lower.includes('backup')) return 'backup_restore';
+                if (lower.includes('integrity')) return 'data_integrity';
+                if (lower.includes('training')) return 'training';
+                if (lower.includes('performance')) return 'performance';
+                if (lower.includes('vendor')) return 'vendor';
+                if (lower.includes('document') || lower.includes('sop')) return 'documentation';
+                if (lower.includes('config')) return 'configuration';
+                return 'other';
+              };
+
+              for (let i = 0; i < criticalFindings.length; i++) {
+                const cf = criticalFindings[i];
+                const severity = severityMap[cf.severity] || 'observation';
+                await supabase.from('findings' as any).insert({
+                  review_case_id: reviewCaseId,
+                  task_id: task.id,
+                  ai_task_result_id: (aiResult as any).id,
+                  title: cf.description?.substring(0, 200) || `Finding ${i + 1}`,
+                  description: cf.description || '',
+                  severity,
+                  category: categoryFromTask(task.title),
+                  source: 'ai_identified',
+                  ai_finding_index: i,
+                  regulation_reference: cf.regulatory_reference || null,
+                  status: 'ai_identified',
+                  created_by: userId,
+                } as any);
+
+                await supabase.from('audit_log').insert({
+                  user_id: userId,
+                  action: 'FINDING_AUTO_CREATED',
+                  resource_type: 'finding',
+                  resource_id: reviewCaseId,
+                  details: { task_id: task.id, ai_task_result_id: (aiResult as any).id, finding_index: i, severity },
+                });
+              }
+            }
+          }
+        } catch (err) {
+          console.error('Failed to auto-populate findings:', err);
+        }
+      }
     },
     onSuccess: () => {
       invalidateQueries();
+      queryClient.invalidateQueries({ queryKey: ['findings', reviewCaseId] });
       toast({ title: 'Task completed' });
     },
     onError: (err: any) => {

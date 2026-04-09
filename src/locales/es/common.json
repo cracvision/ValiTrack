@@ -1117,5 +1117,156 @@
       "viewAllTasks": "Ver todo en Bandeja",
       "viewAllSignoffs": "Ver todo en Bandeja"
     }
+  },
+  "findings": {
+    "section": {
+      "title": "Hallazgos y Acciones",
+      "pendingReview": "pendientes de revisión",
+      "pendingHumanReview": "Pendientes de Revisión Humana",
+      "confirmedFindings": "Hallazgos Confirmados",
+      "dismissed": "Descartados",
+      "empty": "No se han identificado hallazgos para esta revisión. Los hallazgos aparecerán aquí automáticamente cuando se completen las tareas de análisis de IA."
+    },
+    "severity": {
+      "critical": "Crítico",
+      "major": "Mayor",
+      "minor": "Menor",
+      "observation": "Observación"
+    },
+    "status": {
+      "ai_identified": "Identificado por IA",
+      "confirmed": "Confirmado",
+      "dismissed": "Descartado",
+      "in_progress": "En Progreso",
+      "closed": "Cerrado"
+    },
+    "category": {
+      "incident_trend": "Tendencia de Incidentes",
+      "change_control": "Control de Cambios",
+      "access_control": "Control de Acceso",
+      "audit_trail": "Registro de Auditoría",
+      "backup_restore": "Respaldo y Restauración",
+      "data_integrity": "Integridad de Datos",
+      "training": "Capacitación",
+      "performance": "Rendimiento",
+      "vendor": "Proveedor",
+      "regulatory": "Regulatorio",
+      "documentation": "Documentación",
+      "configuration": "Configuración",
+      "other": "Otro"
+    },
+    "source": {
+      "ai_identified": "Identificado por IA",
+      "manual": "Manual"
+    },
+    "risk": {
+      "high": "Alto",
+      "medium": "Medio",
+      "low": "Bajo"
+    },
+    "capaStatus": {
+      "not_required": "No Requerido",
+      "pending": "Pendiente",
+      "open": "Abierto",
+      "closed": "Cerrado",
+      "verified": "Verificado"
+    },
+    "labels": {
+      "title": "Título",
+      "severity": "Severidad",
+      "category": "Categoría",
+      "description": "Descripción",
+      "status": "Estado",
+      "source": "Fuente",
+      "regulationReference": "Referencia Regulatoria",
+      "sopReference": "Referencia SOP",
+      "riskAssessment": "Evaluación de Riesgo (ICH Q9)",
+      "riskProbability": "Probabilidad",
+      "riskImpact": "Impacto",
+      "riskLevel": "Nivel de Riesgo",
+      "actionDescription": "Descripción de la Acción",
+      "actionDueDate": "Fecha Límite de Acción",
+      "correctiveAction": "Acción Correctiva",
+      "capaReference": "Referencia CAPA",
+      "capaSystem": "Sistema CAPA",
+      "capaStatus": "Estado CAPA",
+      "resolution": "Resolución",
+      "justification": "Justificación",
+      "confirmedBy": "Confirmado por",
+      "confirmedAt": "Confirmado",
+      "dismissalJustification": "Justificación del Descarte",
+      "created": "Creado",
+      "lastUpdated": "Última Actualización"
+    },
+    "actions": {
+      "addFinding": "+ Agregar Hallazgo",
+      "confirm": "Confirmar",
+      "dismiss": "Descartar",
+      "close": "Cerrar",
+      "reopen": "Reabrir",
+      "confirmFinding": "Confirmar Hallazgo",
+      "dismissFinding": "Descartar Hallazgo",
+      "closeFinding": "Cerrar Hallazgo",
+      "updateCapa": "Actualizar CAPA",
+      "closeBlockedCapa": "No se puede cerrar: el CAPA debe cerrarse primero en el sistema externo"
+    },
+    "confirm": {
+      "title": "Confirmar Hallazgo",
+      "aiReference": "Referencia del Análisis de IA",
+      "actionRequired": "¿Se requiere acción?",
+      "capaRequired": "¿Se requiere CAPA?"
+    },
+    "dismiss": {
+      "title": "Descartar Hallazgo",
+      "justificationLabel": "Justificación (requerida)",
+      "justificationPlaceholder": "Explique por qué se descarta este hallazgo...",
+      "minLength": "La justificación debe tener al menos 20 caracteres."
+    },
+    "close": {
+      "title": "Cerrar Hallazgo",
+      "resolutionNotes": "Notas de Resolución (requerido)",
+      "resolutionPlaceholder": "Describa cómo se resolvió este hallazgo...",
+      "minLength": "Las notas de resolución deben tener al menos 20 caracteres.",
+      "capaSection": "Información CAPA"
+    },
+    "add": {
+      "title": "Agregar Hallazgo Manual",
+      "submit": "Crear Hallazgo"
+    },
+    "page": {
+      "title": "Hallazgos y Acciones",
+      "subtitle": "Rastrear y gestionar hallazgos en todas las revisiones periódicas",
+      "filters": {
+        "allSeverities": "Todas las severidades",
+        "allStatuses": "Todos los estados",
+        "allSources": "Todas las fuentes",
+        "allCategories": "Todas las categorías"
+      },
+      "summary": {
+        "total": "Total de Hallazgos",
+        "pendingReview": "Pendientes de Revisión",
+        "openCapas": "CAPAs Abiertos"
+      },
+      "table": {
+        "system": "Sistema",
+        "review": "Revisión",
+        "title": "Título",
+        "severity": "Severidad",
+        "category": "Categoría",
+        "status": "Estado",
+        "source": "Fuente",
+        "capa": "CAPA",
+        "created": "Creado"
+      },
+      "empty": "No hay hallazgos que coincidan con los filtros actuales."
+    },
+    "approvalGate": {
+      "unreviewedFindings": "No se puede aprobar: hay {{count}} hallazgos identificados por IA pendientes de revisión humana.",
+      "openCapas": "No se puede aprobar: hay {{count}} hallazgos con CAPAs abiertos que deben resolverse primero."
+    }
+  },
+  "common": {
+    "cancel": "Cancelar",
+    "save": "Guardar"
   }
 }

@@ -191,6 +191,173 @@ export type Database = {
         }
         Relationships: []
       }
+      findings: {
+        Row: {
+          action_description: string | null
+          action_description_es: string | null
+          action_due_date: string | null
+          action_responsible: string | null
+          ai_finding_index: number | null
+          ai_task_result_id: string | null
+          capa_reference: string | null
+          capa_required: boolean | null
+          capa_status: string | null
+          capa_system: string | null
+          category: string
+          confirmed_at: string | null
+          confirmed_by: string | null
+          created_at: string
+          created_by: string
+          deleted_at: string | null
+          deleted_by: string | null
+          description: string
+          description_es: string | null
+          dismissal_justification: string | null
+          dismissed_at: string | null
+          dismissed_by: string | null
+          evidence_file_id: string | null
+          id: string
+          is_deleted: boolean
+          regulation_reference: string | null
+          resolution_notes: string | null
+          resolution_notes_es: string | null
+          resolved_at: string | null
+          resolved_by: string | null
+          review_case_id: string
+          risk_impact: string | null
+          risk_level: string | null
+          risk_probability: string | null
+          severity: string
+          sop_reference: string | null
+          source: string
+          status: string
+          task_id: string | null
+          title: string
+          title_es: string | null
+          updated_at: string | null
+          updated_by: string | null
+        }
+        Insert: {
+          action_description?: string | null
+          action_description_es?: string | null
+          action_due_date?: string | null
+          action_responsible?: string | null
+          ai_finding_index?: number | null
+          ai_task_result_id?: string | null
+          capa_reference?: string | null
+          capa_required?: boolean | null
+          capa_status?: string | null
+          capa_system?: string | null
+          category: string
+          confirmed_at?: string | null
+          confirmed_by?: string | null
+          created_at?: string
+          created_by: string
+          deleted_at?: string | null
+          deleted_by?: string | null
+          description: string
+          description_es?: string | null
+          dismissal_justification?: string | null
+          dismissed_at?: string | null
+          dismissed_by?: string | null
+          evidence_file_id?: string | null
+          id?: string
+          is_deleted?: boolean
+          regulation_reference?: string | null
+          resolution_notes?: string | null
+          resolution_notes_es?: string | null
+          resolved_at?: string | null
+          resolved_by?: string | null
+          review_case_id: string
+          risk_impact?: string | null
+          risk_level?: string | null
+          risk_probability?: string | null
+          severity: string
+          sop_reference?: string | null
+          source?: string
+          status?: string
+          task_id?: string | null
+          title: string
+          title_es?: string | null
+          updated_at?: string | null
+          updated_by?: string | null
+        }
+        Update: {
+          action_description?: string | null
+          action_description_es?: string | null
+          action_due_date?: string | null
+          action_responsible?: string | null
+          ai_finding_index?: number | null
+          ai_task_result_id?: string | null
+          capa_reference?: string | null
+          capa_required?: boolean | null
+          capa_status?: string | null
+          capa_system?: string | null
+          category?: string
+          confirmed_at?: string | null
+          confirmed_by?: string | null
+          created_at?: string
+          created_by?: string
+          deleted_at?: string | null
+          deleted_by?: string | null
+          description?: string
+          description_es?: string | null
+          dismissal_justification?: string | null
+          dismissed_at?: string | null
+          dismissed_by?: string | null
+          evidence_file_id?: string | null
+          id?: string
+          is_deleted?: boolean
+          regulation_reference?: string | null
+          resolution_notes?: string | null
+          resolution_notes_es?: string | null
+          resolved_at?: string | null
+          resolved_by?: string | null
+          review_case_id?: string
+          risk_impact?: string | null
+          risk_level?: string | null
+          risk_probability?: string | null
+          severity?: string
+          sop_reference?: string | null
+          source?: string
+          status?: string
+          task_id?: string | null
+          title?: string
+          title_es?: string | null
+          updated_at?: string | null
+          updated_by?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "findings_ai_task_result_id_fkey"
+            columns: ["ai_task_result_id"]
+            isOneToOne: false
+            referencedRelation: "ai_task_results"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "findings_evidence_file_id_fkey"
+            columns: ["evidence_file_id"]
+            isOneToOne: false
+            referencedRelation: "task_evidence_files"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "findings_review_case_id_fkey"
+            columns: ["review_case_id"]
+            isOneToOne: false
+            referencedRelation: "review_cases"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "findings_task_id_fkey"
+            columns: ["task_id"]
+            isOneToOne: false
+            referencedRelation: "review_tasks"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       notification_log: {
         Row: {
           created_at: string
