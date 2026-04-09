@@ -148,8 +148,9 @@ export function useTaskExecution({ task, reviewCaseId, reviewCaseStatus, systemO
       } as any);
       // AI auto-population: if completing an AI_EVAL task, extract findings
       if (task.task_group === 'AI_EVAL') {
+        console.log('[AI auto-populate] AI_EVAL task detected, checking for AI results...');
         try {
-          const { data: aiResult } = await supabase
+          const { data: aiResult, error: aiError } = await supabase
             .from('ai_task_results' as any)
             .select('*')
             .eq('task_id', task.id)
@@ -157,6 +158,12 @@ export function useTaskExecution({ task, reviewCaseId, reviewCaseStatus, systemO
             .order('created_at', { ascending: false })
             .limit(1)
             .maybeSingle();
+
+          if (aiError) {
+            console.error('[AI auto-populate] Error fetching AI result:', aiError);
+          }
+
+          console.log('[AI auto-populate] AI result found:', !!aiResult, aiResult ? (aiResult as any).id : 'none');
 
           if (aiResult) {
             // Check for duplicates
@@ -167,7 +174,17 @@ export function useTaskExecution({ task, reviewCaseId, reviewCaseStatus, systemO
               .eq('is_deleted', false);
 
             if ((existingCount || 0) === 0) {
-              const analysis = (aiResult as any).analysis_result as any;
+              // analysis_result may be stored as a JSON string (double-encoded) — parse if needed
+              let analysis = (aiResult as any).analysis_result as any;
+              if (typeof analysis === 'string') {
+                try {
+                  analysis = JSON.parse(analysis);
+                  console.log('[AI auto-populate] Parsed analysis_result from string');
+                } catch (parseErr) {
+                  console.error('[AI auto-populate] Failed to parse analysis_result string:', parseErr);
+                  analysis = null;
+                }
+              }
               // Use detailed_findings (primary) with critical_findings as fallback
               const detailedFindings = analysis?.detailed_findings || analysis?.critical_findings || [];
 
