@@ -1118,5 +1118,156 @@
       "viewAllTasks": "View all in Intray",
       "viewAllSignoffs": "View all in Intray"
     }
+  },
+  "findings": {
+    "section": {
+      "title": "Findings & Actions",
+      "pendingReview": "pending review",
+      "pendingHumanReview": "Pending Human Review",
+      "confirmedFindings": "Confirmed Findings",
+      "dismissed": "Dismissed",
+      "empty": "No findings have been identified for this review. Findings will appear here automatically when AI analysis tasks are completed."
+    },
+    "severity": {
+      "critical": "Critical",
+      "major": "Major",
+      "minor": "Minor",
+      "observation": "Observation"
+    },
+    "status": {
+      "ai_identified": "AI Identified",
+      "confirmed": "Confirmed",
+      "dismissed": "Dismissed",
+      "in_progress": "In Progress",
+      "closed": "Closed"
+    },
+    "category": {
+      "incident_trend": "Incident Trend",
+      "change_control": "Change Control",
+      "access_control": "Access Control",
+      "audit_trail": "Audit Trail",
+      "backup_restore": "Backup & Restore",
+      "data_integrity": "Data Integrity",
+      "training": "Training",
+      "performance": "Performance",
+      "vendor": "Vendor",
+      "regulatory": "Regulatory",
+      "documentation": "Documentation",
+      "configuration": "Configuration",
+      "other": "Other"
+    },
+    "source": {
+      "ai_identified": "AI-Identified",
+      "manual": "Manual"
+    },
+    "risk": {
+      "high": "High",
+      "medium": "Medium",
+      "low": "Low"
+    },
+    "capaStatus": {
+      "not_required": "Not Required",
+      "pending": "Pending",
+      "open": "Open",
+      "closed": "Closed",
+      "verified": "Verified"
+    },
+    "labels": {
+      "title": "Title",
+      "severity": "Severity",
+      "category": "Category",
+      "description": "Description",
+      "status": "Status",
+      "source": "Source",
+      "regulationReference": "Regulation Reference",
+      "sopReference": "SOP Reference",
+      "riskAssessment": "Risk Assessment (ICH Q9)",
+      "riskProbability": "Probability",
+      "riskImpact": "Impact",
+      "riskLevel": "Risk Level",
+      "actionDescription": "Action Description",
+      "actionDueDate": "Action Due Date",
+      "correctiveAction": "Corrective Action",
+      "capaReference": "CAPA Reference",
+      "capaSystem": "CAPA System",
+      "capaStatus": "CAPA Status",
+      "resolution": "Resolution",
+      "justification": "Justification",
+      "confirmedBy": "Confirmed by",
+      "confirmedAt": "Confirmed",
+      "dismissalJustification": "Dismissal Justification",
+      "created": "Created",
+      "lastUpdated": "Last Updated"
+    },
+    "actions": {
+      "addFinding": "+ Add Finding",
+      "confirm": "Confirm",
+      "dismiss": "Dismiss",
+      "close": "Close",
+      "reopen": "Reopen",
+      "confirmFinding": "Confirm Finding",
+      "dismissFinding": "Dismiss Finding",
+      "closeFinding": "Close Finding",
+      "updateCapa": "Update CAPA",
+      "closeBlockedCapa": "Cannot close: CAPA must be closed in external system first"
+    },
+    "confirm": {
+      "title": "Confirm Finding",
+      "aiReference": "AI Analysis Reference",
+      "actionRequired": "Action required?",
+      "capaRequired": "CAPA required?"
+    },
+    "dismiss": {
+      "title": "Dismiss Finding",
+      "justificationLabel": "Justification (required)",
+      "justificationPlaceholder": "Explain why this finding is being dismissed...",
+      "minLength": "Justification must be at least 20 characters."
+    },
+    "close": {
+      "title": "Close Finding",
+      "resolutionNotes": "Resolution Notes (required)",
+      "resolutionPlaceholder": "Describe how this finding was resolved...",
+      "minLength": "Resolution notes must be at least 20 characters.",
+      "capaSection": "CAPA Information"
+    },
+    "add": {
+      "title": "Add Manual Finding",
+      "submit": "Create Finding"
+    },
+    "page": {
+      "title": "Findings & Actions",
+      "subtitle": "Track and manage findings across all periodic reviews",
+      "filters": {
+        "allSeverities": "All severities",
+        "allStatuses": "All statuses",
+        "allSources": "All sources",
+        "allCategories": "All categories"
+      },
+      "summary": {
+        "total": "Total Findings",
+        "pendingReview": "Pending Review",
+        "openCapas": "Open CAPAs"
+      },
+      "table": {
+        "system": "System",
+        "review": "Review",
+        "title": "Title",
+        "severity": "Severity",
+        "category": "Category",
+        "status": "Status",
+        "source": "Source",
+        "capa": "CAPA",
+        "created": "Created"
+      },
+      "empty": "No findings match the current filters."
+    },
+    "approvalGate": {
+      "unreviewedFindings": "Cannot approve: there are {{count}} AI-identified findings pending human review.",
+      "openCapas": "Cannot approve: there are {{count}} findings with open CAPAs that must be resolved first."
+    }
+  },
+  "common": {
+    "cancel": "Cancel",
+    "save": "Save"
   }
 }
