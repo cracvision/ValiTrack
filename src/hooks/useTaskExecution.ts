@@ -168,7 +168,10 @@ export function useTaskExecution({ task, reviewCaseId, reviewCaseStatus, systemO
 
             if ((existingCount || 0) === 0) {
               const analysis = (aiResult as any).analysis_result as any;
-              const criticalFindings = analysis?.critical_findings || [];
+              // Use detailed_findings (primary) with critical_findings as fallback
+              const detailedFindings = analysis?.detailed_findings || analysis?.critical_findings || [];
+
+              console.log('[AI auto-populate] Found', detailedFindings.length, 'findings from AI result', (aiResult as any).id);
 
               const severityMap: Record<string, string> = {
                 'CRITICAL': 'critical', 'MAJOR': 'major', 'MINOR': 'minor', 'OBSERVATION': 'observation',
@@ -190,23 +193,46 @@ export function useTaskExecution({ task, reviewCaseId, reviewCaseStatus, systemO
                 return 'other';
               };
 
-              for (let i = 0; i < criticalFindings.length; i++) {
-                const cf = criticalFindings[i];
+              const inferCategory = (aiCategory: string | undefined, taskTitle: string): string => {
+                if (aiCategory) {
+                  const lower = aiCategory.toLowerCase();
+                  if (lower.includes('incident')) return 'incident_trend';
+                  if (lower.includes('change')) return 'change_control';
+                  if (lower.includes('access') || lower.includes('user')) return 'access_control';
+                  if (lower.includes('audit')) return 'audit_trail';
+                  if (lower.includes('backup') || lower.includes('restore')) return 'backup_restore';
+                  if (lower.includes('integrity') || lower.includes('data')) return 'data_integrity';
+                  if (lower.includes('training')) return 'training';
+                  if (lower.includes('performance')) return 'performance';
+                  if (lower.includes('vendor') || lower.includes('supplier') || lower.includes('lifecycle')) return 'vendor';
+                  if (lower.includes('regulat')) return 'regulatory';
+                  if (lower.includes('document') || lower.includes('sop')) return 'documentation';
+                  if (lower.includes('config')) return 'configuration';
+                }
+                return categoryFromTask(taskTitle);
+              };
+
+              for (let i = 0; i < detailedFindings.length; i++) {
+                const cf = detailedFindings[i];
                 const severity = severityMap[cf.severity] || 'observation';
-                await supabase.from('findings' as any).insert({
+                const { error: insertError } = await supabase.from('findings' as any).insert({
                   review_case_id: reviewCaseId,
                   task_id: task.id,
                   ai_task_result_id: (aiResult as any).id,
-                  title: cf.description?.substring(0, 200) || `Finding ${i + 1}`,
+                  title: cf.title || cf.description?.substring(0, 200) || `Finding ${i + 1}`,
                   description: cf.description || '',
                   severity,
-                  category: categoryFromTask(task.title),
+                  category: inferCategory(cf.category, task.title),
                   source: 'ai_identified',
                   ai_finding_index: i,
                   regulation_reference: cf.regulatory_reference || null,
                   status: 'ai_identified',
                   created_by: userId,
                 } as any);
+
+                if (insertError) {
+                  console.error('[AI auto-populate] Failed to insert finding', i, insertError);
+                }
 
                 await supabase.from('audit_log').insert({
                   user_id: userId,
