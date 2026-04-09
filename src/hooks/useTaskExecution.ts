@@ -167,7 +167,17 @@ export function useTaskExecution({ task, reviewCaseId, reviewCaseStatus, systemO
               .eq('is_deleted', false);
 
             if ((existingCount || 0) === 0) {
-              const analysis = (aiResult as any).analysis_result as any;
+              // analysis_result may be stored as a JSON string (double-encoded) — parse if needed
+              let analysis = (aiResult as any).analysis_result as any;
+              if (typeof analysis === 'string') {
+                try {
+                  analysis = JSON.parse(analysis);
+                  console.log('[AI auto-populate] Parsed analysis_result from string');
+                } catch (parseErr) {
+                  console.error('[AI auto-populate] Failed to parse analysis_result string:', parseErr);
+                  analysis = null;
+                }
+              }
               // Use detailed_findings (primary) with critical_findings as fallback
               const detailedFindings = analysis?.detailed_findings || analysis?.critical_findings || [];
 
