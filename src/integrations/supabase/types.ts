@@ -198,6 +198,7 @@ export type Database = {
           action_due_date: string | null
           action_responsible: string | null
           ai_finding_index: number | null
+          ai_severity_raw: string | null
           ai_task_result_id: string | null
           capa_reference: string | null
           capa_required: boolean | null
@@ -243,6 +244,7 @@ export type Database = {
           action_due_date?: string | null
           action_responsible?: string | null
           ai_finding_index?: number | null
+          ai_severity_raw?: string | null
           ai_task_result_id?: string | null
           capa_reference?: string | null
           capa_required?: boolean | null
@@ -288,6 +290,7 @@ export type Database = {
           action_due_date?: string | null
           action_responsible?: string | null
           ai_finding_index?: number | null
+          ai_severity_raw?: string | null
           ai_task_result_id?: string | null
           capa_reference?: string | null
           capa_required?: boolean | null

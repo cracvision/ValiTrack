@@ -26,6 +26,7 @@ export interface Finding {
 
   source: FindingSource;
   ai_finding_index: number | null;
+  ai_severity_raw: string | null;
 
   regulation_reference: string | null;
   sop_reference: string | null;
