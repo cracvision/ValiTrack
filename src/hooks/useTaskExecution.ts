@@ -4,6 +4,7 @@ import { useAuth } from '@/hooks/useAuth';
 import { useResolveUserNames } from '@/hooks/useResolveUserNames';
 import { toast } from '@/hooks/use-toast';
 import { notifyTaskReassigned } from '@/lib/notificationWiring';
+import { mapAiSeverity } from '@/lib/aiSeverityMapping';
 import type { ReviewTask } from '@/types';
 
 interface UseTaskExecutionOptions {
@@ -190,10 +191,6 @@ export function useTaskExecution({ task, reviewCaseId, reviewCaseStatus, systemO
 
               console.log('[AI auto-populate] Found', detailedFindings.length, 'findings from AI result', (aiResult as any).id);
 
-              const severityMap: Record<string, string> = {
-                'CRITICAL': 'critical', 'MAJOR': 'major', 'MINOR': 'minor', 'OBSERVATION': 'observation',
-              };
-
               const categoryFromTask = (title: string): string => {
                 const lower = title.toLowerCase();
                 if (lower.includes('incident')) return 'incident_trend';
@@ -229,16 +226,24 @@ export function useTaskExecution({ task, reviewCaseId, reviewCaseStatus, systemO
                 return categoryFromTask(taskTitle);
               };
 
+              // Normalize prompt_template_id to JS null when missing — serializes as JSON null inside jsonb
+              const promptTemplateId: string | null =
+                (aiResult as any).prompt_template_id ?? null;
+
               for (let i = 0; i < detailedFindings.length; i++) {
                 const cf = detailedFindings[i];
-                const severity = severityMap[cf.severity] || 'observation';
+
+                // Map AI severity (case-insensitive lookup, fail-safe to 'major' on unknown)
+                const severityResult = mapAiSeverity(cf.severity);
+
                 const { error: insertError } = await supabase.from('findings' as any).insert({
                   review_case_id: reviewCaseId,
                   task_id: task.id,
                   ai_task_result_id: (aiResult as any).id,
                   title: cf.title || cf.description?.substring(0, 200) || `Finding ${i + 1}`,
                   description: cf.description || '',
-                  severity,
+                  severity: severityResult.mapped,
+                  ai_severity_raw: severityResult.raw,
                   category: inferCategory(cf.category, task.title),
                   source: 'ai_identified',
                   ai_finding_index: i,
@@ -256,8 +261,35 @@ export function useTaskExecution({ task, reviewCaseId, reviewCaseStatus, systemO
                   action: 'FINDING_AUTO_CREATED',
                   resource_type: 'finding',
                   resource_id: reviewCaseId,
-                  details: { task_id: task.id, ai_task_result_id: (aiResult as any).id, finding_index: i, severity },
+                  details: {
+                    task_id: task.id,
+                    ai_task_result_id: (aiResult as any).id,
+                    finding_index: i,
+                    ai_severity_raw: severityResult.raw,
+                    ai_severity_mapped: severityResult.mapped,
+                    mapping_was_unknown: severityResult.wasUnknown,
+                    prompt_template_id: promptTemplateId,
+                  },
                 });
+
+                // Emit a separate audit row when the AI severity didn't match the dictionary,
+                // so Super Users can monitor prompt-template drift.
+                if (severityResult.wasUnknown) {
+                  await supabase.from('audit_log').insert({
+                    user_id: userId,
+                    action: 'AI_MAPPING_UNKNOWN_SEVERITY',
+                    resource_type: 'finding',
+                    resource_id: reviewCaseId,
+                    details: {
+                      task_id: task.id,
+                      ai_task_result_id: (aiResult as any).id,
+                      finding_index: i,
+                      ai_severity_raw: severityResult.raw,
+                      mapped_to: severityResult.mapped,
+                      prompt_template_id: promptTemplateId,
+                    },
+                  });
+                }
               }
             }
           }
